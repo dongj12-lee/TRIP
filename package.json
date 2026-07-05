@@ -38,6 +38,7 @@
     "@types/react": "~19.1.10",
     "babel-preset-expo": "~54.0.10",
     "dotenv": "^17.4.2",
+    "gh-pages": "^6.3.0",
     "sharp": "^0.35.3",
     "tsx": "^4.23.0",
     "typescript": "~5.9.2"
@@ -49,7 +50,9 @@
     "web": "expo start --web",
     "seed": "tsx scripts/seed.ts",
     "import:tourapi": "tsx scripts/import-tourapi.ts",
-    "import:visitseoul": "tsx scripts/import-visitseoul.ts"
+    "import:visitseoul": "tsx scripts/import-visitseoul.ts",
+    "predeploy": "expo export -p web",
+    "deploy": "gh-pages --nojekyll -d dist"
   },
   "private": true
 }
