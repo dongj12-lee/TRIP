@@ -107,6 +107,8 @@ export type Post = {
   routeDays?: RouteDay[];
   commentList: Comment[];
   fromItinerary?: boolean;
+  // Tally of one-click route-feedback prompts, keyed by prompt id (route posts).
+  feedbackCounts?: Record<string, number>;
 };
 
 export type Buddy = {

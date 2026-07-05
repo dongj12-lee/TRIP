@@ -13,6 +13,7 @@ import { T, H, Screen, DetailHeader, Button } from '@/components/base';
 import { Flag } from '@/components/ui';
 import { PostTypeBadge, PlaceCard } from '@/components/cards';
 import { ReportSheet } from '@/components/ReportSheet';
+import { RouteFeedbackBar } from '@/components/RouteFeedbackBar';
 
 export default function PostDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -111,6 +112,9 @@ export default function PostDetail() {
               ))}
             </View>
           )}
+
+          {/* Structured one-click feedback — route posts only */}
+          {post.type === 'route' && <RouteFeedbackBar postId={post.id} initialCounts={post.feedbackCounts} />}
 
           {/* Comments */}
           <View style={{ marginTop: 12 }}>

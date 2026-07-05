@@ -94,7 +94,29 @@ function mapPost(row: any): Post {
     comments: row.comment_count,
     routeDays: row.route_days ?? undefined,
     commentList: [],
+    feedbackCounts: row.feedback_counts ?? {},
   };
+}
+
+// The prompt keys the current user has already tapped on a given post.
+export async function fetchMyRouteFeedback(postId: string): Promise<string[]> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data, error } = await supabase
+    .from('route_feedback')
+    .select('prompt')
+    .eq('post_id', postId)
+    .eq('user_id', user.id);
+  if (error) throw error;
+  return (data ?? []).map((r: any) => r.prompt as string);
+}
+
+export async function toggleRouteFeedback(postId: string, prompt: string, on: boolean) {
+  const userId = await currentUserId();
+  if (on) await supabase.from('route_feedback').upsert({ post_id: postId, user_id: userId, prompt });
+  else await supabase.from('route_feedback').delete().eq('post_id', postId).eq('user_id', userId).eq('prompt', prompt);
 }
 
 export async function fetchPosts(): Promise<Post[]> {
