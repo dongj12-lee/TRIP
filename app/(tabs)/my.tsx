@@ -12,6 +12,7 @@ import { Creator } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
 import { PlaceCard, PostCardMini } from '@/components/cards';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
+import { useToast } from '@/components/Toast';
 import { Icon } from '@/components/Icon';
 import { Photo } from '@/components/ui';
 
@@ -22,7 +23,14 @@ export default function MyScreen() {
   const { saved, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
+
+  const onFollowToggle = (cr: Creator) => {
+    const wasFollowing = following.has(cr.id);
+    toggleFollow(cr.id);
+    showToast(wasFollowing ? `Unfollowed ${cr.name}` : `Following ${cr.name}`, wasFollowing ? undefined : '✓');
+  };
 
   const name = profile.displayName || 'You';
   const handle = profile.handle || 'traveler';
@@ -102,6 +110,7 @@ export default function MyScreen() {
                 onPress={async () => {
                   if (!sharedPost) {
                     await shareTrip('');
+                    showToast('Shared — feedback incoming', '🙏');
                     router.push('/(tabs)/feed');
                   }
                 }}
@@ -114,7 +123,7 @@ export default function MyScreen() {
         {followingList.length > 0 && (
           <Section title="Following">
             {followingList.map((cr) => (
-              <CreatorRow key={cr.id} creator={cr} following onToggle={() => toggleFollow(cr.id)} />
+              <CreatorRow key={cr.id} creator={cr} following onToggle={() => onFollowToggle(cr)} />
             ))}
           </Section>
         )}
@@ -123,7 +132,7 @@ export default function MyScreen() {
         <Section title="Creators to follow">
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 18 }}>
             {suggestions.map((cr) => (
-              <CreatorCard key={cr.id} creator={cr} onToggle={() => toggleFollow(cr.id)} />
+              <CreatorCard key={cr.id} creator={cr} onToggle={() => onFollowToggle(cr)} />
             ))}
           </ScrollView>
         </Section>

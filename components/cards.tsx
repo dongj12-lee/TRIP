@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { haptic } from '@/lib/haptics';
+import { useToast } from './Toast';
 import { FOREIGNER_TAGS, POST_TYPES, placeBySlug } from '@/data';
 import { Place, Post, RouteDay } from '@/data/types';
 import { Icon } from './Icon';
@@ -49,9 +50,15 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
   const { c } = useTheme();
   const router = useRouter();
   const { saved, toggleSave } = useStore();
+  const { showToast } = useToast();
   const tags = FOREIGNER_TAGS.filter((t) => (place as any)[t.key]);
   const isSaved = saved.has(place.slug);
   const ph = 144;
+  const onSave = () => {
+    haptic.tick();
+    if (!isSaved) showToast('Saved to your spots', '🔖');
+    toggleSave(place.slug);
+  };
   return (
     <Card onPress={() => router.push(`/place/${place.slug}`)} style={{ overflow: 'hidden' }}>
       <View>
@@ -64,7 +71,7 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
           </View>
         )}
         <Pressable
-          onPress={() => { haptic.tick(); toggleSave(place.slug); }}
+          onPress={onSave}
           hitSlop={6}
           style={{
             position: 'absolute', top: 8, right: 8, width: 38, height: 38, borderRadius: 999,

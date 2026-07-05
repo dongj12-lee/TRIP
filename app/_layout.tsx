@@ -25,6 +25,7 @@ import { StoreProvider, useStore } from '@/lib/store';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { RemoteContentProvider } from '@/lib/remoteData';
 import { registerForPushNotifications } from '@/lib/notifications';
+import { ToastProvider } from '@/components/Toast';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -105,13 +106,15 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <AuthProvider>
-            <RemoteContentProvider>
-              <StoreProvider>
-                <RootStack />
-              </StoreProvider>
-            </RemoteContentProvider>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <RemoteContentProvider>
+                <StoreProvider>
+                  <RootStack />
+                </StoreProvider>
+              </RemoteContentProvider>
+            </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

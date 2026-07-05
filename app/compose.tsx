@@ -11,6 +11,8 @@ import { createBuddy, createPost } from '@/data/remote';
 import { POST_TYPES } from '@/data';
 import { PostType } from '@/data/types';
 import { T, H, Screen, DetailHeader, Button } from '@/components/base';
+import { useToast } from '@/components/Toast';
+import { haptic } from '@/lib/haptics';
 
 export default function Compose() {
   const { kind } = useLocalSearchParams<{ kind?: string }>();
@@ -20,6 +22,7 @@ export default function Compose() {
   const { session } = useAuth();
   const { profile } = useStore();
   const { addLocalPost, addLocalBuddy } = useRemoteContent();
+  const { showToast } = useToast();
 
   const isBuddy = kind === 'buddy';
   const [type, setType] = useState<PostType>('tip');
@@ -52,20 +55,24 @@ export default function Compose() {
           whenText: when.trim() || 'Soon',
           groupSize: Number(groupSize) || 2,
           note: body.trim(),
-          authorName: 'You',
+          authorName: profile.displayName || 'You',
           authorCountry: profile.country,
         });
         addLocalBuddy(created);
+        haptic.success();
+        showToast('Buddy plan posted', '🙌');
         router.replace('/(tabs)/buddy');
       } else {
         const created = await createPost({
           type,
           title: title.trim(),
           body: body.trim(),
-          authorName: 'You',
+          authorName: profile.displayName || 'You',
           authorCountry: profile.country,
         });
         addLocalPost(created);
+        haptic.success();
+        showToast('Posted to the community', '🎉');
         router.replace('/(tabs)/feed');
       }
     } catch (e) {

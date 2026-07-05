@@ -11,6 +11,8 @@ import { T, H, IconButton, Button } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Photo, Chip, Rating } from '@/components/ui';
 import { PostCardMini } from '@/components/cards';
+import { useToast } from '@/components/Toast';
+import { haptic } from '@/lib/haptics';
 
 const PHRASES = [
   { en: 'Table for one, please.', ko: '혼자 왔어요. 한 명이요.', ro: 'Honja wasseoyo. Han myeong-iyo.' },
@@ -26,12 +28,18 @@ export default function PlaceDetail() {
   const router = useRouter();
   const { saved, toggleSave } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
+  const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
 
   const place = placeBySlug[slug!];
   if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
 
   const isSaved = saved.has(place.slug);
+  const onSave = () => {
+    haptic.tick();
+    if (!isSaved) showToast('Saved to your spots', '🔖');
+    toggleSave(place.slug);
+  };
   const relatedPosts = posts.filter((p) => p.placeSlug === place.slug);
 
   return (
@@ -47,7 +55,7 @@ export default function PlaceDetail() {
               name="heart"
               bg="rgba(255,253,250,0.85)"
               color={isSaved ? c.rose : c.ink}
-              onPress={() => toggleSave(place.slug)}
+              onPress={onSave}
             />
           </View>
           <View style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>

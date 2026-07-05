@@ -14,6 +14,8 @@ import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { AddStopSheet } from '@/components/AddStopSheet';
 import { TimePickerSheet } from '@/components/TimePickerSheet';
+import { useToast } from '@/components/Toast';
+import { haptic } from '@/lib/haptics';
 
 const EMPTY_STOP: ItineraryStop = { time: '', part: '', name: '', note: '', slug: null, swatch: ['#7a4a2a', '#e0a05a'] };
 
@@ -23,6 +25,7 @@ export default function TripPlanner() {
   const router = useRouter();
   const { itinerary, setItinerary, shareTrip, profile } = useStore();
   const { places, posts } = useRemoteContent();
+  const { showToast } = useToast();
 
   const [sheetDay, setSheetDay] = useState<number | null>(null);
   const [timeTarget, setTimeTarget] = useState<{ di: number; si: number } | null>(null);
@@ -166,7 +169,7 @@ export default function TripPlanner() {
       </KeyboardAvoidingView>
 
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 18, paddingBottom: insets.bottom + 12, backgroundColor: c.paper, borderTopWidth: 1, borderTopColor: c.line }}>
-        <Button label="Share for feedback" icon="share" onPress={async () => { await shareTrip(''); router.replace('/(tabs)/feed'); }} />
+        <Button label="Share for feedback" icon="share" onPress={async () => { haptic.success(); await shareTrip(''); showToast('Shared — feedback incoming', '🙏'); router.replace('/(tabs)/feed'); }} />
       </View>
 
       <AddStopSheet

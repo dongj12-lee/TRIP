@@ -7,6 +7,7 @@ import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { haptic } from '@/lib/haptics';
+import { useToast } from '@/components/Toast';
 import { fetchBuddyInterests } from '@/data/remote';
 import { T, H, Screen, DetailHeader, Card, Button } from '@/components/base';
 import { Flag } from '@/components/ui';
@@ -18,6 +19,7 @@ export default function BuddyDetail() {
   const insets = useSafeAreaInsets();
   const { joined, toggleJoin, profile } = useStore();
   const { buddies, placeBySlug } = useRemoteContent();
+  const { showToast } = useToast();
   const [liveInterested, setLiveInterested] = useState<{ name: string; country: string; message: string }[] | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
 
@@ -38,7 +40,7 @@ export default function BuddyDetail() {
 
   const handleToggleJoin = () => {
     const willJoin = !isJoined;
-    if (willJoin) haptic.success();
+    if (willJoin) { haptic.success(); showToast("You're in — the host will see you", '🙋'); }
     else haptic.tick();
     toggleJoin(buddy.id);
     if (liveInterested) {

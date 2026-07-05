@@ -9,12 +9,15 @@ import { T, H, Screen, DetailHeader, Card, Button } from '@/components/base';
 import { Photo } from '@/components/ui';
 import { PostTypeBadge } from '@/components/cards';
 import { Icon } from '@/components/Icon';
+import { useToast } from '@/components/Toast';
+import { haptic } from '@/lib/haptics';
 
 export default function CreatorDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { following, toggleFollow } = useStore();
+  const { showToast } = useToast();
 
   const creator = creatorById[id!];
   if (!creator) return <Screen><DetailHeader title="Creator" /></Screen>;
@@ -49,7 +52,11 @@ export default function CreatorDetail() {
             label={isFollowing ? 'Following' : 'Follow'}
             variant={isFollowing ? 'soft' : 'primary'}
             style={{ marginTop: 16 }}
-            onPress={() => toggleFollow(creator.id)}
+            onPress={() => {
+              haptic.tick();
+              toggleFollow(creator.id);
+              showToast(isFollowing ? `Unfollowed ${creator.name}` : `Following ${creator.name}`, isFollowing ? undefined : '✓');
+            }}
           />
 
           <H style={{ fontSize: 18, marginTop: 26, marginBottom: 12 }}>Posts</H>
