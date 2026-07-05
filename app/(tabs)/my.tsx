@@ -93,7 +93,7 @@ export default function MyScreen() {
               ))}
             </View>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
-              <Button label="Open & edit" icon="settings" variant="soft" style={{ flex: 1 }} onPress={() => router.push('/planner')} />
+              <Button label="Open & edit" icon="edit" variant="soft" style={{ flex: 1 }} onPress={() => router.push('/planner')} />
               <Button
                 label={sharedPost ? '✓ Shared' : 'Share'}
                 icon={sharedPost ? undefined : 'share'}

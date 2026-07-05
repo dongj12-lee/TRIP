@@ -7,7 +7,7 @@ export type IconName =
   | 'chevron' | 'search' | 'pin' | 'star' | 'heart' | 'up' | 'comment'
   | 'clock' | 'won' | 'globe' | 'sparkle' | 'translate' | 'check' | 'plus'
   | 'arrow' | 'filter' | 'walk' | 'route' | 'info' | 'user' | 'trophy'
-  | 'lock' | 'bolt' | 'settings' | 'share';
+  | 'lock' | 'bolt' | 'settings' | 'share' | 'edit';
 
 type Props = {
   name: IconName;
@@ -48,8 +48,9 @@ const paths: Record<IconName, (p: { stroke: string; sw: number }) => React.React
   trophy: () => (<><Path d="M7 4h10v4a5 5 0 01-10 0V4z" /><Path d="M7 6H4v1a3 3 0 003 3M17 6h3v1a3 3 0 01-3 3M9 19h6M10 15.5V19M14 15.5V19" /></>),
   lock: () => (<><Rect x={5} y={11} width={14} height={9} rx={2} /><Path d="M8 11V8a4 4 0 018 0v3" /></>),
   bolt: () => <Path d="M13 3L5 13h6l-1 8 8-10h-6l1-8z" />,
-  settings: () => (<><Circle cx={12} cy={12} r={3} /><Path d="M12 3v2.5M12 18.5V21M21 12h-2.5M5.5 12H3M18 6l-1.8 1.8M7.8 16.2L6 18M18 18l-1.8-1.8M7.8 7.8L6 6" /></>),
+  settings: () => (<><Circle cx={12} cy={12} r={3.2} /><Path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>),
   share: () => (<><Circle cx={18} cy={5} r={2.5} /><Circle cx={6} cy={12} r={2.5} /><Circle cx={18} cy={19} r={2.5} /><Path d="M8.2 10.8l7.6-4.6M8.2 13.2l7.6 4.6" /></>),
+  edit: () => <Path d="M14.5 4.5l5 5M17 3a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4L17 3z" />,
 };
 
 export function Icon({ name, size = 24, stroke = '#000', fill = 'none', sw = 1.8 }: Props) {
