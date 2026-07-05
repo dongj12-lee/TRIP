@@ -318,23 +318,23 @@ export const DEFAULT_ITINERARY: Itinerary = {
       label: 'Day 1', date: 'Fri, Mar 14', theme: 'Palaces & old Seoul',
       stops: [
         { time: '10:00', part: 'Morning', name: 'Gyeongbokgung Palace', note: 'Rent a hanbok nearby → free entry. Catch the guard-changing ceremony.', slug: null, swatch: ['#5b6f9c', '#8fb0c0'] },
-        { time: '12:30', part: 'Lunch', name: 'Coffee Hanyakbang', note: 'Slow coffee in a hidden antique café.', slug: 'euljiro-coffee-hanyak', swatch: ['#3a2c22', '#caa05a'] },
+        { time: '12:30', part: 'Lunch', name: 'Coffee Hanyakbang', note: 'Slow coffee in a hidden antique café.', slug: 'euljiro-coffee-hanyak', swatch: ['#3a2c22', '#caa05a'], lat: 37.5668, lng: 126.9925, category: 'Cafe' },
         { time: '15:00', part: 'Afternoon', name: 'Bukchon Hanok Village', note: 'Wander the old hanok streets. Quiet before sunset.', slug: null, swatch: ['#7a4a2a', '#e0a05a'] },
-        { time: '19:00', part: 'Evening', name: 'Nogari Alley (Manseon Hof)', note: 'Cheap draft beer on plastic stools — peak local.', slug: 'nogari-alley-manseon', swatch: ['#3a2c22', '#c26b4a'] },
+        { time: '19:00', part: 'Evening', name: 'Nogari Alley (Manseon Hof)', note: 'Cheap draft beer on plastic stools — peak local.', slug: 'nogari-alley-manseon', swatch: ['#3a2c22', '#c26b4a'], lat: 37.5664, lng: 126.991, category: 'Pub / Hof' },
       ],
     },
     {
       label: 'Day 2', date: 'Sat, Mar 15', theme: 'Markets & cold noodles',
       stops: [
-        { time: '11:30', part: 'Lunch', name: 'Eulji Myeonok', note: 'Pyongyang-style naengmyeon. Go before the queue.', slug: 'eulji-myeonok', swatch: ['#4a5240', '#a9bf94'] },
-        { time: '14:00', part: 'Afternoon', name: 'Gwangjang Market — Yukhoe Alley', note: 'Yukhoe + bindaetteok. Confirm prices first!', slug: 'gwangjang-yukhoe', swatch: ['#7a4a2a', '#e0a05a'] },
-        { time: '20:00', part: 'Evening', name: 'Siloam Fire Pot Sauna', note: 'Wind down at a 24h jjimjilbang. Get the sikhye.', slug: 'siloam-sauna', swatch: ['#3f4a52', '#8fb0c0'] },
+        { time: '11:30', part: 'Lunch', name: 'Eulji Myeonok', note: 'Pyongyang-style naengmyeon. Go before the queue.', slug: 'eulji-myeonok', swatch: ['#4a5240', '#a9bf94'], lat: 37.5645, lng: 126.9938, category: 'Naengmyeon (cold noodles)' },
+        { time: '14:00', part: 'Afternoon', name: 'Gwangjang Market — Yukhoe Alley', note: 'Yukhoe + bindaetteok. Confirm prices first!', slug: 'gwangjang-yukhoe', swatch: ['#7a4a2a', '#e0a05a'], lat: 37.5701, lng: 126.9999, category: 'Market / Street food' },
+        { time: '20:00', part: 'Evening', name: 'Siloam Fire Pot Sauna', note: 'Wind down at a 24h jjimjilbang. Get the sikhye.', slug: 'siloam-sauna', swatch: ['#3f4a52', '#8fb0c0'], lat: 37.5556, lng: 126.9706, category: 'Jjimjilbang' },
       ],
     },
     {
       label: 'Day 3', date: 'Sun, Mar 16', theme: 'Open — needs ideas 🤔',
       stops: [
-        { time: '11:00', part: 'Brunch', name: 'GS25 Euljiro — combo stop', note: 'Idol convenience-store combo before checkout.', slug: 'gs25-euljiro-combo', swatch: ['#8a6a1f', '#e3c25f'] },
+        { time: '11:00', part: 'Brunch', name: 'GS25 Euljiro — combo stop', note: 'Idol convenience-store combo before checkout.', slug: 'gs25-euljiro-combo', swatch: ['#8a6a1f', '#e3c25f'], lat: 37.566, lng: 126.9915, category: 'Convenience store' },
       ],
     },
   ],

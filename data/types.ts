@@ -131,6 +131,12 @@ export type ItineraryStop = {
   note: string;
   slug: string | null;
   swatch: Swatch;
+  // Filled when a real DB place is added (enables route-health distance checks
+  // + thumbnails); absent for free-text/custom stops like "KTX to Busan".
+  lat?: number;
+  lng?: number;
+  category?: string;
+  photoUrl?: string;
 };
 export type ItineraryDay = { label: string; date: string; theme: string; stops: ItineraryStop[] };
 export type Itinerary = {
