@@ -16,7 +16,7 @@ export default function MyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, following, toggleFollow, itinerary, sharedPost, shareTrip } = useStore();
+  const { saved, following, toggleFollow, itinerary, sharedPost, shareTrip, profile } = useStore();
   const { placeBySlug } = useRemoteContent();
 
   const tier = tierFor(USER.points);
@@ -124,7 +124,10 @@ export default function MyScreen() {
         <Section title="My contributions">
           <View style={{ gap: 10 }}>
             {USER.myPosts.map((p) => (
-              <PostCardMini key={p.slug} post={p as any} />
+              <PostCardMini
+                key={p.slug}
+                post={{ ...p, author: { name: USER.name, country: profile.country || '🧳' }, body: '', commentList: [] } as any}
+              />
             ))}
           </View>
         </Section>

@@ -163,7 +163,7 @@ export function PostCardMini({ post }: { post: Post }) {
       <PostTypeBadge type={post.type} />
       <T style={{ marginTop: 8, fontSize: 14.5, fontWeight: '700', lineHeight: 19 }}>{post.title}</T>
       <T style={{ marginTop: 5, fontSize: 12, color: c.muted, fontWeight: '600' }}>
-        {post.author.country} {post.author.name} · ▲ {post.votes} · 💬 {post.comments}
+        {post.author ? `${post.author.country} ${post.author.name} · ` : ''}▲ {post.votes} · 💬 {post.comments}
       </T>
     </Pressable>
   );
