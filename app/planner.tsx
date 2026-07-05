@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, ScrollView, TextInput, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
+import { useRemoteContent } from '@/lib/remoteData';
 import { analyzeTrip } from '@/lib/routeHealth';
+import { buildCoOccurrence, suggestPlacesForDay } from '@/lib/routeSuggest';
 import { Itinerary, ItineraryDay, ItineraryStop, Place } from '@/data/types';
 import { T, H, Screen, DetailHeader, Button, IconButton } from '@/components/base';
 import { Photo } from '@/components/ui';
@@ -18,9 +20,18 @@ export default function TripPlanner() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { itinerary, setItinerary, shareTrip } = useStore();
+  const { itinerary, setItinerary, shareTrip, profile } = useStore();
+  const { places, posts } = useRemoteContent();
 
   const [sheetDay, setSheetDay] = useState<number | null>(null);
+  const coOccurrence = useMemo(() => buildCoOccurrence(posts), [posts]);
+  const suggestions = useMemo(
+    () =>
+      sheetDay !== null
+        ? suggestPlacesForDay({ day: itinerary.days[sheetDay], places, interests: profile.interests, coOccurrence })
+        : [],
+    [sheetDay, itinerary.days, places, profile.interests, coOccurrence],
+  );
 
   const patch = (fn: (draft: Itinerary) => Itinerary) =>
     setItinerary((prev) => fn(JSON.parse(JSON.stringify(prev)) as Itinerary));
@@ -162,6 +173,7 @@ export default function TripPlanner() {
         onClose={() => setSheetDay(null)}
         onAddPlace={(place) => sheetDay !== null && addPlaceToDay(sheetDay, place)}
         onAddCustom={() => sheetDay !== null && addCustomToDay(sheetDay)}
+        suggestions={suggestions}
       />
     </Screen>
   );
