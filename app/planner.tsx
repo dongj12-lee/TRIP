@@ -8,13 +8,14 @@ import { useRemoteContent } from '@/lib/remoteData';
 import { analyzeTrip } from '@/lib/routeHealth';
 import { buildCoOccurrence, suggestPlacesForDay } from '@/lib/routeSuggest';
 import { Itinerary, ItineraryDay, ItineraryStop, Place } from '@/data/types';
+import { to12h, partOfDay } from '@/lib/timeUtils';
 import { T, H, Screen, DetailHeader, Button, IconButton } from '@/components/base';
 import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { AddStopSheet } from '@/components/AddStopSheet';
+import { TimePickerSheet } from '@/components/TimePickerSheet';
 
 const EMPTY_STOP: ItineraryStop = { time: '', part: '', name: '', note: '', slug: null, swatch: ['#7a4a2a', '#e0a05a'] };
-const PARTS = ['Morning', 'Lunch', 'Afternoon', 'Evening', 'Night'];
 
 export default function TripPlanner() {
   const { c } = useTheme();
@@ -24,6 +25,7 @@ export default function TripPlanner() {
   const { places, posts } = useRemoteContent();
 
   const [sheetDay, setSheetDay] = useState<number | null>(null);
+  const [timeTarget, setTimeTarget] = useState<{ di: number; si: number } | null>(null);
   const coOccurrence = useMemo(() => buildCoOccurrence(posts), [posts]);
   const suggestions = useMemo(
     () =>
@@ -111,10 +113,9 @@ export default function TripPlanner() {
                     field={field}
                     first={si === 0}
                     last={si === day.stops.length - 1}
-                    onTime={(v) => setStop(di, si, 'time', v)}
+                    onTimePress={() => setTimeTarget({ di, si })}
                     onName={(v) => setStop(di, si, 'name', v)}
                     onNote={(v) => setStop(di, si, 'note', v)}
-                    onPart={(v) => setStop(di, si, 'part', v)}
                     onRemove={() => removeStop(di, si)}
                     onUp={() => moveStop(di, si, -1)}
                     onDown={() => moveStop(di, si, 1)}
@@ -175,27 +176,37 @@ export default function TripPlanner() {
         onAddCustom={() => sheetDay !== null && addCustomToDay(sheetDay)}
         suggestions={suggestions}
       />
+
+      <TimePickerSheet
+        visible={timeTarget !== null}
+        value={timeTarget ? itinerary.days[timeTarget.di]?.stops[timeTarget.si]?.time ?? '' : ''}
+        onSelect={(t) => timeTarget && setStop(timeTarget.di, timeTarget.si, 'time', t)}
+        onClear={() => timeTarget && setStop(timeTarget.di, timeTarget.si, 'time', '')}
+        onClose={() => setTimeTarget(null)}
+      />
     </Screen>
   );
 }
 
 function StopCard({
-  stop, field, first, last, onTime, onName, onNote, onPart, onRemove, onUp, onDown,
+  stop, field, first, last, onTimePress, onName, onNote, onRemove, onUp, onDown,
 }: {
   stop: ItineraryStop;
   field: object;
   first: boolean;
   last: boolean;
-  onTime: (v: string) => void;
+  onTimePress: () => void;
   onName: (v: string) => void;
   onNote: (v: string) => void;
-  onPart: (v: string) => void;
   onRemove: () => void;
   onUp: () => void;
   onDown: () => void;
 }) {
   const { c } = useTheme();
   const isPlace = !!stop.slug;
+  const [noteOpen, setNoteOpen] = useState(!!stop.note);
+  const part = partOfDay(stop.time);
+
   return (
     <View style={{ marginTop: 12, borderLeftWidth: 2, borderLeftColor: c.accent50, paddingLeft: 12 }}>
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
@@ -227,26 +238,41 @@ function StopCard({
         <IconButton name="close" size={16} color={c.muted} onPress={onRemove} />
       </View>
 
-      {/* Part-of-day chips */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, marginTop: 8 }}>
-        {PARTS.map((p) => {
-          const on = stop.part === p;
-          return (
-            <Pressable
-              key={p}
-              onPress={() => onPart(on ? '' : p)}
-              style={{ paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999, borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent50 : 'transparent' }}
-            >
-              <T style={{ fontSize: 11.5, fontWeight: '700', color: on ? c.accent : c.muted }}>{p}</T>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        <TextInput value={stop.time} onChangeText={onTime} placeholder="Time" style={[field, { width: 80, paddingVertical: 8 }]} placeholderTextColor={c.muted} />
-        <TextInput value={stop.note} onChangeText={onNote} placeholder="Note (why, tips…)" style={[field, { flex: 1, paddingVertical: 8 }]} placeholderTextColor={c.muted} />
+      {/* Time pill (tap to pick) + auto-derived part-of-day + optional note toggle */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+        <Pressable
+          onPress={onTimePress}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 999,
+            borderWidth: 1, borderColor: stop.time ? c.accent : c.line,
+            backgroundColor: stop.time ? c.accent50 : c.surface,
+            borderStyle: stop.time ? 'solid' : 'dashed',
+          }}
+        >
+          <Icon name="clock" size={15} stroke={stop.time ? c.accent : c.muted} sw={2} />
+          <T style={{ fontSize: 13, fontWeight: '700', color: stop.time ? c.accent : c.muted }}>
+            {stop.time ? to12h(stop.time) : 'Add time'}
+          </T>
+        </Pressable>
+        {!!part && <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{part}</T>}
+        {!noteOpen && (
+          <Pressable onPress={() => setNoteOpen(true)} hitSlop={6} style={{ marginLeft: 'auto' }}>
+            <T style={{ fontSize: 12.5, color: c.muted, fontWeight: '600' }}>+ Note</T>
+          </Pressable>
+        )}
       </View>
+
+      {noteOpen && (
+        <TextInput
+          value={stop.note}
+          onChangeText={onNote}
+          placeholder="Optional note — why, a tip, what to order…"
+          placeholderTextColor={c.muted}
+          multiline
+          autoFocus={!stop.note}
+          style={[field, { marginTop: 8, paddingVertical: 8, minHeight: 40 }]}
+        />
+      )}
     </View>
   );
 }
