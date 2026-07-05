@@ -33,6 +33,12 @@
       "expo-font",
       "expo-secure-store",
       [
+        "expo-notifications",
+        {
+          "color": "#c26b4a"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#fbf6ee",

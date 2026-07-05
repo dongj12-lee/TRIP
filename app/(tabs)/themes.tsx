@@ -4,6 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useRemoteContent } from '@/lib/remoteData';
+import { useStore } from '@/lib/store';
+import { personalizedThemes } from '@/lib/personalize';
 import { Theme } from '@/data/types';
 import { T, H, Card } from '@/components/base';
 import { Photo, Chip } from '@/components/ui';
@@ -15,9 +17,17 @@ export default function ThemesScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { themes } = useRemoteContent();
+  const { profile } = useStore();
   const [cat, setCat] = useState('All');
 
-  const list = useMemo(() => (cat === 'All' ? themes : themes.filter((t) => t.category === cat)), [themes, cat]);
+  // On "All", order by the user's interests so their trip type leads.
+  const list = useMemo(() => {
+    if (cat !== 'All') return themes.filter((t) => t.category === cat);
+    if (!profile.interests.length) return themes;
+    const ranked = personalizedThemes(themes, profile.interests, themes.length);
+    const seen = new Set(ranked.map((t) => t.slug));
+    return [...ranked, ...themes.filter((t) => !seen.has(t.slug))];
+  }, [themes, cat, profile.interests]);
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>

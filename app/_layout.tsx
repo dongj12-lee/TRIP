@@ -4,7 +4,8 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import {
@@ -23,13 +24,35 @@ import { ThemeProvider, useTheme } from '@/theme/theme';
 import { StoreProvider, useStore } from '@/lib/store';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { RemoteContentProvider } from '@/lib/remoteData';
+import { registerForPushNotifications } from '@/lib/notifications';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Registers for push once signed in, and routes to the relevant screen when a
+// notification is tapped. No-ops safely in Expo Go (see lib/notifications.ts).
+function usePushNotifications() {
+  const { session } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (session) registerForPushNotifications().catch(() => {});
+  }, [session]);
+
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { type?: string; id?: string };
+      if (data?.type === 'buddy' && data.id) router.push(`/buddy/${data.id}`);
+      else if (data?.type === 'post' && data.id) router.push(`/post/${data.id}`);
+    });
+    return () => sub.remove();
+  }, [router]);
+}
 
 function RootStack() {
   const { c, dark } = useTheme();
   const { hydrated } = useStore();
   const { ready } = useAuth();
+  usePushNotifications();
 
   useEffect(() => {
     if (hydrated && ready) SplashScreen.hideAsync().catch(() => {});

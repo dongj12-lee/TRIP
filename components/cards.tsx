@@ -14,6 +14,36 @@ export function PostTypeBadge({ type }: { type: string }) {
   return <Chip tone={t.tone}>{`${t.emoji} ${t.label}`}</Chip>;
 }
 
+// Compact fixed-width card for horizontal carousels (e.g. the "For you" rail).
+export function PlaceCardCompact({ place }: { place: Place }) {
+  const { c } = useTheme();
+  const router = useRouter();
+  return (
+    <Pressable
+      onPress={() => router.push(`/place/${place.slug}`)}
+      style={({ pressed }) => [
+        { width: 172, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: c.line, backgroundColor: c.surface },
+        pressed && { opacity: 0.9 },
+      ]}
+    >
+      <View>
+        <Photo uri={place.photoUrl} swatch={place.swatch} height={110} label={place.photoUrl ? undefined : place.category} />
+        {!!place.kContentTitle && (
+          <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(28,20,14,.55)', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 999 }}>
+            <T style={{ color: '#f7efd8', fontSize: 10.5, fontWeight: '700' }}>🎬 {place.kContentTitle}</T>
+          </View>
+        )}
+      </View>
+      <View style={{ padding: 11 }}>
+        <T style={{ fontSize: 14, fontWeight: '700' }} numberOfLines={1}>{place.name}</T>
+        <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600', marginTop: 2 }} numberOfLines={1}>
+          {place.category} · {place.neighborhood}
+        </T>
+      </View>
+    </Pressable>
+  );
+}
+
 export function PlaceCard({ place, compact = false }: { place: Place; compact?: boolean }) {
   const { c } = useTheme();
   const router = useRouter();
