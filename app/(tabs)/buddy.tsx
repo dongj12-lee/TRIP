@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -13,7 +13,13 @@ export default function BuddyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { buddies } = useRemoteContent();
+  const { buddies, refreshBuddies } = useRemoteContent();
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshBuddies();
+    setRefreshing(false);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
@@ -27,7 +33,11 @@ export default function BuddyScreen() {
         <IconButton name="plus" bg={c.accent} color="#fff" onPress={() => router.push('/compose?kind=buddy')} />
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12, paddingTop: 6 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12, paddingTop: 6 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
+      >
         {/* Safety banner */}
         <View style={{ backgroundColor: c.gold50, borderRadius: 14, padding: 12, flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
           <T style={{ fontSize: 18 }}>🛟</T>
@@ -69,8 +79,10 @@ function BuddyCard({ buddy }: { buddy: Buddy }) {
           <Flag country={buddy.author.country} size={22} />
           <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600' }}>{buddy.author.name}</T>
         </View>
-        <View style={{ backgroundColor: c.surface2, paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
-          <T style={{ fontSize: 12, fontWeight: '700', color: c.inkSoft }}>🙋 {count} interested</T>
+        <View style={{ backgroundColor: count > 0 ? c.surface2 : 'transparent', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
+          <T style={{ fontSize: 12, fontWeight: '700', color: count > 0 ? c.inkSoft : c.muted }}>
+            {count > 0 ? `🙋 ${count} interested` : 'Be the first 🙋'}
+          </T>
         </View>
       </View>
     </Card>

@@ -16,6 +16,7 @@ type RemoteContentValue = {
   themeBySlug: Record<string, Theme>;
   refreshPosts: () => Promise<void>;
   refreshBuddies: () => Promise<void>;
+  refreshAll: () => Promise<void>;
   addLocalPost: (p: Post) => void;
   addLocalBuddy: (b: Buddy) => void;
 };
@@ -80,6 +81,8 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
+  const refreshAll = useCallback(() => loadAll(), [loadAll]);
+
   const addLocalPost = useCallback((p: Post) => setPosts((prev) => [p, ...prev]), []);
   const addLocalBuddy = useCallback((b: Buddy) => setBuddies((prev) => [b, ...prev]), []);
 
@@ -98,10 +101,11 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
       themeBySlug,
       refreshPosts,
       refreshBuddies,
+      refreshAll,
       addLocalPost,
       addLocalBuddy,
     }),
-    [live, loading, places, themes, posts, buddies, placeBySlug, themeBySlug, refreshPosts, refreshBuddies, addLocalPost, addLocalBuddy],
+    [live, loading, places, themes, posts, buddies, placeBySlug, themeBySlug, refreshPosts, refreshBuddies, refreshAll, addLocalPost, addLocalBuddy],
   );
 
   return <RemoteContentContext.Provider value={value}>{children}</RemoteContentContext.Provider>;

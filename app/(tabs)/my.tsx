@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
+import { plural } from '@/lib/format';
 import { CREATORS, USER, creatorById, tierFor } from '@/data';
 import { Creator } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
@@ -72,15 +73,15 @@ export default function MyScreen() {
             </View>
             <H style={{ fontSize: 20, marginTop: 6 }}>{itinerary.title}</H>
             <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600', marginTop: 3 }}>
-              🗓 {itinerary.dates} · {itinerary.travelers} · {itinerary.days.length} days ·{' '}
-              {itinerary.days.reduce((s, d) => s + d.stops.length, 0)} stops
+              🗓 {itinerary.dates} · {itinerary.travelers} · {plural(itinerary.days.length, 'day')} ·{' '}
+              {plural(itinerary.days.reduce((s, d) => s + d.stops.length, 0), 'stop')}
             </T>
             <View style={{ marginTop: 12, gap: 8 }}>
               {itinerary.days.map((d, i) => (
                 <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                   <T style={{ fontSize: 11.5, fontWeight: '800', color: c.accent, width: 42 }}>{d.label}</T>
                   <T style={{ flex: 1, fontSize: 13, color: c.ink, fontWeight: '600' }} numberOfLines={1}>{d.theme}</T>
-                  <T style={{ fontSize: 12, color: c.muted }}>{d.stops.length} stops</T>
+                  <T style={{ fontSize: 12, color: c.muted }}>{plural(d.stops.length, 'stop')}</T>
                 </View>
               ))}
             </View>

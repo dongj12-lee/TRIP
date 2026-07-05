@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Pressable } from 'react-native';
+import { View, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -14,8 +14,14 @@ export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { sharedPost } = useStore();
-  const { posts } = useRemoteContent();
+  const { posts, refreshPosts } = useRemoteContent();
   const [type, setType] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshPosts();
+    setRefreshing(false);
+  };
 
   // sharedPost is added into `posts` via addLocalPost once it's actually created
   // (see lib/store.tsx shareTrip); only prepend it here for the local/offline
@@ -42,26 +48,32 @@ export default function FeedScreen() {
         <IconButton name="plus" bg={c.accent} color="#fff" onPress={() => router.push('/compose?kind=post')} />
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 10 }}>
-        {chips.map(([k, label]) => {
-          const on = (k === 'all' && !type) || type === k;
-          return (
-            <Pressable
-              key={k}
-              onPress={() => setType(k === 'all' ? null : k)}
-              style={{
-                paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
-                borderWidth: 1, borderColor: on ? c.accent : c.line,
-                backgroundColor: on ? c.accent : c.surface,
-              }}
-            >
-              <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : c.inkSoft }}>{label}</T>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      <View style={{ height: 56 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 10, alignItems: 'center' }}>
+          {chips.map(([k, label]) => {
+            const on = (k === 'all' && !type) || type === k;
+            return (
+              <Pressable
+                key={k}
+                onPress={() => setType(k === 'all' ? null : k)}
+                style={{
+                  paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
+                  borderWidth: 1, borderColor: on ? c.accent : c.line,
+                  backgroundColor: on ? c.accent : c.surface,
+                }}
+              >
+                <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : c.inkSoft }}>{label}</T>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
+      >
         {list.map((p) => (
           <PostCard key={p.slug} post={p} />
         ))}

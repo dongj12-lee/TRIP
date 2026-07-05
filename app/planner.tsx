@@ -225,11 +225,11 @@ function StopCard({
             <TextInput value={stop.name} onChangeText={onName} placeholder="Custom stop (e.g. KTX to Busan)" style={[field, { paddingVertical: 8 }]} placeholderTextColor={c.muted} />
           )}
         </View>
-        <View style={{ alignItems: 'center' }}>
-          <Pressable onPress={onUp} disabled={first} hitSlop={6} style={{ opacity: first ? 0.25 : 1, padding: 2 }}>
+        <View style={{ alignItems: 'center', gap: 2 }}>
+          <Pressable onPress={onUp} disabled={first} hitSlop={6} style={{ opacity: first ? 0.25 : 1, padding: 2, transform: [{ rotate: '-90deg' }] }}>
             <Icon name="chevron" size={16} stroke={c.muted} sw={2.4} />
           </Pressable>
-          <View style={{ transform: [{ rotate: '180deg' }] }}>
+          <View style={{ transform: [{ rotate: '90deg' }] }}>
             <Pressable onPress={onDown} disabled={last} hitSlop={6} style={{ opacity: last ? 0.25 : 1, padding: 2 }}>
               <Icon name="chevron" size={16} stroke={c.muted} sw={2.4} />
             </Pressable>

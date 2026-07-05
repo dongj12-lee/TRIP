@@ -38,23 +38,25 @@ export default function ThemesScreen() {
         </T>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 10 }}>
-        {CATEGORIES.map((k) => {
-          const on = cat === k;
-          return (
-            <Pressable
-              key={k}
-              onPress={() => setCat(k)}
-              style={{
-                paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
-                borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent : c.surface,
-              }}
-            >
-              <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : c.inkSoft }}>{k}</T>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      <View style={{ height: 56 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 10, alignItems: 'center' }}>
+          {CATEGORIES.map((k) => {
+            const on = cat === k;
+            return (
+              <Pressable
+                key={k}
+                onPress={() => setCat(k)}
+                style={{
+                  paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
+                  borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent : c.surface,
+                }}
+              >
+                <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : c.inkSoft }}>{k}</T>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 14 }} showsVerticalScrollIndicator={false}>
         {list.map((t) => (

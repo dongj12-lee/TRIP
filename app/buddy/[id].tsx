@@ -6,6 +6,7 @@ import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
+import { haptic } from '@/lib/haptics';
 import { fetchBuddyInterests } from '@/data/remote';
 import { T, H, Screen, DetailHeader, Card, Button } from '@/components/base';
 import { Flag } from '@/components/ui';
@@ -37,6 +38,8 @@ export default function BuddyDetail() {
 
   const handleToggleJoin = () => {
     const willJoin = !isJoined;
+    if (willJoin) haptic.success();
+    else haptic.tick();
     toggleJoin(buddy.id);
     if (liveInterested) {
       setLiveInterested((prev) =>

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, FlatList, ScrollView, Pressable, TextInput } from 'react-native';
+import { View, FlatList, ScrollView, Pressable, TextInput, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { FOREIGNER_TAGS } from '@/data';
@@ -20,8 +20,15 @@ const MAX_MAP_PINS = 40;
 export default function ExploreScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { places } = useRemoteContent();
+  const { places, refreshAll } = useRemoteContent();
   const { profile } = useStore();
+
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshAll();
+    setRefreshing(false);
+  };
 
   const [query, setQuery] = useState('');
   const [activeTags, setActiveTags] = useState<Set<ForeignerTagKey>>(new Set());
@@ -79,25 +86,8 @@ export default function ExploreScreen() {
         </T>
       </View>
 
-      {/* For you */}
-      {forYou.length > 0 && (
-        <View style={{ paddingBottom: 14 }}>
-          <View style={{ paddingHorizontal: 18, marginBottom: 10 }}>
-            <Eyebrow>For you</Eyebrow>
-            <T style={{ fontSize: 12.5, color: c.muted, marginTop: 2 }}>
-              {profile.interests.length ? 'Picked from your interests' : 'K-content spots to start with'}
-            </T>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 18 }}>
-            {forYou.map((p) => (
-              <PlaceCardCompact key={p.slug} place={p} />
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Search bar */}
-      <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
+      {/* Search bar — primary discovery tool, kept at the top */}
+      <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
         <View
           style={{
             flexDirection: 'row', alignItems: 'center', gap: 8,
@@ -122,6 +112,23 @@ export default function ExploreScreen() {
           )}
         </View>
       </View>
+
+      {/* For you (only when nothing is filtered/searched) */}
+      {forYou.length > 0 && (
+        <View style={{ paddingBottom: 16 }}>
+          <View style={{ paddingHorizontal: 18, marginBottom: 10 }}>
+            <Eyebrow>For you</Eyebrow>
+            <T style={{ fontSize: 12.5, color: c.muted, marginTop: 2 }}>
+              {profile.interests.length ? 'Picked from your interests' : 'K-content spots to start with'}
+            </T>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 18 }}>
+            {forYou.map((p) => (
+              <PlaceCardCompact key={p.slug} place={p} />
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* Map (hidden while searching to keep results focused) */}
       {showMap && !query && (
@@ -194,6 +201,7 @@ export default function ExploreScreen() {
         initialNumToRender={8}
         windowSize={9}
         removeClippedSubviews
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
       />
     </View>
   );

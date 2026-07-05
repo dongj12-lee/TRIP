@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { useTheme } from '@/theme/theme';
+import { haptic } from '@/lib/haptics';
 import { Icon, IconName } from '@/components/Icon';
 import { T } from '@/components/base';
 
@@ -26,16 +27,19 @@ type TabBarProps = {
 function TabBar({ state, navigation }: TabBarProps) {
   const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
+  // Native gets a frosted BlurView; web's blur fallback lets content bleed
+  // through, so use a solid surface there for a clean edge.
+  const Container: any = Platform.OS === 'web' ? View : BlurView;
+  const containerProps = Platform.OS === 'web' ? {} : { intensity: 30, tint: dark ? 'dark' : 'light' };
   return (
     <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
-      <BlurView
-        intensity={40}
-        tint={dark ? 'dark' : 'light'}
+      <Container
+        {...containerProps}
         style={{
           flexDirection: 'row',
           borderTopWidth: 1,
           borderTopColor: c.line,
-          backgroundColor: dark ? 'rgba(26,22,17,0.7)' : 'rgba(251,246,238,0.8)',
+          backgroundColor: Platform.OS === 'web' ? c.paper : dark ? 'rgba(26,22,17,0.92)' : 'rgba(251,246,238,0.94)',
           paddingTop: 8,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
         }}
@@ -48,6 +52,7 @@ function TabBar({ state, navigation }: TabBarProps) {
             <Pressable
               key={route.key}
               onPress={() => {
+                haptic.tick();
                 const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
                 if (!focused && !event.defaultPrevented) navigation.navigate(route.name);
               }}
@@ -66,7 +71,7 @@ function TabBar({ state, navigation }: TabBarProps) {
             </Pressable>
           );
         })}
-      </BlurView>
+      </Container>
     </View>
   );
 }

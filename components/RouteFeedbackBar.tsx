@@ -4,6 +4,7 @@ import { useTheme } from '@/theme/theme';
 import { useAuth } from '@/lib/auth';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { ROUTE_PROMPTS } from '@/lib/routePrompts';
+import { haptic } from '@/lib/haptics';
 import { fetchMyRouteFeedback, toggleRouteFeedback } from '@/data/remote';
 import { T } from './base';
 
@@ -26,6 +27,7 @@ export function RouteFeedbackBar({ postId, initialCounts }: { postId?: string; i
 
   const toggle = (key: string) => {
     const on = !mine.has(key);
+    haptic.tick();
     // optimistic
     setMine((prev) => {
       const n = new Set(prev);

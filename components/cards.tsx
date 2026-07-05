@@ -3,6 +3,7 @@ import { View, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
+import { haptic } from '@/lib/haptics';
 import { FOREIGNER_TAGS, POST_TYPES, placeBySlug } from '@/data';
 import { Place, Post, RouteDay } from '@/data/types';
 import { Icon } from './Icon';
@@ -27,7 +28,7 @@ export function PlaceCardCompact({ place }: { place: Place }) {
       ]}
     >
       <View>
-        <Photo uri={place.photoUrl} swatch={place.swatch} height={110} label={place.photoUrl ? undefined : place.category} />
+        <Photo uri={place.photoUrl} swatch={place.swatch} height={110} />
         {!!place.kContentTitle && (
           <View style={{ position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(28,20,14,.55)', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 999 }}>
             <T style={{ color: '#f7efd8', fontSize: 10.5, fontWeight: '700' }}>🎬 {place.kContentTitle}</T>
@@ -63,7 +64,7 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
           </View>
         )}
         <Pressable
-          onPress={() => toggleSave(place.slug)}
+          onPress={() => { haptic.tick(); toggleSave(place.slug); }}
           hitSlop={6}
           style={{
             position: 'absolute', top: 8, right: 8, width: 38, height: 38, borderRadius: 999,
@@ -137,7 +138,7 @@ export function PostCard({ post }: { post: Post }) {
           <T style={{ fontSize: 12, color: c.muted }} numberOfLines={1}>· {post.when} · 💬 {post.comments}</T>
         </View>
         <Pressable
-          onPress={() => toggleVote(post)}
+          onPress={() => { haptic.tick(); toggleVote(post); }}
           hitSlop={6}
           style={{
             flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 999,
