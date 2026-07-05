@@ -40,6 +40,8 @@ type StoreValue = {
   toggleFollow: (id: string) => void;
   setItinerary: (next: Itinerary | ((prev: Itinerary) => Itinerary)) => void;
   shareTrip: (message: string) => Promise<void>;
+  updateProfile: (fields: Partial<Profile>) => Promise<void>;
+  myPostCount: number;
   resetAll: () => void;
 };
 
@@ -64,6 +66,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [following, setFollowing] = useState<Set<string>>(new Set(['c1']));
   const [itinerary, setItineraryState] = useState<Itinerary>(DEFAULT_ITINERARY);
   const [sharedPost, setSharedPost] = useState<Post | null>(null);
+  const [myPostCount, setMyPostCount] = useState(0);
 
   // hydrate from local cache first (instant paint, and the whole story when offline)
   useEffect(() => {
@@ -103,6 +106,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (data) setItineraryState(data as Itinerary);
       })
       .catch((e) => console.warn('fetchItinerary failed', e));
+    // Real identity — replaces the hardcoded "You / 340 PTS" mock.
+    remote
+      .fetchProfile(user.id)
+      .then((p) => {
+        if (p) setProfile((prev) => ({ ...prev, ...p }));
+      })
+      .catch((e) => console.warn('fetchProfile failed', e));
+    remote
+      .fetchMyPostCount(user.id)
+      .then(setMyPostCount)
+      .catch((e) => console.warn('fetchMyPostCount failed', e));
   }, [user?.id]);
 
   // persist to local cache on every change
@@ -166,7 +180,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           const willJoin = !prev.has(buddyId);
           if (canWrite) {
             remote
-              .setJoined(buddyId, willJoin, { authorName: 'You', authorCountry: profile.country })
+              .setJoined(buddyId, willJoin, { authorName: profile.displayName || 'You', authorCountry: profile.country })
               .catch((e) => console.warn('setJoined failed', e));
           }
           return toggleInSet(prev, buddyId);
@@ -191,11 +205,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               body: built.body,
               neighborhood: built.neighborhood,
               routeDays: built.routeDays,
-              authorName: 'You',
+              authorName: profile.displayName || 'You',
               authorCountry: profile.country,
             });
             setSharedPost(created);
             addLocalPost(created);
+            setMyPostCount((n) => n + 1);
             return;
           } catch (e) {
             console.warn('shareTrip remote failed, falling back to local', e);
@@ -203,6 +218,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         }
         setSharedPost(built);
       },
+      updateProfile: async (fields) => {
+        setProfile((prev) => ({ ...prev, ...fields }));
+        if (canWrite) await remote.updateProfile(fields).catch((e) => console.warn('updateProfile failed', e));
+      },
+      myPostCount,
       resetAll: () => {
         setOnboarded(false);
         setProfile({ country: null, interests: [] });
@@ -212,9 +232,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setFollowing(new Set(['c1']));
         setItineraryState(DEFAULT_ITINERARY);
         setSharedPost(null);
+        setMyPostCount(0);
       },
     }),
-    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, canWrite, user, addLocalPost],
+    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, canWrite, user, addLocalPost],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

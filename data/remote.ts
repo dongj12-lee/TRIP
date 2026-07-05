@@ -2,7 +2,51 @@
 // (see data/types.ts). Every function here is safe to call only when
 // isSupabaseConfigured — callers should check that first (see lib/remoteData.tsx).
 import { supabase } from '@/lib/supabase';
-import { Buddy, Comment, ForeignerTagKey, Place, Post, PostType, Theme } from './types';
+import { Buddy, Comment, ForeignerTagKey, Place, Post, PostType, Profile, Theme } from './types';
+
+// ─────────────────────────── Profile ───────────────────────────
+export async function fetchProfile(userId: string): Promise<Partial<Profile> | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('display_name, handle, country, interests, points, avatar_url')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return {
+    displayName: data.display_name ?? undefined,
+    handle: data.handle ?? undefined,
+    country: data.country ?? null,
+    interests: data.interests ?? [],
+    points: data.points ?? 0,
+    avatarUrl: data.avatar_url ?? undefined,
+  };
+}
+
+export async function updateProfile(fields: { displayName?: string; handle?: string; country?: string | null; interests?: string[] }) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not signed in');
+  const row: Record<string, unknown> = {};
+  if (fields.displayName !== undefined) row.display_name = fields.displayName;
+  if (fields.handle !== undefined) row.handle = fields.handle;
+  if (fields.country !== undefined) row.country = fields.country;
+  if (fields.interests !== undefined) row.interests = fields.interests;
+  const { error } = await supabase.from('profiles').update(row).eq('id', user.id);
+  if (error) throw error;
+}
+
+// Count of a user's own non-removed posts (for the profile "Posts" stat).
+export async function fetchMyPostCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('author_id', userId)
+    .eq('removed', false);
+  if (error) throw error;
+  return count ?? 0;
+}
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();

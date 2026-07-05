@@ -170,4 +170,13 @@ export type Region = { key: string; emoji: string; label: string; hint: string }
 export type Interest = { key: string; emoji: string; label: string };
 export type Country = { flag: string; name: string };
 
-export type Profile = { country: string | null; interests: string[] };
+export type Profile = {
+  country: string | null;
+  interests: string[];
+  // Real identity, hydrated from the Supabase `profiles` row on sign-in.
+  // Absent in the local/offline demo, where sensible defaults are shown.
+  displayName?: string;
+  handle?: string;
+  points?: number;
+  avatarUrl?: string;
+};

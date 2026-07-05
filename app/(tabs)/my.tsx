@@ -1,15 +1,17 @@
-import React from 'react';
-import { View, ScrollView, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, Pressable, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
+import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
 import { plural } from '@/lib/format';
-import { CREATORS, USER, creatorById, tierFor } from '@/data';
+import { CREATORS, creatorById, tierFor } from '@/data';
 import { Creator } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
 import { PlaceCard, PostCardMini } from '@/components/cards';
+import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { Icon } from '@/components/Icon';
 import { Photo } from '@/components/ui';
 
@@ -17,13 +19,20 @@ export default function MyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, following, toggleFollow, itinerary, sharedPost, shareTrip, profile } = useStore();
-  const { placeBySlug } = useRemoteContent();
+  const { saved, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount } = useStore();
+  const { placeBySlug, posts } = useRemoteContent();
+  const { user } = useAuth();
+  const [editing, setEditing] = useState(false);
 
-  const tier = tierFor(USER.points);
+  const name = profile.displayName || 'You';
+  const handle = profile.handle || 'traveler';
+  const points = profile.points ?? 0;
+  const tier = tierFor(points);
   const savedPlaces = [...saved].map((s) => placeBySlug[s]).filter(Boolean);
   const followingList = CREATORS.filter((cr) => following.has(cr.id));
   const suggestions = CREATORS.filter((cr) => !following.has(cr.id));
+  // The user's own posts — real, not the seeded mock contributions.
+  const myPosts = user ? posts.filter((p) => p.authorId === user.id) : [];
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
@@ -33,31 +42,29 @@ export default function MyScreen() {
           <IconButton name="settings" onPress={() => router.push('/settings')} color={c.inkSoft} />
         </View>
 
-        {/* Identity */}
-        <View style={{ paddingHorizontal: 18, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 56, height: 56, borderRadius: 999, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
-            <Photo swatch={['#c26b4a', '#e0a05a']} height={56} />
-          </View>
+        {/* Identity — tap to edit */}
+        <Pressable onPress={() => setEditing(true)} style={{ paddingHorizontal: 18, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Avatar name={name} uri={profile.avatarUrl} />
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <H style={{ fontSize: 20 }}>{USER.name}</H>
+              <H style={{ fontSize: 20 }} numberOfLines={1}>{name}</H>
               <View style={{ backgroundColor: c.accent50, paddingVertical: 3, paddingHorizontal: 8, borderRadius: 999 }}>
                 <T style={{ fontSize: 11.5, fontWeight: '700', color: c.accent }}>{tier.emoji} {tier.label}</T>
               </View>
             </View>
-            <T style={{ fontSize: 13, color: c.muted, marginTop: 1 }}>@{USER.handle}</T>
+            <T style={{ fontSize: 13, color: c.muted, marginTop: 1 }}>@{handle} · Tap to edit</T>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <H style={{ fontSize: 20, color: c.accent }}>{USER.points}</H>
+            <H style={{ fontSize: 20, color: c.accent }}>{points}</H>
             <T style={{ fontSize: 10.5, color: c.muted, fontWeight: '700' }}>PTS</T>
           </View>
-        </View>
+        </Pressable>
 
-        {/* Stats */}
+        {/* Stats — real usage */}
         <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 14 }}>
-          <Stat n={USER.contributions} label="Posts" />
-          <Stat n={USER.helpfulVotes} label="Helpful" />
-          <Stat n={USER.followers} label="Followers" />
+          <Stat n={myPostCount} label="Posts" />
+          <Stat n={saved.size} label="Saved" />
+          <Stat n={following.size} label="Following" />
         </View>
 
         {/* Itinerary card */}
@@ -121,16 +128,24 @@ export default function MyScreen() {
           </ScrollView>
         </Section>
 
-        {/* My contributions */}
+        {/* My contributions — the user's own posts, or an empty state */}
         <Section title="My contributions">
-          <View style={{ gap: 10 }}>
-            {USER.myPosts.map((p) => (
-              <PostCardMini
-                key={p.slug}
-                post={{ ...p, author: { name: USER.name, country: profile.country || '🧳' }, body: '', commentList: [] } as any}
-              />
-            ))}
-          </View>
+          {myPosts.length === 0 ? (
+            <Pressable
+              onPress={() => router.push('/compose?kind=post')}
+              style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line }}
+            >
+              <T style={{ fontSize: 26 }}>✍️</T>
+              <T style={{ color: c.ink, marginTop: 6, fontWeight: '700' }}>Share your first tip</T>
+              <T style={{ color: c.muted, marginTop: 2, fontSize: 12.5, textAlign: 'center' }}>Post a tip or a route and help the next traveler.</T>
+            </Pressable>
+          ) : (
+            <View style={{ gap: 10 }}>
+              {myPosts.map((p) => (
+                <PostCardMini key={p.id ?? p.slug} post={p} />
+              ))}
+            </View>
+          )}
         </Section>
 
         {/* Saved places */}
@@ -149,6 +164,22 @@ export default function MyScreen() {
           )}
         </Section>
       </ScrollView>
+
+      <EditProfileSheet visible={editing} onClose={() => setEditing(false)} />
+    </View>
+  );
+}
+
+// Circular avatar: real photo if set, else initials on an accent tint.
+function Avatar({ name, uri }: { name: string; uri?: string }) {
+  const { c } = useTheme();
+  const initial = (name.trim()[0] || 'Y').toUpperCase();
+  if (uri) {
+    return <Image source={{ uri }} style={{ width: 56, height: 56, borderRadius: 999, borderWidth: 1, borderColor: c.line }} />;
+  }
+  return (
+    <View style={{ width: 56, height: 56, borderRadius: 999, backgroundColor: c.accent50, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' }}>
+      <H style={{ fontSize: 24, color: c.accent }}>{initial}</H>
     </View>
   );
 }
