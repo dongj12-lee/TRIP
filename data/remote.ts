@@ -105,7 +105,16 @@ function mapPlace(row: any): Place {
 }
 
 export async function fetchPlaces(): Promise<Place[]> {
-  const { data, error } = await supabase.from('places').select('*').order('name');
+  // PostgREST caps a single response at 1000 rows. With the Visit Seoul import
+  // the catalog exceeds that, so order photos-first (every Visit Seoul place has
+  // one) and cap explicitly — the app browses the richest 1000, not an arbitrary
+  // alphabetical slice, and never silently truncates.
+  const { data, error } = await supabase
+    .from('places')
+    .select('*')
+    .order('photo_url', { nullsFirst: false })
+    .order('name')
+    .limit(1000);
   if (error) throw error;
   return (data ?? []).map(mapPlace);
 }

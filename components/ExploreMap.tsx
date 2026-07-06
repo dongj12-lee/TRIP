@@ -8,11 +8,15 @@ import { T } from './base';
 // Styled stand-in for a real Naver/Kakao Maps SDK (see README Assets note).
 function pinEmoji(cat: string) {
   if (cat.includes('Cafe')) return '☕';
-  if (cat.includes('Naeng') || cat.includes('noodle')) return '🍜';
-  if (cat.includes('Market')) return '🥢';
+  if (cat.includes('Nightlife')) return '🍺';
+  if (cat.includes('Shopping') || cat.includes('Market')) return '🛍️';
+  if (cat.includes('Culture')) return '🎭';
+  if (cat.includes('Attraction')) return '🏯';
+  if (cat.includes('Activity')) return '🎟️';
+  if (cat.includes('Naeng') || cat.includes('noodle') || cat.includes('Restaurant')) return '🍜';
   if (cat.includes('Jjimjil')) return '♨️';
   if (cat.includes('Convenience')) return '🏪';
-  return '🍺';
+  return '📍';
 }
 
 export function ExploreMap({
