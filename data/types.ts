@@ -20,7 +20,12 @@ export type Place = {
   lng: number;
   name: string;
   nameKo: string;
+  // Real Visit Seoul category hierarchy: category = L1 (e.g. "Cuisine"),
+  // categoryL2/L3 = finer levels where they exist (e.g. "Foreign Restaurant" /
+  // "Chinese"). Not every place has L2/L3.
   category: string;
+  categoryL2?: string | null;
+  categoryL3?: string | null;
   neighborhood: string;
   city: string;
   address: string;

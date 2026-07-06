@@ -6,16 +6,18 @@ import { Place } from '@/data/types';
 import { T } from './base';
 
 // Styled stand-in for a real Naver/Kakao Maps SDK (see README Assets note).
-function pinEmoji(cat: string) {
-  if (cat.includes('Cafe')) return '☕';
-  if (cat.includes('Nightlife')) return '🍺';
-  if (cat.includes('Shopping') || cat.includes('Market')) return '🛍️';
+// `sub` is category_l2 — lets Cuisine (cafes/bars/restaurants all share the
+// same L1) still get a distinct pin per kind.
+function pinEmoji(cat: string, sub?: string | null) {
+  if (sub?.includes('Cafe')) return '☕';
+  if (sub?.includes('Bar')) return '🍺';
+  if (sub?.includes('Restaurant')) return '🍜';
   if (cat.includes('Culture')) return '🎭';
-  if (cat.includes('Attraction')) return '🏯';
-  if (cat.includes('Activity')) return '🎟️';
-  if (cat.includes('Naeng') || cat.includes('noodle') || cat.includes('Restaurant')) return '🍜';
-  if (cat.includes('Jjimjil')) return '♨️';
-  if (cat.includes('Convenience')) return '🏪';
+  if (cat.includes('History')) return '🏯';
+  if (cat.includes('Nature')) return '🌳';
+  if (cat.includes('Shopping')) return '🛍️';
+  if (cat.includes('Experience')) return '🎟️';
+  if (cat.includes('Cuisine')) return '🍽️';
   return '📍';
 }
 
@@ -80,7 +82,7 @@ export function ExploreMap({
                 borderWidth: 2, borderColor: c.surface,
               }}
             >
-              <T style={{ transform: [{ rotate: '-45deg' }], fontSize: 14 }}>{pinEmoji(p.category)}</T>
+              <T style={{ transform: [{ rotate: '-45deg' }], fontSize: 14 }}>{pinEmoji(p.category, p.categoryL2)}</T>
             </View>
           </Pressable>
         );

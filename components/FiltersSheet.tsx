@@ -6,6 +6,7 @@ import { FOREIGNER_TAGS } from '@/data';
 import { ForeignerTagKey } from '@/data/types';
 import { T, H, Button } from './base';
 import { TagPill } from './ui';
+import { SeoulMapPicker } from './SeoulMapPicker';
 import { haptic } from '@/lib/haptics';
 
 // Consolidates the foreigner-tag and neighborhood pickers — previously two
@@ -59,13 +60,20 @@ export function FiltersSheet({
             ))}
           </View>
 
-          <T style={{ fontSize: 12, fontWeight: '800', color: c.muted, letterSpacing: 0.6, marginBottom: 10 }}>NEIGHBORHOOD</T>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            <NeighborhoodChip label="All areas" active={!hood} onPress={() => { haptic.tick(); setHood(null); }} />
-            {hoods.map((h) => (
-              <NeighborhoodChip key={h} label={h} active={hood === h} onPress={() => { haptic.tick(); setHood(hood === h ? null : h); }} />
-            ))}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            <T style={{ fontSize: 12, fontWeight: '800', color: c.muted, letterSpacing: 0.6 }}>NEIGHBORHOOD</T>
+            {hood && (
+              <Pressable onPress={() => { haptic.tick(); setHood(null); }} hitSlop={6}>
+                <T style={{ fontSize: 12.5, fontWeight: '700', color: c.accent }}>Clear · {hood}</T>
+              </Pressable>
+            )}
           </View>
+          <T style={{ fontSize: 12, color: c.muted, marginBottom: 10 }}>Tap a district on the map — laid out where it actually sits in the city.</T>
+          <SeoulMapPicker
+            active={hood}
+            onSelect={(h) => { haptic.tick(); setHood(h); }}
+            available={new Set(hoods)}
+          />
         </ScrollView>
 
         <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: insets.bottom + 16, borderTopWidth: 1, borderTopColor: c.line }}>
@@ -73,21 +81,5 @@ export function FiltersSheet({
         </View>
       </View>
     </Modal>
-  );
-}
-
-function NeighborhoodChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  const { c } = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      style={{
-        paddingVertical: 7, paddingHorizontal: 13, borderRadius: 999,
-        backgroundColor: active ? c.ink : c.surface,
-        borderWidth: 1, borderColor: active ? c.ink : c.line,
-      }}
-    >
-      <T style={{ fontSize: 13, fontWeight: '700', color: active ? c.paper : c.inkSoft }}>{label}</T>
-    </Pressable>
   );
 }

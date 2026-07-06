@@ -81,6 +81,8 @@ function mapPlace(row: any): Place {
     name: row.name,
     nameKo: row.name_ko,
     category: row.category,
+    categoryL2: row.category_l2 ?? undefined,
+    categoryL3: row.category_l3 ?? undefined,
     neighborhood: row.neighborhood,
     city: row.city,
     address: row.address,
@@ -110,19 +112,41 @@ function mapPlace(row: any): Place {
   };
 }
 
+// Columns needed to browse/filter/map — everything EXCEPT the heavy
+// `description` (avg ~1KB/place). At 2,300+ places, shipping descriptions in
+// the list query would add megabytes; the place detail screen lazy-loads the
+// full record instead (see fetchPlace).
+const BROWSE_COLS =
+  'slug,lat,lng,name,name_ko,category,category_l2,category_l3,neighborhood,city,address,hours,' +
+  'price_range,rating,reviews,solo_ok,english_menu,price_transparent,card_ok,english_spoken,votes,' +
+  'warn_tip,k_content_title,k_content_type,k_content_note,swatch,photo_url,subway,free_entry,' +
+  'english_site,wheelchair,like_count,dislike_count';
+
 export async function fetchPlaces(): Promise<Place[]> {
-  // PostgREST caps a single response at 1000 rows. With the Visit Seoul import
-  // the catalog exceeds that, so order photos-first (every Visit Seoul place has
-  // one) and cap explicitly — the app browses the richest 1000, not an arbitrary
-  // alphabetical slice, and never silently truncates.
-  const { data, error } = await supabase
-    .from('places')
-    .select('*')
-    .order('photo_url', { nullsFirst: false })
-    .order('name')
-    .limit(1000);
+  // PostgREST caps a single response at 1000 rows, so page through the whole
+  // catalog (photos-first) to load every place, not an arbitrary slice.
+  const PAGE = 1000;
+  const all: any[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from('places')
+      .select(BROWSE_COLS)
+      .order('photo_url', { nullsFirst: false })
+      .order('name')
+      .range(from, from + PAGE - 1);
+    if (error) throw error;
+    all.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  return all.map((row) => ({ ...mapPlace(row), description: '' }));
+}
+
+// Full single place incl. description — for the detail screen, which loads it
+// lazily since the browse query omits description for payload size.
+export async function fetchPlace(slug: string): Promise<Place | null> {
+  const { data, error } = await supabase.from('places').select('*').eq('slug', slug).maybeSingle();
   if (error) throw error;
-  return (data ?? []).map(mapPlace);
+  return data ? mapPlace(data) : null;
 }
 
 // ─────────────────────────── Themes ───────────────────────────

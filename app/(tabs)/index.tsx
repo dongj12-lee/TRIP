@@ -15,8 +15,8 @@ import { FiltersSheet } from '@/components/FiltersSheet';
 import { haptic } from '@/lib/haptics';
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  Culture: '🎭', Attraction: '🏯', Cafe: '☕', Shopping: '🛍️',
-  Activity: '🎟️', Nightlife: '🍺', Restaurant: '🍜',
+  Culture: '🎭', History: '🏯', Nature: '🌳', Shopping: '🛍️',
+  Cuisine: '🍽️', 'Experience Programs': '🎟️',
 };
 
 // Cap map pins so the Seoul map doesn't turn into an unreadable pin-cloud
@@ -40,6 +40,8 @@ export default function ExploreScreen() {
   const [activeTags, setActiveTags] = useState<Set<ForeignerTagKey>>(new Set());
   const [hood, setHood] = useState<string | null>(null);
   const [category, setCategory] = useState<string | null>(null);
+  const [subcategory, setSubcategory] = useState<string | null>(null);
+  const [subsubcategory, setSubsubcategory] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -53,19 +55,53 @@ export default function ExploreScreen() {
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([cat]) => cat);
   }, [places]);
 
+  // Drill-down: sub-categories only make sense once a top category is picked,
+  // and only for places within it that actually have an L2 tag.
+  const subcategories = useMemo(() => {
+    if (!category) return [];
+    const counts = new Map<string, number>();
+    places.forEach((p) => {
+      if (p.category === category && p.categoryL2) counts.set(p.categoryL2, (counts.get(p.categoryL2) ?? 0) + 1);
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([s]) => s);
+  }, [places, category]);
+
+  const subsubcategories = useMemo(() => {
+    if (!category || !subcategory) return [];
+    const counts = new Map<string, number>();
+    places.forEach((p) => {
+      if (p.category === category && p.categoryL2 === subcategory && p.categoryL3) {
+        counts.set(p.categoryL3, (counts.get(p.categoryL3) ?? 0) + 1);
+      }
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([s]) => s);
+  }, [places, category, subcategory]);
+
+  const selectCategory = (cat: string | null) => {
+    setCategory(cat);
+    setSubcategory(null);
+    setSubsubcategory(null);
+  };
+  const selectSubcategory = (sub: string | null) => {
+    setSubcategory(sub);
+    setSubsubcategory(null);
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return places.filter((p) => {
       if (![...activeTags].every((t) => (p as any)[t])) return false;
       if (hood && p.neighborhood !== hood) return false;
       if (category && p.category !== category) return false;
+      if (subcategory && p.categoryL2 !== subcategory) return false;
+      if (subsubcategory && p.categoryL3 !== subsubcategory) return false;
       if (q) {
         const hay = `${p.name} ${p.nameKo} ${p.category} ${p.neighborhood} ${p.description}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [places, query, activeTags, hood, category]);
+  }, [places, query, activeTags, hood, category, subcategory, subsubcategory]);
 
   const activeFilterCount = activeTags.size + (hood ? 1 : 0);
 
@@ -149,16 +185,36 @@ export default function ExploreScreen() {
 
       {/* Category rail — the one filter kept always visible; icon-forward for quick scanning */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
-        <Chip label="All types" active={!category} onPress={() => setCategory(null)} />
+        <Chip label="All types" active={!category} onPress={() => selectCategory(null)} />
         {categories.map((cat) => (
           <Chip
             key={cat}
             label={CATEGORY_EMOJI[cat] ? `${CATEGORY_EMOJI[cat]} ${cat}` : cat}
             active={category === cat}
-            onPress={() => setCategory(category === cat ? null : cat)}
+            onPress={() => selectCategory(category === cat ? null : cat)}
           />
         ))}
       </ScrollView>
+
+      {/* Sub-category drill-down — only appears once a top category with real
+          sub-groups is picked, mirroring Visit Seoul's own L1 → L2 → L3 tree
+          instead of flattening everything into one giant list. */}
+      {subcategories.length > 1 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
+          <Chip label={`All ${category}`} active={!subcategory} onPress={() => selectSubcategory(null)} dark />
+          {subcategories.map((sub) => (
+            <Chip key={sub} label={sub} active={subcategory === sub} onPress={() => selectSubcategory(subcategory === sub ? null : sub)} dark />
+          ))}
+        </ScrollView>
+      )}
+      {subcategory && subsubcategories.length > 1 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
+          <Chip label={`All ${subcategory}`} active={!subsubcategory} onPress={() => setSubsubcategory(null)} />
+          {subsubcategories.map((s) => (
+            <Chip key={s} label={s} active={subsubcategory === s} onPress={() => setSubsubcategory(subsubcategory === s ? null : s)} />
+          ))}
+        </ScrollView>
+      )}
 
       {/* Everything else (foreigner-fit tags, neighborhood) lives behind one
           Filters button, so the default view never shows more than one row
@@ -191,7 +247,7 @@ export default function ExploreScreen() {
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {category || hood || 'All spots'} · {filtered.length}
+          {subsubcategory || subcategory || category || hood || 'All spots'} · {filtered.length}
         </T>
         {!query && (
           <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>

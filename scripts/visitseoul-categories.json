@@ -1,0 +1,3886 @@
+{
+  "source": "Visit Seoul API (https://api-call.visitseoul.net)",
+  "endpoint_used": "POST /api/v1/contents/list with lang_code_id=en, com_ctgry_sn=<code>",
+  "total_categories": 61,
+  "categories": [
+    {
+      "code": "Ca0o2d4",
+      "level": 1,
+      "path": "Culture",
+      "name": "Culture",
+      "total_count_en": 728,
+      "examples": [
+        {
+          "cid": "ENP4u05qa",
+          "name": "Seongbuk Young Art Space",
+          "summary": "A living creative space that continues to experiment across the diverse terrain of creation.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPj1ro8q",
+          "name": "Haechi Madang (Gwanghwamun Square)",
+          "summary": "A place that connects Gwanghwamun Station and Gwanghwamun Square, serving as a venue for rest and meetings.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwd3ohy",
+          "name": "Atelier Gwanghwa",
+          "summary": "A media gallery established on the exterior wall of the Sejong Center for the Performing Arts.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPt1364i",
+          "name": "The Garden of Simwon : Ink and Silence",
+          "summary": "The moment when ink, deep empty space, and time-embracing trees become a single garden.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqosaz0",
+          "name": "Summer Table : Six Hands, One Table",
+          "summary": "A special exhibition by six craft artists, <Summer Hands, One Six Table Table:>",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhs2wlq",
+          "name": "ICON: The Chair Series",
+          "summary": "Major new works that unravel human existence, desire, and the structure of memory and time through a unique visual language, centered on 'The Chair' series, which has been explored over a long period.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0e0w4k",
+          "name": "Samilro Changgo Theater",
+          "summary": "A Seoul Future Heritage site and a small-theater-based complex cultural space aiming for performances, exhibitions, and the incubation of young artists.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPx0x7wx",
+          "name": "BANKSY: Still Here",
+          "summary": "A symbol stronger than identity, Banksy's unending message!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPm8j6gm",
+          "name": "Kwon Byungjun: I Embrace You",
+          "summary": "A solo exhibition by artist Kwon Byungjun, who has long explored the intersection of technology and art, featured as part of the annual Children+ exhibition at the Seoul Museum of Art, Buk-Seoul Museu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwdbw7j",
+          "name": "Everything Dance Hall",
+          "summary": "Hongik University Department of Art Studies Graduation Exhibition 《Everything Dance Hall》. This exhibition, created together by 13 artists and emerging curators, compares our lives living in an uncert",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cu8e6t5",
+      "level": 1,
+      "path": "Shopping",
+      "name": "Shopping",
+      "total_count_en": 289,
+      "examples": [
+        {
+          "cid": "ENP42hkoc",
+          "name": "Good Morning General Store",
+          "summary": "A lifestyle select shop that delivers values and stories together.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPza4e3a",
+          "name": "Olive Better Gwanghwamun Branch",
+          "summary": "A wellness-specialized store presented by 'Olive Young.'",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfko0nq",
+          "name": "Atypical Yongsan shop & gallery",
+          "summary": "A cute and lovely prop shop and gallery.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0zmnvi",
+          "name": "dearpost",
+          "summary": "A letter shop that captures the beautiful moments of cloudy days.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPth7w31",
+          "name": "M CRAFT",
+          "summary": "A leather bag brand that started in a small workshop in 1987.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3crf5v",
+          "name": "LOW CLASSIC Mirae Building Branch",
+          "summary": "A ready-to-wear brand inspired by the sensibility of Seoul, based on classic and minimalism.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPab5p53",
+          "name": "LOW CLASSIC Seongsu Branch",
+          "summary": "A ready-to-wear brand inspired by the sensibility of Seoul, based on classic and minimalism.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2i6uh8",
+          "name": "LOW CLASSIC Garosu-gil Branch",
+          "summary": "A ready-to-wear brand inspired by the sensibility of Seoul, based on classic and minimalism.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPrzx6dz",
+          "name": "Renewed Seongsu",
+          "summary": "A Seongsu vintage shop full of neatly arranged secondhand products.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP1p6g0h",
+          "name": "Romantic Move Seongsu Flagship Store",
+          "summary": "A Korean local shoe brand with high completeness and quality.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ch4v8z7",
+      "level": 1,
+      "path": "Accommodations",
+      "name": "Accommodations",
+      "total_count_en": 16,
+      "examples": [
+        {
+          "cid": "ENPvmf745",
+          "name": "Leejae Seoul",
+          "summary": "A detached house accommodation located where the Seoul City Wall unfolds right in front of the house.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP54ay57",
+          "name": "Surak Hyu Treehouse",
+          "summary": "The nation's first urban-style forest retreat",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPrb2d9e",
+          "name": "Stay Davansa",
+          "summary": "A perfect spot to enjoy an open-air bath while gazing at the sky and a cozy garden, sipping freshly brewed tea, and reading in peace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPx17ry7",
+          "name": "Hotel Poco Seongsu",
+          "summary": "Hotel Poco Seongsu is a lifestyle hotel that aims to provide a safe haven in the fast-paced and bustling city center. Located just a 2-minute walk from Exit 3 of Seongsu Station, it offers excellent a",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9dsjmt",
+          "name": "Andaz Seoul Gangnam",
+          "summary": "A luxurious lifestyle hotel that showcases the local culture and sensibilities of the area with a modern touch in the heart of Gangnam.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042851",
+          "name": "Nostalgia Bluejae",
+          "summary": "A noble and blue hanok nestled in Bukchon Hanok Village",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042850",
+          "name": "Nuwa",
+          "summary": "Nuwa, a small hanok deep in the narrow alleys of Seochon's residential area",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042849",
+          "name": "Eungjeongheon",
+          "summary": "Enjoying nature in a hanok hotel",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039311",
+          "name": "Mangrove Sinseol",
+          "summary": "Through the renovation of a hotel comes the newest co-living house.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP028037",
+          "name": "Vista Walkerhill Seoul",
+          "summary": "Located in Achasan, Gwangjin-gu, Vista Walkerhill Seoul is the best place to soak in a hot tub while viewing the wonderful scenery of the Hangang River.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ca1z6p7",
+      "level": 1,
+      "path": "History",
+      "name": "History",
+      "total_count_en": 92,
+      "examples": [
+        {
+          "cid": "ENPw9eym0",
+          "name": "Dalmasa Temple",
+          "summary": "The only traditional temple in the Dongjak-gu area, enveloped by Seodalsan Mountain.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPnje8ve",
+          "name": "Gyeonggyojang",
+          "summary": "The final headquarters of the Provisional Government of the Republic of Korea and the momentous historical site of the assassination of Baekbum Kim Gu.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPv4bofj",
+          "name": "Garden of Gratitude",
+          "summary": "A space to reflect upon the gratitude toward Korean War veterans, as well as the achievements and prosperity of the Republic of Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0wav1s",
+          "name": "Jongmyo Shrine Stonewall Path ",
+          "summary": "A serene stone wall path stretches along the west wall of Jongmyo Shrine",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfk9nxi",
+          "name": "Gyeongbokgung Palace Jibokjae",
+          "summary": "A pavilion located to the west of Geoncheonggung in Gyeongbokgung Palace, used as King Gojong's study",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPldz98j",
+          "name": "Gyeongbokgung Stonewall Walkway ",
+          "summary": "The stonewall path surrounding Gyeongbokgung Palace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPl8f5md",
+          "name": "Changdeokgung Secret Garden ",
+          "summary": "A garden of a Joseon Dynasty located inside Changdeokgung Palace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkxi16h",
+          "name": "Kyungguksa",
+          "summary": "A temple located on the eastern foothills of Samgaksan (Bukhansan) in Jeongneung-dong, Seongbuk-gu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPexzzw3",
+          "name": "Seokguram",
+          "summary": "Seokguram Grotto is nestled halfway up Inwangsan Mountain, just below Chimabawi Rock, and can be reached via the Inwangsan Mountain Trail.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjkm9y3",
+          "name": "Shina Memorial Hall",
+          "summary": "This place serves as a memorial to honor the founder, Jang Ki-bong and Shina Ilbo, after its forced closure.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cl9s3y9",
+      "level": 1,
+      "path": "Cuisine",
+      "name": "Cuisine",
+      "total_count_en": 1263,
+      "examples": [
+        {
+          "cid": "ENPt829ij",
+          "name": "ASHLEY QUEENS HONGDAE BRANCH",
+          "summary": "Korea’s No. 1 Buffet Brand that serves 20 million customers yearly.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPf0gxy1",
+          "name": "ASHLEY QUEENS SEONGSU NAKNAK BRANCH",
+          "summary": "Unlimited Wine & Tap Beer Special Store : Perfect spot to Wine & Dine",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwv6j5f",
+          "name": "ASHLEY QUEENS DUNDUN DONGDAEMUN BRANCH",
+          "summary": "Korea’s No. 1 Buffet Brand that serves 20 million customers yearly.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPpr9v1k",
+          "name": "Cheongdonok",
+          "summary": "A Hongdae BBQ restaurant grilling domestic female pork, cross-aged wet and dry for 240 hours, over charcoal.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6sdoro",
+          "name": "Joseph's Coffee Tree",
+          "summary": "A specialized roastery cafe where you can taste specialty coffee brewed directly by a Barista Championship judge.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPll1tbp",
+          "name": "Babjitgo Tiurim (Cooking Rice and Brewing Tea)",
+          "summary": "A place where tea is brewed, rice is cooked, and alcohol is aged with sincere hands.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPuhyzcz",
+          "name": "Jazz Story",
+          "summary": "A live jazz cafe where you can listen under cozy incandescent lights.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPa7mlqm",
+          "name": "Dongjak Sunset Café",
+          "summary": "A cafe where you can leisurely view the Yeouido landscape from Dongjak Bridge.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPc4ztew",
+          "name": "THE SSANGHWA  ",
+          "summary": "A premium traditional herbal tea cafe that preserves traditional herbal medicinal secrets while catering to modern palates.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPn176ze",
+          "name": "Dotori Oven",
+          "summary": "A Seongsu cafe famous for desserts that captivates visitors with an exterior resembling a fairy-tale world.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Co6c2n2",
+      "level": 1,
+      "path": "Nature",
+      "name": "Nature",
+      "total_count_en": 91,
+      "examples": [
+        {
+          "cid": "ENPtr2tsi",
+          "name": "Seodalsan Mountain",
+          "summary": "A mountain embracing the National Cemetery, recommended as a beginner's hiking course.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPyia5so",
+          "name": "Yeonhui Forest Rest Area",
+          "summary": "A rest area located in Seodaemun-gu where you can feel the beauty of nature in the city center.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0aa7qh",
+          "name": "Songjeong Jebang gil",
+          "summary": "A riverside trail along Jungnangcheon that is beautiful in all four seasons",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5nlj26",
+          "name": "Namsan Sky Forest Trail",
+          "summary": "A walking trail where visitors can enjoy the freshness of Namsan under the clear sky.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPda1e2c",
+          "name": "Suraksan Byeokung Valley",
+          "summary": "A valley near Seoul accessible by subway",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPctphmy",
+          "name": "Yongsan Children's Garden",
+          "summary": "Yongsan Children's Garden temporarily opened on the returned Yongsan Park site",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9l9dhu",
+          "name": "Choansan Neighborhood Park Barefoot Loess Trail",
+          "summary": "A healing space to enhance the well-being of city residents weary from daily life",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9jn7zj",
+          "name": "Namsan Dulle-gil Trail",
+          "summary": "A healing trail circling Namsan in the heart of Seoul, centered around N Seoul Tower",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPxjlehm",
+          "name": "Anyangcheon Stream",
+          "summary": "Anyangcheon Stream, where every season brings a new scenic walk",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkxys7x",
+          "name": "Eungbongsan Mountain",
+          "summary": "A low mountain located in Eungbong-dong, Seongdong-gu",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cc9i5o2",
+      "level": 1,
+      "path": "Experience Programs",
+      "name": "Experience Programs",
+      "total_count_en": 101,
+      "examples": [
+        {
+          "cid": "ENPh6ancr",
+          "name": "Korea Fashion Psychology Institute",
+          "summary": "A Cheongdam-dong personal color salon trusted by luxury brands and designer houses.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPsbsko1",
+          "name": "A:muu Hair (Myeongdong A:muu Hair)",
+          "summary": "A premium hair salon located in Myeongdong, operated by a head director with over 28 years of experience.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhd6ywx",
+          "name": "Adellain Jewelry Studio",
+          "summary": "An experiential traditional Korean craft-based workshop where you can make one-of-a-kind silver jewelry in Jongno, Seoul, where tradition and modernity blend.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPaijkqu",
+          "name": "Myeongdong Personal Color & Makeup Colorholic",
+          "summary": "A specialized consulting space where you can directly experience Korea's personal color analysis, body type analysis, and K-beauty makeup.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPf78gji",
+          "name": "Running Man Experience Center Insadong Branch",
+          "summary": "A dynamic experiential attraction that brings the format of the popular entertainment program  exactly offline, allowing you to directly become a <Running Man> member.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkq5ji1",
+          "name": "Youngchive Seochon Branch",
+          "summary": "A self-photo booth recording daily life in Seochon.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg992ys",
+          "name": "My Friend Seoul, Seoul Gallery",
+          "summary": "A complex cultural space where you can experience the future and present of Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPcztazx",
+          "name": "Louis Vuitton Visionary Journeys Seoul",
+          "summary": "A complex cultural space where Louis Vuitton's store, exhibition, restaurant, and cafe are harmonized in one place.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwygusk",
+          "name": "Laurel Studio",
+          "summary": "An ondol floor skincare experience space based on traditional Korean lifestyle culture.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi88tyg",
+          "name": "Venue G Aqua 24",
+          "summary": "The largest sauna and jjimjilbang in Gangseo gu, Seoul, with an area of 3000 pyeong",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cv7s8m5",
+      "level": 1,
+      "path": "Festivals/Events/Performances",
+      "name": "Festivals/Events/Performances",
+      "total_count_en": 1109,
+      "examples": [
+        {
+          "cid": "ENPu7606j",
+          "name": "Yongsan Art Hall",
+          "summary": "A culture and arts space capable of hosting large-scale performances, providing opportunities to enjoy diverse cultures.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPocnv9w",
+          "name": "2026 Yeowoorak Festival",
+          "summary": "This summer! Dive into the sea of our music! The National Theater of Korea's representative summer festival.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4p11lw",
+          "name": "Local Trip Gourmet Pop-UP",
+          "summary": "The most delicious way to find your next travel destination: The taste and charm of the region encountered at the regional tourism antenna shop.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhhpmd3",
+          "name": "2026 Namsan Summer Festival",
+          "summary": "A summer-specialized festival held around Namsan Park",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPzqncck",
+          "name": "2026 Donhwamun Traditional Culture Festa",
+          "summary": "A complex small-scale festival combining performances, exhibitions, and crafts alongside cultural artists in the field of Korean tradition.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9byb55",
+          "name": "GAME AiCON Seoul 2026",
+          "summary": "GAME AiCON 2026 is a B2B-focused event designed for Asian game publishing and global partnerships.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPif3oia",
+          "name": "2026 Seoul Tourism Food Festival (Picnic on the Bridge)",
+          "summary": "The one and only K-gastronomy festival unfolding on the Hangang Jamsu Bridge! Seoul Tourism Food Festival.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP8s9qmk",
+          "name": "2026 N Seoul Tower Global Night Walk",
+          "summary": "A unique experience of walking while simultaneously feeling the sparkling night view of downtown Seoul and the sensibility of Namsan Mountain.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPd5mmfg",
+          "name": "2026 Seoul Taekwondo Performance",
+          "summary": "A Taekwondo performance enjoyed in the center of Seoul!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPcrjas7",
+          "name": "Pokemon Secret Forest",
+          "summary": "A character pop-up garden where urban nature and Pokemon harmonize.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ce7q5s7",
+      "level": 2,
+      "path": "Accommodations > Hotels",
+      "name": "Hotels",
+      "total_count_en": 9,
+      "examples": [
+        {
+          "cid": "ENPx17ry7",
+          "name": "Hotel Poco Seongsu",
+          "summary": "Hotel Poco Seongsu is a lifestyle hotel that aims to provide a safe haven in the fast-paced and bustling city center. Located just a 2-minute walk from Exit 3 of Seongsu Station, it offers excellent a",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9dsjmt",
+          "name": "Andaz Seoul Gangnam",
+          "summary": "A luxurious lifestyle hotel that showcases the local culture and sensibilities of the area with a modern touch in the heart of Gangnam.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042850",
+          "name": "Nuwa",
+          "summary": "Nuwa, a small hanok deep in the narrow alleys of Seochon's residential area",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042849",
+          "name": "Eungjeongheon",
+          "summary": "Enjoying nature in a hanok hotel",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP028037",
+          "name": "Vista Walkerhill Seoul",
+          "summary": "Located in Achasan, Gwangjin-gu, Vista Walkerhill Seoul is the best place to soak in a hot tub while viewing the wonderful scenery of the Hangang River.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024551",
+          "name": "Hotel Cappuccino",
+          "summary": "Welcome to Hotel Cappuccino, an urban lifestyle destination where every day brings new surprises and inspiration.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP012495",
+          "name": "Mayfield Hotel",
+          "summary": "The Mayfield Hotel is a conveniently located urban resort in Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP013049",
+          "name": "Grand Walkerhill Hotel",
+          "summary": "The Grand Walkerhill Hotel is a five-star hotel located between the Hangang River and Achasan Mountain.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP011307",
+          "name": "Conrad Seoul Hotel",
+          "summary": "The Conrad Seoul Hotel is a 5-star hotel located in Yeongdeungpo-gu, Seoul.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cz9d1h6",
+      "level": 2,
+      "path": "Cuisine > Korean Restaurants",
+      "name": "Korean Restaurants",
+      "total_count_en": 544,
+      "examples": [
+        {
+          "cid": "ENPt829ij",
+          "name": "ASHLEY QUEENS HONGDAE BRANCH",
+          "summary": "Korea’s No. 1 Buffet Brand that serves 20 million customers yearly.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPf0gxy1",
+          "name": "ASHLEY QUEENS SEONGSU NAKNAK BRANCH",
+          "summary": "Unlimited Wine & Tap Beer Special Store : Perfect spot to Wine & Dine",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwv6j5f",
+          "name": "ASHLEY QUEENS DUNDUN DONGDAEMUN BRANCH",
+          "summary": "Korea’s No. 1 Buffet Brand that serves 20 million customers yearly.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPpr9v1k",
+          "name": "Cheongdonok",
+          "summary": "A Hongdae BBQ restaurant grilling domestic female pork, cross-aged wet and dry for 240 hours, over charcoal.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPll1tbp",
+          "name": "Babjitgo Tiurim (Cooking Rice and Brewing Tea)",
+          "summary": "A place where tea is brewed, rice is cooked, and alcohol is aged with sincere hands.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPh7v6i1",
+          "name": "Palgyejip",
+          "summary": "A Korean cuisine specialty restaurant where you can feel the sensibility of Hongdae and Yeonnam.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP8ndtkv",
+          "name": "Muguok",
+          "summary": "A chicken specialty restaurant featuring a rich broth boiled in a traditional iron cauldron (Gamasot).",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPq5g5y2",
+          "name": "Munjeonseongsi",
+          "summary": "A Korean pub specializing in Jeon (Korean pancakes) with diverse and generous portions, perfectly harmonized with Makgeolli.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjdhubv",
+          "name": "Dalmaji Gwangjang Barbecue",
+          "summary": "A K-BBQ house specializing in made-to-order barbecue, located in Euljiro.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqyikuv",
+          "name": "Durumi Bunsik N Seoul Tower Branch",
+          "summary": "A new taste of Bunsik (Korean street food) enjoyed at Namsan",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ce9z7g9",
+      "level": 2,
+      "path": "Culture > Parks",
+      "name": "Parks",
+      "total_count_en": 48,
+      "examples": [
+        {
+          "cid": "ENPyz09up",
+          "name": "Rooftop Garden (The Roof)",
+          "summary": "A place where you can enjoy open views and comfortable relaxation in the heart of Seoul, it also serves as a connection between Seoul Station and Seoullo 7017",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqsaooa",
+          "name": "Inwangsan Shelter in the Woods ",
+          "summary": "Inwangsan Shelter in the Woods, a place where you can enjoy the tranquility of reading a book in the forest of Inwangsan Mountain",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPe5w2yc",
+          "name": "Yanghwa Hangang Park",
+          "summary": "This location is Yanghwa Hangang Park, offering expansive vistas for you to delight in the stunning scenery.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039707",
+          "name": "Hyochang Park",
+          "summary": "National cultural heritage site, Hyochang Park",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039706",
+          "name": "Seoripul Park",
+          "summary": "If you'd like to travel somewhere in the city with nature, recreational areas, and walking paths, visit Seoripul Park. Take in the clean fresh air of the forest in the city whose beauty can be felt each season.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039629",
+          "name": "Chundangji Pond",
+          "summary": "On the rear garden grounds of Changgyeonggung Palace sits Chundangji Pond",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP038861",
+          "name": "World Cup Park's Dog Park",
+          "summary": "A space where visitors can have fun running around with their off-leash dog!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037160",
+          "name": "Gyeongui Line Forest Park",
+          "summary": "The Gyeongi Line Forest Park is a long section of land including Yeontral Park and Gyeongi Line Book Street, and is a place where you can enjoy green spaces in the city center.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037010",
+          "name": "Gwangjin Forest Naru Park",
+          "summary": "A community park located at the northern end of the Cheonho-daero Tunnel.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP036989",
+          "name": "Seocho Culture & Arts Park",
+          "summary": "A park built in the third zone of Yangjae Citizens' Forest filled with gorgeous plane trees.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cr6o1h2",
+      "level": 2,
+      "path": "Experience Programs > Industrial Sites",
+      "name": "Industrial Sites",
+      "total_count_en": 17,
+      "examples": [
+        {
+          "cid": "ENP5dtalk",
+          "name": "Adamo Studio",
+          "summary": "A high-end tailor that draws customers from all across the country",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP56qewe",
+          "name": "Seolwha Hardware",
+          "summary": "A 50-year-old hardware store near Namseong Station",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034360",
+          "name": "1Million Dance Studio",
+          "summary": "Introducing Korea's largest dance studio and management agency",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023564",
+          "name": "Seoul AI Hub",
+          "summary": "The Seoul AI Hub specializes in cultivating and promoting the AI (artificial intelligence) sector in Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023538",
+          "name": "Seoul Bio Hub",
+          "summary": "The Seoul Bio Hub is a support hub for biomedical startup companies.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023571",
+          "name": "Seoul Startup Hub",
+          "summary": "Founded in June 2017, The Seoul Startup Hub is Korea's largest startup incubator.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023602",
+          "name": "Seoul 50 Plus Southern Campus",
+          "summary": "Seoul 50 Plus is a continuing education center geared towards people who are aged 50 and older. The southern campus sits at the foot of Gaeungsan Mountain in Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP022047",
+          "name": "Space 42",
+          "summary": "Space 42 is a multipurpose jewelry exhibtion venue where jewels and jewelry are showcased and can be purchased",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP015408",
+          "name": "Real Kpop Dance",
+          "summary": "You can receive personal lessons and group lessons with the direction of back dancers working with famous singers of JYJ, TVXQ, Super Junior, Sinhwa, Jang Woo Hyuk, and IU. It is located near Hongdae with the YG Entertainment building, club performance halls, guesthouse, various shopping stores and restaurants.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP011869",
+          "name": "Boutique Monaco",
+          "summary": "Boutique Monaco is an avant-gard penthouse and apartment building that has been used as a filming location for Korean TV shows.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cd4y5u1",
+      "level": 2,
+      "path": "Festivals/Events/Performances > Festivals",
+      "name": "Festivals",
+      "total_count_en": 700,
+      "examples": [
+        {
+          "cid": "ENPrjv9l2",
+          "name": "17th Jungnang  Seoul Rose Festival",
+          "summary": "Experience the Most Romantic May, Blooming with Roses!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042906",
+          "name": "One and All",
+          "summary": "Artists include Lee Eun-hwang, Gum Sahong, Ban Miryung, Hong Kyung-hui, Yang Dae-man, Kim Ki-tae, Lee Myung-hwa, Jung Jae-chul, Choi Young Wook, Kang Hong-gu, Ji Yu-ra, Park Yong-il, Jo Mi-hwa, Ha So-young, Bae Jung-eun, Yoo Song, Lee Kyung-min, and Kim Bo-yeon - all of which express themselves in their own distinctive manner. Stop by and admire the works of these 20 unique individuals and get the year off to a fascinating and uplifting start!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042886",
+          "name": "Lee Kyoungmi Solo Exhibition 《The Best is yet to Come》",
+          "summary": "Lee Kyoung-mi has been showcasing works that contain an in-depth reflection on existence and the world by placing the image of the much-loved cat \"Nana\" with a landscape where the real world and imaginary space are mixed. The exhibition will introduce about 20 paintings and video works produced by SKM Project (Kim Si-kyoung and Lee Kyoung-mi.)",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042877",
+          "name": "Artist Kim Jong-ku Private Exhibition 《Fe-Aerial Landscape》",
+          "summary": "Through plant landscape paintings emphasizing the value of the invisible, the artist reminds us of the importance of our inner beings in a modern society where what is seen is important. At the same time, it reveals the truth in nature and shows it to us. It makes us realize that our lives are driven by the invisible, not the visible.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042723",
+          "name": "Choi Min Collection: Ways of Seeing",
+          "summary": "This exhibition showcases the Choi Min collection donated in large quantities to the Seoul Museum of Art by the bereaved family of art critic Choi Min (1944-2018).",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042701",
+          "name": "Breath, Rest: The journey to innocence",
+          "summary": "The hope is that facing all these artworks of nature and taking a breath, the most fundamental element of our lives, will help us look at ourselves calmly.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042699",
+          "name": "《Kang Seok-ho: Three Minutes Delight》",
+          "summary": "Kang Seok-ho (1971-2021) first retrospective exhibition 《Kang Seok-ho: Three Minutes Delight》 complexly portrays the images of Kang Seok-ho, who has expanded his aesthetic taste through the collection and production of design furniture while insisting on his unique way of painting.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042692",
+          "name": "My Soul Figure",
+          "summary": "This Jo Deok-ho archive figure exhibition comprises Lego and mini figures collected for six years. It is a figure photo exhibition and an exhibition where you can make special goods such as 'your own figure made with a single picture.’",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042665",
+          "name": "The first story of Pierrot and Laurent <MAISON DE LAURENT>",
+          "summary": "MAISON DE LAURENT\nLaurent's House contains the stories of all of us\n\nA clown who smiles but lives with tears in his eyes.\nPierrot Laurent, a self-portrait of people whom each carry a special pain.\nYou are invited to Laurent's house",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042540",
+          "name": "Seoul Lantern Festival 2022",
+          "summary": "Not only will the beautiful light exhibition shine warmly at the end of the year in Seoul, but various events, such as the Gwanghwamun Square Market and Media Facade will make an appearance during the year-end and New Year’s holidays.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cw1i3e4",
+      "level": 2,
+      "path": "History > Religious Sites",
+      "name": "Religious Sites",
+      "total_count_en": 20,
+      "examples": [
+        {
+          "cid": "ENPw9eym0",
+          "name": "Dalmasa Temple",
+          "summary": "The only traditional temple in the Dongjak-gu area, enveloped by Seodalsan Mountain.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkxi16h",
+          "name": "Kyungguksa",
+          "summary": "A temple located on the eastern foothills of Samgaksan (Bukhansan) in Jeongneung-dong, Seongbuk-gu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPexzzw3",
+          "name": "Seokguram",
+          "summary": "Seokguram Grotto is nestled halfway up Inwangsan Mountain, just below Chimabawi Rock, and can be reached via the Inwangsan Mountain Trail.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP036843",
+          "name": "Geumseonsa Temple",
+          "summary": "A strikingly beautiful temple at the foot of the Bukhansan Mountain!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP033829",
+          "name": "Hwagyesa Temple",
+          "summary": "Hwagyesa Temple was founded by Seonsa (Seon master) Sinwol in 1522 (17th year of King Jungjong's reign).",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP029394",
+          "name": "Korean Catholic Martyrs’ Museum",
+          "summary": "The former Jeoldusan Matyrs' Memorial Hall.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP028339",
+          "name": "Bongwonsa Temple",
+          "summary": "Originally built on the site of Yonsei University by Queen Jinseong of the Shilla Dynasty in 889 A.D., Bongwonsa Temple was moved to its current site by King Yongjo of the Joseon Dynasty in 1748.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001862",
+          "name": "Wonhyoro Catholic Church",
+          "summary": "Wonhyoro Catholic Church is located beside Sacred Heart Girls' High School and was consecrated in 1902.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002010",
+          "name": "Andong Presbyterian Church's Soheodang",
+          "summary": "Andong Presbyterian Church is located in Bukchon Hanok Village. The church dates back to the early 20th century.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002021",
+          "name": "Hwagyesa Temple",
+          "summary": "Hwagyesa Temple is located in the Samgaksan Woods, at the foot of Samgaksan Mountain in Seoul.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cu5u8d4",
+      "level": 2,
+      "path": "Nature > Natural Sites(Mountains)",
+      "name": "Natural Sites(Mountains)",
+      "total_count_en": 30,
+      "examples": [
+        {
+          "cid": "ENPtr2tsi",
+          "name": "Seodalsan Mountain",
+          "summary": "A mountain embracing the National Cemetery, recommended as a beginner's hiking course.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9jn7zj",
+          "name": "Namsan Dulle-gil Trail",
+          "summary": "A healing trail circling Namsan in the heart of Seoul, centered around N Seoul Tower",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkxys7x",
+          "name": "Eungbongsan Mountain",
+          "summary": "A low mountain located in Eungbong-dong, Seongdong-gu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039306",
+          "name": "Inwangsan Night Views",
+          "summary": "Thanks to its stunning night time views, Inwangsan has quickly captured the hearts of many.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039305",
+          "name": "Yongmasan Mountain",
+          "summary": "The highest mountain in Jungnang-gu and the highest peak in Achasan Mountain.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP038786",
+          "name": "Eungbongsan Mountain Night View",
+          "summary": "A place to enjoy the sparkling night view of downtown Seoul",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP038785",
+          "name": "Eungbongsan Mountain Palgakjeong Pavilion ",
+          "summary": "A place where visitors can get a beautiful overlook of Seoul on Eungbongsan Mountain.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037532",
+          "name": "Jiyangsan Mountain",
+          "summary": "Jiyangsan mountain is an accessible and inclusive place for anyone that wants to enjoy urban nature",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037529",
+          "name": "Baengnyeonsan Mountain",
+          "summary": "Baengnyeonsan mountain - a great place for an easy and comfortable walk",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037364",
+          "name": "Ansan Mountain",
+          "summary": "Ansan Mountain is 295.5 meters high and it is located in the Seodaemun-gu district of Seoul.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cn0t1e0",
+      "level": 2,
+      "path": "Shopping > Specialty Shops & Stores",
+      "name": "Specialty Shops & Stores",
+      "total_count_en": 151,
+      "examples": [
+        {
+          "cid": "ENPfko0nq",
+          "name": "Atypical Yongsan shop & gallery",
+          "summary": "A cute and lovely prop shop and gallery.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0zmnvi",
+          "name": "dearpost",
+          "summary": "A letter shop that captures the beautiful moments of cloudy days.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPth7w31",
+          "name": "M CRAFT",
+          "summary": "A leather bag brand that started in a small workshop in 1987.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2i6uh8",
+          "name": "LOW CLASSIC Garosu-gil Branch",
+          "summary": "A ready-to-wear brand inspired by the sensibility of Seoul, based on classic and minimalism.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP1p6g0h",
+          "name": "Romantic Move Seongsu Flagship Store",
+          "summary": "A Korean local shoe brand with high completeness and quality.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4sh9je",
+          "name": "Cosmic Mansion Seochon",
+          "summary": "A specialized fragrance brand located in an alley of Seochon.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPncj7nn",
+          "name": "Poset Yeonhui",
+          "summary": "A prop shop in Yeonhui-dong that feels like coming to a postcard library.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjx2a9d",
+          "name": "Beesket Studio",
+          "summary": "A stationery store where photos and writing linger.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP86di0a",
+          "name": "Hetras Seongsu",
+          "summary": "A lifestyle shop enveloped in scents.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi3s4ab",
+          "name": "Seongsu Ready Young drug store",
+          "summary": "A premium drug store where you can experience K-beauty cosmetics and highly functional cosmetics available only at pharmacies.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ct9n1n3",
+      "level": 2,
+      "path": "Accommodations > Hostels",
+      "name": "Hostels",
+      "total_count_en": 2,
+      "examples": [
+        {
+          "cid": "ENP039311",
+          "name": "Mangrove Sinseol",
+          "summary": "Through the renovation of a hotel comes the newest co-living house.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP009960",
+          "name": "Hi Seoul Youth Hostel",
+          "summary": "Opening its doors on March 2, 2011, Hi Seoul Youth Hostel is a new, state-of-the art lodging facility that offers a variety of programs, events and hands-on experiences in addition to comfortable accommodation.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cx0t8m5",
+      "level": 2,
+      "path": "Cuisine > Cafes & Tea Shops",
+      "name": "Cafes & Tea Shops",
+      "total_count_en": 226,
+      "examples": [
+        {
+          "cid": "ENP6sdoro",
+          "name": "Joseph's Coffee Tree",
+          "summary": "A specialized roastery cafe where you can taste specialty coffee brewed directly by a Barista Championship judge.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPa7mlqm",
+          "name": "Dongjak Sunset Café",
+          "summary": "A cafe where you can leisurely view the Yeouido landscape from Dongjak Bridge.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPc4ztew",
+          "name": "THE SSANGHWA  ",
+          "summary": "A premium traditional herbal tea cafe that preserves traditional herbal medicinal secrets while catering to modern palates.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPn176ze",
+          "name": "Dotori Oven",
+          "summary": "A Seongsu cafe famous for desserts that captivates visitors with an exterior resembling a fairy-tale world.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP14h5v9",
+          "name": "Undebt",
+          "summary": "A cafe featuring an interior that aims for the enjoyment of nature in the heart of the city.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP7bb6ng",
+          "name": "Tung Empty Life",
+          "summary": "A cafe and beer bar at Anguk Station with a great view capturing the scenery of Jongno.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2ms2gs",
+          "name": "Scoff Seochon",
+          "summary": "A British bakery cafe famous for its scones, serving as the 1st Seochon branch (main branch).",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5l258t",
+          "name": "H COFFEE ROASTERS SEOCHON",
+          "summary": "A cafe located in a Seochon alley that directly roasts specialty coffee.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5xmb4f",
+          "name": "Space K Nodeul",
+          "summary": "A media art cafe and complex cultural space remodeled from the former Noryangjin Water Intake Station",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPz2k7k0",
+          "name": "Surokgok Giroksil",
+          "summary": "A book cafe & bar where individual listening to LPs, CDs, and cassette tapes is possible at each seat.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ca1u7i6",
+      "level": 2,
+      "path": "Culture > Cultural Districts",
+      "name": "Cultural Districts",
+      "total_count_en": 50,
+      "examples": [
+        {
+          "cid": "ENPqyzmh2",
+          "name": "LuggageQ Hongdae Branch",
+          "summary": "A 24-hour unmanned luggage storage near Hongik University Station where you can affordably store your items in large lockers that can fit up to six 20-inch suitcases.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP60cztf",
+          "name": "LuggageQ Seoul Station Branch",
+          "summary": "A 24-hour unmanned luggage storage near Seoul Station where you can affordably store your items in large lockers that can fit up to six 20-inch suitcases.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPpip0hk",
+          "name": "Yongsan Cultural Foundation Complex Cultural Space",
+          "summary": "A central hub for culture and arts integrated into daily life.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPk0c3m0",
+          "name": "Hangangjin Station",
+          "summary": "The start of Hannam-dong's hidden showroom street, a Line 6 subway station you want to walk along.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqb6ctu",
+          "name": "Hangang Play Place",
+          "summary": "A complex cultural space where all the joys of the Han River come together, offering diverse ways to experience the many charms of the Han River.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPsrsape",
+          "name": "Arcade Seoul",
+          "summary": "A Mullae dong complex cultural space born from an old iron workshop",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP70yggc",
+          "name": "Chungmuro Station",
+          "summary": "A station located in Chungmuro, once called the mecca of Korean cinema.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0asdjp",
+          "name": "Magok Cultural Street",
+          "summary": "A cultural and artistic street in Magok District",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPh83fpt",
+          "name": "Seoul Regional Tourism Center",
+          "summary": "A space where you can discover travel information from all regions of Korea in one place",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPf8bj59",
+          "name": "Euljiro Nogari Alley",
+          "summary": "The food alley of Euljiro",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cq3m6s6",
+      "level": 2,
+      "path": "Experience Programs > Craft Workshops",
+      "name": "Craft Workshops",
+      "total_count_en": 17,
+      "examples": [
+        {
+          "cid": "ENPiwuy53",
+          "name": "Seolleim Candle",
+          "summary": "A craft studio offering candle making, perfumery, glass art, and a variety of handmade classes",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPil6eky",
+          "name": "Lettering Jewelry Lab",
+          "summary": "An accessory-making experience inspired by Hangul",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPoqlgy2",
+          "name": "Elburim Tailorshop",
+          "summary": "A master tailor shop boasting a 40-year history",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP1vsos3",
+          "name": "Seoul Studio",
+          "summary": "Professionally shot keepsake photos with premium equipment and materials",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034361",
+          "name": "Ceradu Ceramics Studio",
+          "summary": "Experience a great ceramics workshop in the Gangnam area!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP027813",
+          "name": "Bukchon Woodwork Workshop",
+          "summary": "A woodcraft workshop in Bukchon where you can take a class to make traditional masks",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP025927",
+          "name": "Myung Sin Dang Brush Store",
+          "summary": "A store of four treasures of the study that grew up with artists",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP025016",
+          "name": "Ahwon Workshop",
+          "summary": "A metal craft store that offers both gallery exhibitions and goods on display",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001459",
+          "name": "Rhee Kitae Traditional Kite Workshop",
+          "summary": "The Rhee Kitae Traditional Kite Workshop is the place to go to learn about traditional Korean kites.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP005580",
+          "name": "Institution of Natural Dyeing",
+          "summary": "The Institution of Natural Dyeing educates the public on traditional Korean dyeing methods.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cb2b0t2",
+      "level": 2,
+      "path": "Festivals/Events/Performances > Performances",
+      "name": "Performances",
+      "total_count_en": 14,
+      "examples": [
+        {
+          "cid": "ENPu7606j",
+          "name": "Yongsan Art Hall",
+          "summary": "A culture and arts space capable of hosting large-scale performances, providing opportunities to enjoy diverse cultures.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPyeex1b",
+          "name": "2023 SEOUL LANTERN FESTIVAL",
+          "summary": "You're invited to the Seoul Lantern Festival, which beautifully colors the winter night with light.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6i7br4",
+          "name": "[S-TCEP] 2023 Seoul Philharmonic Orchestra: Ligeti Piano Concerto",
+          "summary": "A performance by pianist, Pierre-Laurent Aimard, who was acknowledged by world-renowned composer,  György Ligeti, for his exceptional understanding of his work",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPdlccnj",
+          "name": "[S-TCEP] Munich Philharmonic Orchestra in Korea",
+          "summary": "One of the world's top orchestras, carrying on a 120-year history, meets top Korean conductor, Maestro Chung Myung-hoon, for a performance based on the traditional sound of Germany",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPua5zwq",
+          "name": "[S-TCEP] Cats, the Musical",
+          "summary": "The world famous musical, Cats, is back for an even more immersive and interactive experience",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg50ipl",
+          "name": "[S-TCEP] 2023 Seoul Philharmonic Orchestra: Pletnev & Sunwoo",
+          "summary": "A taste of Russian ballet music and concertos sophisticatedly blended with the traits of the Russian conductor",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi018lw",
+          "name": "[S-TCEP] 2023 Seoul Philharmonic Orchestra: Stenz & Bell",
+          "summary": "One of the United States' top violinists is invited to the stage for an innovative show of modern music",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg5tw1e",
+          "name": "[S-TCEP] 2023 Seoul Philharmonic Orchestra: The Ring",
+          "summary": "Witness this year's arrival of Wagner's Sound",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPl23uol",
+          "name": "[S-TCEP] 2023 Seoul Philharmonic Orchestra: Violin Concerto",
+          "summary": "German classic music record label, Deutsche Grammophon's star violinist, Lisa Batiashvili, marks first performance in Korea",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPgzt4p3",
+          "name": "[S-TCEP] 2023 Seoul Philharmonic Orchestra: Shostakovich Concerto",
+          "summary": "Previously postponed due to pandemic, Patricia Kopatchinskaja makes her first concerto appearance",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cl1k5b1",
+      "level": 2,
+      "path": "History > Historical Sites",
+      "name": "Historical Sites",
+      "total_count_en": 70,
+      "examples": [
+        {
+          "cid": "ENPnje8ve",
+          "name": "Gyeonggyojang",
+          "summary": "The final headquarters of the Provisional Government of the Republic of Korea and the momentous historical site of the assassination of Baekbum Kim Gu.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0wav1s",
+          "name": "Jongmyo Shrine Stonewall Path ",
+          "summary": "A serene stone wall path stretches along the west wall of Jongmyo Shrine",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfk9nxi",
+          "name": "Gyeongbokgung Palace Jibokjae",
+          "summary": "A pavilion located to the west of Geoncheonggung in Gyeongbokgung Palace, used as King Gojong's study",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPldz98j",
+          "name": "Gyeongbokgung Stonewall Walkway ",
+          "summary": "The stonewall path surrounding Gyeongbokgung Palace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPl8f5md",
+          "name": "Changdeokgung Secret Garden ",
+          "summary": "A garden of a Joseon Dynasty located inside Changdeokgung Palace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjkm9y3",
+          "name": "Shina Memorial Hall",
+          "summary": "This place serves as a memorial to honor the founder, Jang Ki-bong and Shina Ilbo, after its forced closure.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPlpqd8k",
+          "name": "Cheongjeon Yi Sang-beom House",
+          "summary": "Yi Sang-beom’s House located in Nuha-dong",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPcyd45f",
+          "name": "Site of Concubine Jang Huibin’s Well",
+          "summary": "Jang Huibin’s Well has been associated with Yeonhui Palace, a detached palace since the early Joseon Dynasty. It has been associated with palace grounds, courtyards and main buildings.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037164",
+          "name": "Seokpajeong",
+          "summary": "A garden that was tended to by the ruling class during the Joseon Dynasty",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037176",
+          "name": "Grand Greenhouse Changgyeonggung Palace",
+          "summary": "Joseon's beautiful Grand Greenhouse",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cw8j0y7",
+      "level": 2,
+      "path": "Nature > Natural Sites(Rivers)",
+      "name": "Natural Sites(Rivers)",
+      "total_count_en": 22,
+      "examples": [
+        {
+          "cid": "ENP0aa7qh",
+          "name": "Songjeong Jebang gil",
+          "summary": "A riverside trail along Jungnangcheon that is beautiful in all four seasons",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPda1e2c",
+          "name": "Suraksan Byeokung Valley",
+          "summary": "A valley near Seoul accessible by subway",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPxjlehm",
+          "name": "Anyangcheon Stream",
+          "summary": "Anyangcheon Stream, where every season brings a new scenic walk",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2xzi3t",
+          "name": "Hongjecheon Artificial Waterfall",
+          "summary": "A man-made waterfall in the heart of Seoul\r\nA relaxing space for residents equipped with shelters, artificial waterfalls, music fountains, and more.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037952",
+          "name": "Suseong-dong Valley",
+          "summary": "Suseong-dong Valley has been known as a valley to be so beautiful that is has appeared in Suseong-dong's \"Jangdong Eight Hinges\" by Jeongseon Gyeomjae. It is said that Daegun Anpyeong and Jeongseon Gyeomjae visited frequently and enjoyed Chinese calligraphy and art while looking over the beautiful view.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP003968",
+          "name": "Banpo Hangang Park",
+          "summary": "Recently renovated under the city's \"Hangang Renaissance Project.\"",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP003617",
+          "name": "Ichon Hangang Park",
+          "summary": "Features Nodeulseom Island and the northern banks of Hangang River.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002909",
+          "name": "Jamwon Hangang Park",
+          "summary": "Acts as both a popular date spot, as well as home to numerous sports facilities, including 8.2 km inline skating rink.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP004023",
+          "name": "Jamsil Hangang Park",
+          "summary": "Comes fully equipped with large recreational facilities, such as a swimming pool, inline skating rinks, cycling roads, ice rink, soccer field, and volleyball courts.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002841",
+          "name": "Mangwon Hangang Park",
+          "summary": "Located between Seongsandaegyo Bridge and Yanghwadaegyo Bridge, Mangwon Hangang Park is a beautiful place with many historical sites.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cy4k5t1",
+      "level": 2,
+      "path": "Shopping > Shopping Malls & Outlets",
+      "name": "Shopping Malls & Outlets",
+      "total_count_en": 28,
+      "examples": [
+        {
+          "cid": "ENP2dr3he",
+          "name": "Lotte Outlet Seoul Station",
+          "summary": "We offer new and enjoyable experiences every day!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPx2foc9",
+          "name": "Kwangya@Seoul",
+          "summary": "A space where you can directly experience the IP contents of K-POP artists",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPpic8xu",
+          "name": "Enter-6 Fashion Mall",
+          "summary": "The newest shopping grounds and culture spot in Gangnam",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP041786",
+          "name": "Songridan-gil",
+          "summary": "Walking course from Seokchon Lake Dongho to Songpanaru Station",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP041784",
+          "name": "Gyeongnidan-gil",
+          "summary": "Between Itaewon and Haebangchon, the road from the Armed Forces Financial Management Corps to the Grand Hyatt Seoul and its surrounding alleys",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037934",
+          "name": "Ssamzi-gil",
+          "summary": "Ssamzi-gil is a shopping mall that was established in 2004 and features both traditional and modern crafts and doubles as a cultural complex",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037890",
+          "name": "Sewoon Cheonggye Shopping Center",
+          "summary": "Sewoon Cheonggye Shopping Mall, built as a residential and commercial building in the 1960s, appeared as \"Geumga Plaza\" in the drama Vincenzo and has become a hot place to visit ever since.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP029546",
+          "name": "Goto Mall",
+          "summary": "Located in Express Bus Terminal Station, Goto Mall is the largest underground shopping center in Gangnam.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP017740",
+          "name": "Gangnam Station Underground Shopping Center",
+          "summary": "In Gangnam Station on Subway Line 2, below the extravagant world of Gangnam-daero, a new world awaits shoppers.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001307",
+          "name": "Cheongdamdong Fashion Street",
+          "summary": "Cheongdam currently boasts the world's major luxury brands lined up neatly for your shopping pleasure.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ck6n0w6",
+      "level": 2,
+      "path": "Cuisine > Bars & Clubs",
+      "name": "Bars & Clubs",
+      "total_count_en": 53,
+      "examples": [
+        {
+          "cid": "ENPuhyzcz",
+          "name": "Jazz Story",
+          "summary": "A live jazz cafe where you can listen under cozy incandescent lights.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2w1s9w",
+          "name": "Baekpal (108)",
+          "summary": "A bar located at the end of Huam-dong, Yongsan, beneath the 108 steps of Haebangchon.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPpxfou6",
+          "name": "l’oubli",
+          "summary": "A quiet and cozy bar located in Seorae Village",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPadtomq",
+          "name": "Romantic LP Bar Jamsil Bangi Branch",
+          "summary": "An LP bar where guests can enjoy drinks, great music, and romance through real LP listening",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP8f9it6",
+          "name": "Four Seasons Hotel Seoul Charles H.",
+          "summary": "An exotic cocktail bar named after a legendary American writer",
+          "has_photo": true
+        },
+        {
+          "cid": "ENParm2do",
+          "name": "Bangul & Kkomak",
+          "summary": "A Korean-style tavern in Yongsan specializing in seasonal seafood and pojangmacha dishes",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2h7itr",
+          "name": "Namsan Sul Club",
+          "summary": "A traditional liquor bar where you can taste 100 types of Korean liquor by the glass",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPb3iegs",
+          "name": "Mexitiger",
+          "summary": "A bold and edgy Mexican-Chinese tequila pub inspired by the cantinas of San Cristóbal",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPni42mf",
+          "name": "Amazing Brewing Company Seongsu Brewpub",
+          "summary": "A pub where you can enjoy 50 kinds of freshly brewed craft beer",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhnvr4s",
+          "name": "Mullae Pocha 1422",
+          "summary": "A go-to bar for great side dishes, approved by Mullae’s factory owners and run by a chef with over 30 years of experience in Chinese cuisine",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cr1f0k2",
+      "level": 2,
+      "path": "Culture > Performance Halls",
+      "name": "Performance Halls",
+      "total_count_en": 27,
+      "examples": [
+        {
+          "cid": "ENP8kwn54",
+          "name": "Arko Kkumbat Theater",
+          "summary": "A children-centered theater.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPaacet0",
+          "name": "MCKITHAN HOTEL",
+          "summary": "A dedicated performance theater for <Sleep No More> Seoul located in Pil-dong, Jung-gu, Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjy51fz",
+          "name": "LG Arts Center Seoul",
+          "summary": "A performance hall that introduces the flow of contemporary performing arts and engages with both artists and audiences of our time",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3fknzc",
+          "name": "BLUE SQUARE ",
+          "summary": "A must-visit performance venue for musical fans",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPup1c05",
+          "name": "National Jeongdong Theater Cecil",
+          "summary": "The National Jeongdong Theater of Korea, Cecil, operates a 232-seat performance hall.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP028334",
+          "name": "CGV Cine Library",
+          "summary": "CGV Cine Library is the first cinema library and art house to exist in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024710",
+          "name": "Jeongdong Maru",
+          "summary": "Unique Venues and it is located in the middle of Seoul down town; Jeongdong-gil in where cultural heritages from Korea’s modern society are located.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024596",
+          "name": "Seoul Donhwamun Traditional Theater",
+          "summary": "Seoul Donhwamun Traditional Theater is one of the nation's top-notch performance stages specializing in acoustic sound traditional music.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001478",
+          "name": "LATT Children’s Theater",
+          "summary": "LATT Children’s Theater is the only English-language children's theater in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001747",
+          "name": "Theater Sanwoollim",
+          "summary": "Cultural capital of Korea, famous for Waiting for Godot",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cd0m9o0",
+      "level": 2,
+      "path": "Experience Programs > Traditional Experience",
+      "name": "Traditional Experience",
+      "total_count_en": 16,
+      "examples": [
+        {
+          "cid": "ENPnhju8i",
+          "name": "Darakbang",
+          "summary": "A space offering tea experiences and opportunities for cultural enjoyment in a hanok",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP8qrjci",
+          "name": "Heesum",
+          "summary": "A Korean traditional tea class guided by a certified tea master",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi8afi4",
+          "name": "SEOUL CULTURE LOUNGE",
+          "summary": "Seoul Culture Lounge is a space where you can experience the charms of Korean culture!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6lxyy0",
+          "name": "Hansik Space E:EUM",
+          "summary": "Hansik Space E:EUM is a comprehensive space for exhibitions, experiences, promotions, and education related to Hansik (Korean dishes). It comprises Hansik Gallery, Hansik Learning Center, Hansik Educa",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2ikgt3",
+          "name": "Cheyul",
+          "summary": "Art works by artisans and modern artists of Korean traditional crafts are displayed and sold, and traditional crafts class using mother-of-pearl is provided.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP75ls3r",
+          "name": "Seoul Kimchi Academy",
+          "summary": "In the Seoul Kimchi Academy, situated in Bukchon Hanok Village, you can craft your delectable kimchi while immersing yourself in the traditional Korean art of kimchi-making.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPvsi1e5",
+          "name": "Hyoseong Oriental Medicine Clinic",
+          "summary": "A one-stop shop for individualized medical care and herbal tea according to body constitution",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP851vd2",
+          "name": "Samyangtang\t",
+          "summary": "A nostalgic baths and a retro-style café housed in a repurposed inn",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPnel0nx",
+          "name": "Sangsindang",
+          "summary": "Premium stamps customized to one’s fortune and destiny",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037043",
+          "name": "ONDO Studio",
+          "summary": "A quaint workshop where visitors can create their own pottery and porcelain ware!",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cf9q1q4",
+      "level": 2,
+      "path": "Festivals/Events/Performances > Events",
+      "name": "Events",
+      "total_count_en": 139,
+      "examples": [
+        {
+          "cid": "ENPbnvhzx",
+          "name": "Hohojae Seoul",
+          "summary": "A Hanok Gallery that introduces contemporary Korean artists.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi7ar6v",
+          "name": "Touch Me Tell, A Children's Exhibition at Seoul Museum of Art by Melanie Bonajo",
+          "summary": "How many people do we interact with each day? Is holding hands an act of intimacy? You are invited to perceive your emotions in this Touch Me Tell exhibition. This exhibition is about realizing and ac",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4i105w",
+          "name": "Reflective Space: Void Towards The Realm of The Mind",
+          "summary": "The Vivian Choi Gallery has been holding the Reflective Space: Void Towards The Realm of The Mind exhibition since March 16th",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPlim9ah",
+          "name": "[S-TCEP] Bag & Shoes Loved by Celebrities",
+          "summary": "An exhibition looking back on bag and shoe trends led by Michael Jordan, Michael Jackson, and other celebrities of the past",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP12kduj",
+          "name": "[S-TCEP] National Geographic Photo Exhibition: Photo Ark",
+          "summary": "A diverse photo exhibition featuring the world's animals currently walking the earth",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3e60eb",
+          "name": "[S-TCEP] Hello, Creators! Seoul Design Incubating Center & Exhibition",
+          "summary": "The challenge and alliances formed on the road to becoming design entrepreneurs",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg939wm",
+          "name": "[S-TCEP] Jin Dallae & Park Woohyuk: Cosmos",
+          "summary": "In line with the theme of typography, this exhibition displays the creative process of its subject matter and asks questions about the essence of typography while proposing a new kind of \"order\"",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPuucrur",
+          "name": "[S-TCEP] DDP Things Exhibition VOL. 1: TELE+VISION Memories of the Future",
+          "summary": "The first permanent exhibition of its kind at the Dongdaemun Design Plaza (DDP). The event puts the focus on the discourse surrounding the act of \"watching\" along with other modern design elements",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhonaqg",
+          "name": "[S-TCEP] Circulation of Placeness: Media Artist Exhibition",
+          "summary": "An exhibition featuring media projection and 3D digital art through various time frames and methods of artists at the once heart of Seoul, Dongdaemun",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqljohs",
+          "name": "[S-TCEP] DDP Design Archive KSVD: 1972-1993",
+          "summary": "An exhibition highlighting the transformation of social awareness of the development and concept of Korean modern-day visual design",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cp3b3j9",
+      "level": 2,
+      "path": "Nature > Natural Sites(Parks)",
+      "name": "Natural Sites(Parks)",
+      "total_count_en": 33,
+      "examples": [
+        {
+          "cid": "ENPyia5so",
+          "name": "Yeonhui Forest Rest Area",
+          "summary": "A rest area located in Seodaemun-gu where you can feel the beauty of nature in the city center.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPctphmy",
+          "name": "Yongsan Children's Garden",
+          "summary": "Yongsan Children's Garden temporarily opened on the returned Yongsan Park site",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9l9dhu",
+          "name": "Choansan Neighborhood Park Barefoot Loess Trail",
+          "summary": "A healing space to enhance the well-being of city residents weary from daily life",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0l726f",
+          "name": "Bamseom Island",
+          "summary": "An island located downstream of the Mapodaegyo Bridge on the Hangang River, where the Seogangdaegyo Bridge passes through",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi8pv19",
+          "name": "Gyeongchun Line (Railroad) Forest",
+          "summary": "The Gyeongchun Line (Railroad) Forest in Gongneung-dong, Nowon-gu, Seoul, once traversed by trains bound for Chuncheon",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjxg13l",
+          "name": "Mapo Saebit Culture Forest",
+          "summary": "A neighborhood park located in Dangin-dong, Mapo-gu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPbdyynw",
+          "name": "Ttukseom Hangang Park",
+          "summary": "Hangang Park with various sports facilities",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPsgywus",
+          "name": "Seocho Flower Garden",
+          "summary": "Enjoy nature and main seasonal flowers at the Seocho Flower Garden",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPv3l77y",
+          "name": "Cheonggyesan Waterside Ecological Park",
+          "summary": "A park designed for people of all ages, including children, seniors, and those with disabilities, ensuring their utmost comfort while enjoying the natural environment.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042009",
+          "name": "Namsan Yejang Park",
+          "summary": "A Way Walking with History, NamsanYejangPark",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cn7z1h7",
+      "level": 2,
+      "path": "Shopping > Traditional Markets",
+      "name": "Traditional Markets",
+      "total_count_en": 34,
+      "examples": [
+        {
+          "cid": "ENPrzx6dz",
+          "name": "Renewed Seongsu",
+          "summary": "A Seongsu vintage shop full of neatly arranged secondhand products.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg1mnzj",
+          "name": "Hwanghak-dong Flea Market",
+          "summary": "A market where old memories are piled up layer by layer.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP64f1uy",
+          "name": "Yangjae Flower Market",
+          "summary": "The largest flower market in Korea",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3rjtd6",
+          "name": "Gyeongdong Market",
+          "summary": "A representative market of Seoul in Cheongnyangni where tradition and modernity harmonize",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPdi0px1",
+          "name": "pocaboo",
+          "summary": "A K-POP photocard lucky draw shop",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPveuat2",
+          "name": "DUCKY WORLD",
+          "summary": "A store for storing and decorating K-POP idol photocards",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkbyxzt",
+          "name": "WITH·MU·U HONGDAE AK PLAZA",
+          "summary": "A must-visit goods shop for all K-POP fans",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPue1dn6",
+          "name": "Prop Factory",
+          "summary": "A doll accessory shop where you can dress up and decorate dolls",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPc8w958",
+          "name": "Hongdae R3 Fashion Street",
+          "summary": "The hub of fashion and shopping in Hongdae",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP7xadww",
+          "name": "Gongneung-dong Dokkaebi Market",
+          "summary": "Gongneung-dong Dokkaebi Market originated from street vendors gathered near Hwarangdae",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cx2j0n1",
+      "level": 2,
+      "path": "Cuisine > Foreign Restaurant",
+      "name": "Foreign Restaurant",
+      "total_count_en": 248,
+      "examples": [
+        {
+          "cid": "ENP53n6hr",
+          "name": "I.O MEAL",
+          "summary": "A one-plate Japanese home-style dining restaurant using seasonal ingredients.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3qxuik",
+          "name": "Namsan memories",
+          "summary": "A Japanese restaurant with a wonderful panoramic view of Namsan Tower unfolding above the rooftop.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqilmw0",
+          "name": "Guanho Yeouido Main Branch",
+          "summary": "A lamb rib specialty restaurant that grills premium Halal young lamb over charcoal.\r\nA premier restaurant for business meetings and hosting foreigners, featuring private rooms and a service where staf",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPe3levx",
+          "name": "Himalaya Jonggak",
+          "summary": "“Little India across from Cheonggyecheon and Bosingak”",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPz6bmpi",
+          "name": "The Makan Yeouido",
+          "summary": "“A Malaysian Refresh among the Skyscrapers”",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5j7jo8",
+          "name": "Kwanho Yeouido",
+          "summary": "“The True Taste of Premium Lamb Barbecue with Rich Smoky Flavor”",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4aaule",
+          "name": "Durga Gwanghwamun",
+          "summary": "“The taste and tradition of Indian and Nepalese cuisine enjoyed comfortably\"",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPum8opd",
+          "name": "Bobae Banjum Myeongdong Branch",
+          "summary": "A Chinese restaurant where you can enjoy authentic Chinese cuisine in the heart of Myeongdong",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjnrt3e",
+          "name": "Yankees Grill",
+          "summary": "An American style steak house located in Mullae Creative Village",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPtif74h",
+          "name": "CARAVEL East Asia Hannam",
+          "summary": "A unique restaurant that delivers the authentic everyday flavors enjoyed by people in Korea, Japan, Taiwan, and China",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cl5y4k0",
+      "level": 2,
+      "path": "Culture > Landmarks",
+      "name": "Landmarks",
+      "total_count_en": 49,
+      "examples": [
+        {
+          "cid": "ENPxe6hpp",
+          "name": "Sogang University",
+          "summary": "A campus with beautiful scenery in every season, located at the end of the Gyeongui Line Forest Trail.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPoty0zx",
+          "name": "Kyung Hee University Seoul Campus",
+          "summary": "A Seoul campus that boasts beautiful scenery throughout all four seasons with magnificent Gothic style architecture",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP998h6q",
+          "name": "Yongmasan Skywalk Observatory",
+          "summary": "An extraordinary experience that feels like walking above the forest, offering a panoramic view of both the Seoul cityscape and the woodland.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP87afpd",
+          "name": "Cheongdamdaegyo Bridge",
+          "summary": "Korea’s first double-deck bridge, featured in films and animations",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPmluo32",
+          "name": "Hangang River Bus",
+          "summary": "The beginning of a unique journey on the Hangang River, a new water public transportation system",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfitqa2",
+          "name": "Samseong Station Luggage Storage",
+          "summary": "Samseong Station Luggage Storage",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPtdi6q6",
+          "name": "Lotte World Tower Luggage Storage",
+          "summary": "Lotte World Tower Luggage Storage",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPpwo7rk",
+          "name": "Jamsil Station",
+          "summary": "Jamsil Station",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPidz0r2",
+          "name": "Hongdae R1 Red Culture Market",
+          "summary": "A space where retro vibes meet cultural content",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPrn1wrn",
+          "name": "SEOULDAL",
+          "summary": "A helium balloon that offers the most vivid aerial view of Seoul's nightscape",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cl8f8q1",
+      "level": 2,
+      "path": "Experience Programs > Other Experiences",
+      "name": "Other Experiences",
+      "total_count_en": 28,
+      "examples": [
+        {
+          "cid": "ENPh6ancr",
+          "name": "Korea Fashion Psychology Institute",
+          "summary": "A Cheongdam-dong personal color salon trusted by luxury brands and designer houses.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPf78gji",
+          "name": "Running Man Experience Center Insadong Branch",
+          "summary": "A dynamic experiential attraction that brings the format of the popular entertainment program  exactly offline, allowing you to directly become a <Running Man> member.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPkq5ji1",
+          "name": "Youngchive Seochon Branch",
+          "summary": "A self-photo booth recording daily life in Seochon.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg992ys",
+          "name": "My Friend Seoul, Seoul Gallery",
+          "summary": "A complex cultural space where you can experience the future and present of Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPcztazx",
+          "name": "Louis Vuitton Visionary Journeys Seoul",
+          "summary": "A complex cultural space where Louis Vuitton's store, exhibition, restaurant, and cafe are harmonized in one place.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPic1sqq",
+          "name": "Pyunkang Yul Flagship and Tea House",
+          "summary": "A premium tea house and beauty flagship store that harmoniously contains Korean traditional beauty and modern sensibility",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPx6ew5x",
+          "name": "Nowon Railway Village Swiss Pavilion",
+          "summary": "A miniature exhibition hall reproducing the magnificent scenery of the Swiss Alps",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfg2lhj",
+          "name": "Colorholic Personal Color Image Studio",
+          "summary": "Colorholic is a premium personal color and image consulting center that enhances one’s natural beauty by finding their unique image rather than following trend colors.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPz0djo8",
+          "name": "Print Café Anguk Station Branch",
+          "summary": "An unmanned print shop",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0cezb3",
+          "name": "Seongsu Self Photo Booth",
+          "summary": "A popular pastime among MZ Generation in Seongsu-dong",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cs3j7y4",
+      "level": 2,
+      "path": "Shopping > Department Stores",
+      "name": "Department Stores",
+      "total_count_en": 18,
+      "examples": [
+        {
+          "cid": "ENP6ptemj",
+          "name": "Shinsegae The Heritage",
+          "summary": "A shopping and cultural complex reborn through the preservation and restoration of a designated tangible cultural heritage modern building.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP32m3he",
+          "name": "COEX Luggage Storage",
+          "summary": "COEX Luggage Storage",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037170",
+          "name": "The Hyundai Seoul",
+          "summary": "The Hyundai Seoul is the largest shopping mall in Seoul, covering an area the size of 13 football fields. The mall opened in 2021 and offers visitors the chance to enjoy a relaxed shopping experience, which is why the mall has dedicated 49% of its entire property to recreational areas.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP017598",
+          "name": "Shinsegae Department Store (Main Store)",
+          "summary": "Situated between Myeong-dong and Namdaemun Market, the Shinsegae Department Store (Main Store) catches people’s attention with its vintage, early 20th century style architecture.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP015859",
+          "name": "Lotte World Mall",
+          "summary": "Lotte world Tower, a high-rise building with 123 floors, height of 555m, the 6th tallest building in the world",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP015857",
+          "name": "Enter6 Wangsimni Store",
+          "summary": "Enter6 Wangsimni store, where you could feel Europe within South Korea is a multiplex with 120 domestic and foreign fashion brand stores, movie theatres, restaurants and cafes, where you could enjoy shopping and cultural experiences at the same time.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000475",
+          "name": "Galleria Luxury Hall",
+          "summary": "Galleria Luxury is the largest single luxury store in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000419",
+          "name": "IFC Mall",
+          "summary": "The IFC Mall is a large indoor mall located on the B1-B3 levels of the Yeouido IFC. The mall has many stores and often hosts Hallyu events, such as fan meetings and movie premieres.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000403",
+          "name": "Times Square",
+          "summary": "Times Square is one of the biggest multipurpose shopping malls in Korea. With diverse brand-name goods, resting areas and a central location, people of all ages can enjoy an urban lifestyle in Times Square.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000268",
+          "name": "COEX Mall",
+          "summary": "COEX Mall is the largest underground shopping mall in Asia and is connected to several exhibition halls, a convention center, a hotel, a department store, and an office building.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ct4h4b7",
+      "level": 2,
+      "path": "Culture > Other Cultural Destinations",
+      "name": "Other Cultural Destinations",
+      "total_count_en": 32,
+      "examples": [
+        {
+          "cid": "ENP0e0w4k",
+          "name": "Samilro Changgo Theater",
+          "summary": "A Seoul Future Heritage site and a small-theater-based complex cultural space aiming for performances, exhibitions, and the incubation of young artists.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4zbweb",
+          "name": "tvN  broadcasting",
+          "summary": "A paid broadcasting channel by CJ ENM",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3f5lvc",
+          "name": "SBS  broadcasting",
+          "summary": "A terrestrial commercial broadcasting company",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPnw1hit",
+          "name": "MBC New Headquarters in Sangam-dong",
+          "summary": "A terrestrial broadcasting company operated by the Foundation for Broadcast Culture",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPm73wet",
+          "name": "LoL Park",
+          "summary": "The central stadium for e-Sports",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6nkrnk",
+          "name": "Hanji House",
+          "summary": "Hanji workshops in Korea, a specialized space for traditional paper, and a hanji culture promotion center",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPzncurn",
+          "name": "Hanji House Docent Program/Permanent Experience Program/Hanji Print Studio",
+          "summary": "Hanji House Space and Exhibition Explanation Docent Program, Permanent Experience Program, and Hanji Print Studio Experience",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPw9vnct",
+          "name": "Dongguk Univ.Station",
+          "summary": "Dongguk Univ.Station",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPitng4e",
+          "name": "HiKR Ground",
+          "summary": "A multi-cultural complex to enjoy Korean Wave culture",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfynf9l",
+          "name": "Graphic by Daishin",
+          "summary": "A new comic/book cafe with a variety of comic books",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cf1y9k1",
+      "level": 2,
+      "path": "Experience Programs > Wellness",
+      "name": "Wellness",
+      "total_count_en": 15,
+      "examples": [
+        {
+          "cid": "ENPsbsko1",
+          "name": "A:muu Hair (Myeongdong A:muu Hair)",
+          "summary": "A premium hair salon located in Myeongdong, operated by a head director with over 28 years of experience.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhd6ywx",
+          "name": "Adellain Jewelry Studio",
+          "summary": "An experiential traditional Korean craft-based workshop where you can make one-of-a-kind silver jewelry in Jongno, Seoul, where tradition and modernity blend.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPaijkqu",
+          "name": "Myeongdong Personal Color & Makeup Colorholic",
+          "summary": "A specialized consulting space where you can directly experience Korea's personal color analysis, body type analysis, and K-beauty makeup.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwygusk",
+          "name": "Laurel Studio",
+          "summary": "An ondol floor skincare experience space based on traditional Korean lifestyle culture.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi88tyg",
+          "name": "Venue G Aqua 24",
+          "summary": "The largest sauna and jjimjilbang in Gangseo gu, Seoul, with an area of 3000 pyeong",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0chi2z",
+          "name": "VOCspa",
+          "summary": "VOCspa in Gangnam, a must visit healing spot for travelers in Seoul, is a premium spa that offers various types of massage and facial care using the French luxury brand THALGO.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP0jakmu",
+          "name": "Park Habio Water Kingdom Water Park & Jjimjil Spa",
+          "summary": "Indoor water park and jjimjilbang to enjoy in the city center",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPccgonx",
+          "name": "SPA GOGYEOL",
+          "summary": "A spa that restores natural skin texture through traditional Korean water-based therapy",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwi2gw4",
+          "name": "Dr.FORHAIR Care Lab",
+          "summary": "Dr.FORHAIR's Scalp and Hair Loss Specialist Center",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP028036",
+          "name": "Bongil Spa Land",
+          "summary": "Opened in 2017, Bongil Spa Land is the only spa to have alkaline hot spring water in the southwestern region of Seoul.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cp5i3g2",
+      "level": 2,
+      "path": "Shopping > Duty Free Shops",
+      "name": "Duty Free Shops",
+      "total_count_en": 5,
+      "examples": [
+        {
+          "cid": "ENP024463",
+          "name": "Shinsegae Duty Free",
+          "summary": "Shinsegae Duty Free’s Myung-dong store is located on the 8th through 12th floors of the Shinsegae Main Store building.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP016352",
+          "name": "Shilla IPark Duty Free",
+          "summary": "Located in Yongsan-gu, central Seoul, the Shilla IPark Duty Free carries over 600 luxury and designer brands.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000217",
+          "name": "Lotte Duty Free Shop",
+          "summary": "Lotte Duty Free Shop-Main Store is located in Myeong-dong, which is the center of Seoul.  You can enjoy Smart Store and Star Avenue with handprints of Lotte Duty Free models on floor 1.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP009641",
+          "name": "Lotte Duty Free Main Store",
+          "summary": "Owned and operated by the Lotte Corporation, Lotte Duty Free Shop is situated in the Lotte Department Store, offering shoppers a superb one-stop shopping opportunity.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP009677",
+          "name": "Dongwha Duty Free Shop",
+          "summary": "Carries famous brands such as Hermès, Louis Vuitton, Gucci, Bvlgari, Salvatore Ferragamo and Ermenegildo Zegna, and over 300,000 different imported goods are on display and sale.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Co0g3x0",
+      "level": 2,
+      "path": "Culture > Leisure/Sports Centers",
+      "name": "Leisure/Sports Centers",
+      "total_count_en": 27,
+      "examples": [
+        {
+          "cid": "ENP2s8isl",
+          "name": "Jamwon Hangang Park Swimming Pool",
+          "summary": "A Summer-Only Outdoor Pool in Hangang Park",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPn0qtcb",
+          "name": "River City Water Ski Park",
+          "summary": "A Place to Enjoy Water Activities on the Hangang River",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP67o3xb",
+          "name": "Seoul Olympic Stadium",
+          "summary": "The main stadium of Seoul Sports Complex in Jamsil.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPh15wjf",
+          "name": "Yeouinaru Station Runner Station",
+          "summary": "Subway sports convenience facility for Han River runners to use before and after workouts",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqspquw",
+          "name": "Strikezon Seoul Jamsil Stadium",
+          "summary": "A screen baseball venue where you can experience playing baseball after cheering at a real game",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPl4rnb2",
+          "name": "Healswing Wangsimni(K-Swing)",
+          "summary": "Healswing: Experience Thrilling Extremes in Wangsimni",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqkuw4r",
+          "name": "Ttukseom Windsurfing Park",
+          "summary": "A spot for enjoy various water sports such as windsurfing, kayaking, paddle boarding, paddle yoga, and banana boating on the Han River.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPbhq8vy",
+          "name": "Ttukseom Artificial Rock Climbing Wall",
+          "summary": "Outdoor Artificial Rock Climbing Wall located in Ttukseom Hangang Park",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6zvjr6",
+          "name": "Ttukseom Hangang Park X Game Zone",
+          "summary": "X-game Zone where you can enjoy skateboarding, inline skating",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP035307",
+          "name": "Joongrang Camping Site",
+          "summary": "An experiential park perfect for school and family picnics",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cq9d5v0",
+      "level": 2,
+      "path": "Experience Programs > Temple Stays",
+      "name": "Temple Stays",
+      "total_count_en": 2,
+      "examples": [
+        {
+          "cid": "ENP0pzgtj",
+          "name": "International Seon Center Templestay",
+          "summary": "A cultural program where you can experience 1,700 years of Korean Buddhist tradition",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP019558",
+          "name": "Templestay Information Center",
+          "summary": "The Templestay Information Center offers information on Buddhist temple stays, Buddhist cooking, as well as various cultural activities.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ct1z4k9",
+      "level": 2,
+      "path": "Shopping > Supermarkets & Warehouses",
+      "name": "Supermarkets & Warehouses",
+      "total_count_en": 3,
+      "examples": [
+        {
+          "cid": "ENPpp5dae",
+          "name": "Seungjun Toy",
+          "summary": "A landmark of Dongdaemun Toy Street, and a place of nostalgia",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000541",
+          "name": "Lotte Mart Zettaplex (Seoul Station)",
+          "summary": "Lotte Mart is one of the leading discount store chains in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP009885",
+          "name": "E-Mart (Wangsimni Branch)",
+          "summary": "Find fresh food, processed food, everyday supplies, cosmetics, fashion accessories, toys, stationery, and even the latest electronic appliances at a reasonable price. All items are tax free for foreigners.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cl2d2s1",
+      "level": 2,
+      "path": "Culture > Education Centers",
+      "name": "Education Centers",
+      "total_count_en": 12,
+      "examples": [
+        {
+          "cid": "ENPojrz90",
+          "name": "Cheongwoon Literature Library",
+          "summary": "Jongno-gu's literature-specialized library built in hanok style",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPgcblme",
+          "name": "Choong Ang High School",
+          "summary": "The first private high school located in Jongno-gu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5gy81t",
+          "name": "Hangeul Park Academy",
+          "summary": "Specializing in conversation classes, we provide various options, including standard conversation courses, short-term study abroad programs, one-day workshops, and TOPIK (Test of Proficiency in Korean",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPn1ua1r",
+          "name": "Seoul Science Museum",
+          "summary": "The Seoul Science Museum is a science experiential facility targeting youth, featuring permanent exhibitions, various educational programs, and events.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP035570",
+          "name": "Modu School",
+          "summary": "The Seoul Lifelong Learning Center was reborn as a space for educational and cultural programs for all generations between middle school and 45 years old.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037194",
+          "name": "TRYGROUND Studyroom",
+          "summary": "A study room that is perfect for school work and productivity",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP031055",
+          "name": "Seoul Science Park",
+          "summary": "Created to foster children's creativity, Seoul Science Park is an interactive science experience center featuring close to 21 different experience exhibits including a Science Playground (with 24 different exhibits), Eco Experience Center, and Nature Observatory (made up of an agricultural farm and floral garden).",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001596",
+          "name": "Jeongdok Public Library",
+          "summary": "The Jeongdok Public Library was established to provide Seoulites and visitors with a space to study and enjoy books.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001912",
+          "name": "Gwangnaru Safety Experience Center",
+          "summary": "The Gwangnaru Safety Experience Center is an experience center that educates the public on disaster response and safety awareness.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002275",
+          "name": "Nowon Astronomy and Space Science Museum  ",
+          "summary": "Nowon Cosmos School is a family-friendly park that is designed to educate children about science and English.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cy5h2x9",
+      "level": 2,
+      "path": "Culture > Theme Parks",
+      "name": "Theme Parks",
+      "total_count_en": 7,
+      "examples": [
+        {
+          "cid": "ENP3o0027",
+          "name": "KIDZANIA SEOUL",
+          "summary": "A career experience theme park where children can explore and experience various occupations in a realistic city setting.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPe3alnl",
+          "name": "Nowon Light Garden (Old Hwarangdae Station)",
+          "summary": "Enjoy a beautiful free  evening stroll at the Light Garden",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037367",
+          "name": "Lotte World Aquarium",
+          "summary": "Bring the whole family to encounter a wide variety of marine life here at the aquarium in Jamsil-dong!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP029502",
+          "name": "Larva Town",
+          "summary": "Created by the producers of popular animation Larva, Larva Town is a fun-filled attraction divided into three different spaces: a public resting spot, a character shop, and a cafe.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001434",
+          "name": "Seoul Land ",
+          "summary": "Opened in 1988, Seoul Land is Korea's first comprehensive theme park and is composed of five different themed areas: World Plaza, Samcheoli Land, Future Land, Fantasy Land, and Adventure Land. Seoul Land features about 40 different rollercoasters, as well as a fantastic laser show in the evenings and seasonal festivals.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000374",
+          "name": "SEA LIFE COEX, Seoul Aquarium",
+          "summary": "SEA LIFE COEX, Seoul Aquarium is one of largest aquariums in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002192",
+          "name": "Lotte World Adventure",
+          "summary": "Opened in 1989, Lotte World is a major recreation complex located in downtown Seoul.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cp7e6o3",
+      "level": 2,
+      "path": "Culture > Convention Centers",
+      "name": "Convention Centers",
+      "total_count_en": 5,
+      "examples": [
+        {
+          "cid": "ENP029561",
+          "name": "aT Center",
+          "summary": "The aT Center is a new type of convention center for holding exhibition, conferences, business meetings, and more.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024668",
+          "name": "Sejong University Convention Center",
+          "summary": "A modern facility with the stunning Acha Mountain and the lush forest of the Children’s Grand Park in the backdrop, the Sejong Convention Center is an international-level facility specially designed to provide a full “one-stop” service for professional customers.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024663",
+          "name": "COEX",
+          "summary": "This convention center features a conference hall which can host large events such as international conferences, international receptions, business seminars and small conferences.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024630",
+          "name": "The RAUM",
+          "summary": "Social Events Exquisitely Hosted by The RAUM for Precious Guests. The RAUM is located in Gangnam, Seoul, which is easily accessible from every part of the city.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP005246",
+          "name": "KBS Tourhall",
+          "summary": "KBS Tourhall is Korea's first dedicated broadcasting exhibition hall in Korea.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cg1x6l1",
+      "level": 2,
+      "path": "Culture > Cultural Facilities",
+      "name": "Cultural Facilities",
+      "total_count_en": 450,
+      "examples": [
+        {
+          "cid": "ENP4u05qa",
+          "name": "Seongbuk Young Art Space",
+          "summary": "A living creative space that continues to experiment across the diverse terrain of creation.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPt1364i",
+          "name": "The Garden of Simwon : Ink and Silence",
+          "summary": "The moment when ink, deep empty space, and time-embracing trees become a single garden.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqosaz0",
+          "name": "Summer Table : Six Hands, One Table",
+          "summary": "A special exhibition by six craft artists, <Summer Hands, One Six Table Table:>",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhs2wlq",
+          "name": "ICON: The Chair Series",
+          "summary": "Major new works that unravel human existence, desire, and the structure of memory and time through a unique visual language, centered on 'The Chair' series, which has been explored over a long period.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPx0x7wx",
+          "name": "BANKSY: Still Here",
+          "summary": "A symbol stronger than identity, Banksy's unending message!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPm8j6gm",
+          "name": "Kwon Byungjun: I Embrace You",
+          "summary": "A solo exhibition by artist Kwon Byungjun, who has long explored the intersection of technology and art, featured as part of the annual Children+ exhibition at the Seoul Museum of Art, Buk-Seoul Museu",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPwdbw7j",
+          "name": "Everything Dance Hall",
+          "summary": "Hongik University Department of Art Studies Graduation Exhibition 《Everything Dance Hall》. This exhibition, created together by 13 artists and emerging curators, compares our lives living in an uncert",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6y9jr9",
+          "name": "IBK Moduda Family Concert 2026",
+          "summary": "The ‘IBK Moduda Family Concert’ where families with diverse cultures and stories gather together to share warm music and unforgettable memories.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPnw33eg",
+          "name": "club Seolhwa",
+          "summary": "The unfair stories of villains and misunderstood beings in Korean folktales.\r\nA new form of audience-participatory performance combining musicals and club culture.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP52w7m1",
+          "name": "Drawing Room",
+          "summary": "A commercial exhibition space designed to deliver a familiar experience of contemporary art.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cn7k2s5",
+      "level": 3,
+      "path": "Cuisine > Foreign Restaurant > Others",
+      "name": "Others",
+      "total_count_en": 42,
+      "examples": [
+        {
+          "cid": "ENPe3levx",
+          "name": "Himalaya Jonggak",
+          "summary": "“Little India across from Cheonggyecheon and Bosingak”",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPz6bmpi",
+          "name": "The Makan Yeouido",
+          "summary": "“A Malaysian Refresh among the Skyscrapers”",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4aaule",
+          "name": "Durga Gwanghwamun",
+          "summary": "“The taste and tradition of Indian and Nepalese cuisine enjoyed comfortably\"",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhsowxr",
+          "name": "Oldy’s Taco Euljiro Main Branch",
+          "summary": "An exotic taco specialty restaurant known for both taste and atmosphere",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP031015",
+          "name": "Himalaya Jonggak Branch",
+          "summary": "Himalaya is an Indian and Nepalese restaurant.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP031013",
+          "name": "Durga Main Branch",
+          "summary": "Durga is an Indian and Nepalese restaurant.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP030983",
+          "name": "Kali Sadang Branch",
+          "summary": "A restaurant serving food made by an Indian chef, Kali Sadang Branch offers visitors a wide range of dishes and beverages in their menu.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP030970",
+          "name": "Ganga Jamsil Branch",
+          "summary": "Starting as a restaurant in Sinsa back in 2000, Ganga is currently a chain restaurant with many branch stores available throughout the country.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP030957",
+          "name": "Ganga Mugyo Branch",
+          "summary": "Ganga is an Indian restaurant serving authentic Indian cuisine.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP030956",
+          "name": "Ganga Yeoksam Branch",
+          "summary": "Ganga is an Indian restaurant serving authentic Indian cuisine.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cy6j7j7",
+      "level": 3,
+      "path": "Culture > Cultural Facilities > Others Cultural Facilities",
+      "name": "Others Cultural Facilities",
+      "total_count_en": 20,
+      "examples": [
+        {
+          "cid": "ENPhax5cj",
+          "name": "Art Cube 2R2",
+          "summary": "An exhibition platform that expands and connects digitally generated art into offline exhibition experiences.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhd2f4q",
+          "name": "Dilkusha",
+          "summary": "Dilkusha, a red-brick house signifying \"a joyful heart\" in Persian. A historic residence reflecting the lives of the Taylor family who built it a century ago, alongside the elegant narrative embedded",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP8r0zj2",
+          "name": "Lee Hoe-young Memorial Hall",
+          "summary": "A space honoring the independence activist Woodang Lee Hoe-young, his five brothers, and their comrades.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPxrmedb",
+          "name": "Gungisi Relics Exhibition Hall",
+          "summary": "Exhibiting Gungisi relics and excavated artifacts from the Joseon Dynasty discovered during the construction process of the new Seoul City Hall.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPfpky3x",
+          "name": "e-Sports Hall of Fame",
+          "summary": "An exhibition hall commemorating the achievements of e-Sports players",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP678cv8",
+          "name": "The replica of an old mayor’s office",
+          "summary": "The office space of past Seoul mayors, including the furniture and office equipment from that time period, has been faithfully reproduced.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPx138ls",
+          "name": "Geoan",
+          "summary": "Handmade wooden furniture specializing in zelkova",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP041903",
+          "name": "Kim Geun-tae Memorial Library-Archives",
+          "summary": "A larchiveum, widely opened towards the nature, Kim Geun-tae Memorial Library-Archives",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039726",
+          "name": "The Project HUAM",
+          "summary": "A shared library where visitors can enjoy reading in a comfortable space.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP039725",
+          "name": "Book Park Lounge",
+          "summary": "A book café where everyone can enjoy reading and relaxing.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cw7q1x8",
+      "level": 3,
+      "path": "Festivals/Events/Performances > Events > Other Events",
+      "name": "Other Events",
+      "total_count_en": 16,
+      "examples": [
+        {
+          "cid": "ENP041939",
+          "name": "Seoul Beauty Travel Week",
+          "summary": "The journey of discovering the true story of beauty",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP041733",
+          "name": "2022 Seoul Beauty Week",
+          "summary": "A festival showcasing Seoul's beauty trends and promising brands while enjoying Hallyu and beauty culture",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP041732",
+          "name": "Seoul Design 2022",
+          "summary": "Seoul Representative Design MICE Event",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP040455",
+          "name": "11th Annual World Coffee Leaders Forum",
+          "summary": "A knowledge-sharing forum that gathers the world's top coffee scholars in one sitting",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037592",
+          "name": "Moonlight Walk at Changdeokgung Palace 2021",
+          "summary": "Take a walk under the moonlight in Changdeokgung Palace, a favorite palace of the Joseon dynasty!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP036287",
+          "name": "K-Mas Live Market",
+          "summary": "A beautiful Christmas market festival just in time for the holiday season!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP035914",
+          "name": "2020 Korea Dance Awards & Dance Night",
+          "summary": "A competition-style performance that includes performances from the current repertoire along with new works as well!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034079",
+          "name": "2020 Republic of Korea International Culinary Competition",
+          "summary": "Come watch as the stage is set to promote Korean food culture, discover up-and-coming talent, and promote consumption of agro-fishery products.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034018",
+          "name": "Yeonnam, One Fine Day",
+          "summary": "A 2-hour walking tour around the area to view every nook and cranny of Yeonnam.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP033276",
+          "name": "Seongsu Newtro Tour",
+          "summary": "Seongsu Newtro Tour lets visitors look around every nook and cranny of Seongsu-dong, a sacred home to the newtro trend where old culture meets the new.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ch5t7s7",
+      "level": 3,
+      "path": "History > Historical Sites > Palaces",
+      "name": "Palaces",
+      "total_count_en": 9,
+      "examples": [
+        {
+          "cid": "ENPl8f5md",
+          "name": "Changdeokgung Secret Garden ",
+          "summary": "A garden of a Joseon Dynasty located inside Changdeokgung Palace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP037176",
+          "name": "Grand Greenhouse Changgyeonggung Palace",
+          "summary": "Joseon's beautiful Grand Greenhouse",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001159",
+          "name": "Gyeonghuigung Palace",
+          "summary": "One of the five grand palaces, Gyeonghuigung Palace was also called \"Seogweol\" (which means \"palace of the west\") because it's located west of the main palace, Gyeongbokgung.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000507",
+          "name": "Jongmyo Shrine",
+          "summary": "Jongmyo is a royal shrine dedicated to the performance of ancestral rites for the deceased kings and queens of the Joseon Dynasty.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000471",
+          "name": "Unhyeongung Palace",
+          "summary": "Unhyeongung Palace is one of Seoul's smaller palaces and it is an important historic site that is open to the public.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000297",
+          "name": "Changgyeonggung Palace",
+          "summary": "Changgyeonggung Palace was built in 1483 by King Seongjong (the ninth king of the Joseon Dynasty) to take care of the wives of the preceding kings.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000295",
+          "name": "Changdeokgung Palace ",
+          "summary": "Changdeokgung Palace is also known as Donggwol, the Eastern Palace, because of its location to the east of Gyeongbokgung.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP000072",
+          "name": "Gyeongbokgung Palace",
+          "summary": "Gyeongbokgung Palace was the first and largest of the royal palaces built during the Joseon Dynasty.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002046",
+          "name": "Deoksugung Palace",
+          "summary": "Deoksugung Palace is unique among Korean palaces in having a modern seal engraving and a western style garden and fountain.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cl9n1c2",
+      "level": 3,
+      "path": "Cuisine > Foreign Restaurant > Western",
+      "name": "Western",
+      "total_count_en": 90,
+      "examples": [
+        {
+          "cid": "ENPqilmw0",
+          "name": "Guanho Yeouido Main Branch",
+          "summary": "A lamb rib specialty restaurant that grills premium Halal young lamb over charcoal.\r\nA premier restaurant for business meetings and hosting foreigners, featuring private rooms and a service where staf",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjnrt3e",
+          "name": "Yankees Grill",
+          "summary": "An American style steak house located in Mullae Creative Village",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPag9r0c",
+          "name": "Coccinelle",
+          "summary": "A casual farm to table French bistro",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6rymuy",
+          "name": "Kensington Hotel Broadway",
+          "summary": "All-day dining restaurant",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPb49ucp",
+          "name": "Oddhaus Osteria",
+          "summary": "Brunch and wine enjoyed in a historic building",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPawn5vl",
+          "name": "SZIMPATIKUS Yongsan Branch ",
+          "summary": "A fine casual restaurant offering European cuisine with an Asian twist",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPmmx0cv",
+          "name": "Seongsudarak",
+          "summary": "An omurice and pasta specialty restaurant located in the Seongsu-dong café street",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPcmzo8u",
+          "name": "Sadelleʼs at Kith Seoul",
+          "summary": "A popular brunch restaurant from New York",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5lzzfv",
+          "name": "Apgujeong Door to Door ",
+          "summary": "A charming brunch café that brings to mind open-air cafés in Europe",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5pwtvb",
+          "name": "Bittle’s Pizza Yeonnam ",
+          "summary": "An American-style pizzeria in Yeonnam-dong with an outdoor terrace",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ct9t6m8",
+      "level": 3,
+      "path": "Culture > Cultural Facilities > Art Museums/Galleries",
+      "name": "Art Museums/Galleries",
+      "total_count_en": 57,
+      "examples": [
+        {
+          "cid": "ENP52w7m1",
+          "name": "Drawing Room",
+          "summary": "A commercial exhibition space designed to deliver a familiar experience of contemporary art.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5uw5dz",
+          "name": "My Art Museum One Grove Branch",
+          "summary": "An art museum where daily life and art meet.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP15st7z",
+          "name": "Seokpajeong Seoul Museum of Art",
+          "summary": "A private art museum located in Buam-dong, Jongno-gu.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPxa3w2o",
+          "name": "Kansong Art Museum",
+          "summary": "Korea's first private art museum.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP1f5yex",
+          "name": "Seoul Museum of Art Buk Seoul Branch",
+          "summary": "A cultural communication space where the museum and park meet, and people, nature, and art live and breathe together",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6edc88",
+          "name": "Seoul Art Center Doam Gallery",
+          "summary": "A gallery where various artistic activities take place, including exhibitions, academies, and workshops",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPn0wsm1",
+          "name": "Platform-L Contemporary Art Center",
+          "summary": "An art center open to both those who create and those who enjoy art.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP5hau1h",
+          "name": "Gallery Chosun",
+          "summary": "A gallery inheriting the spirit of Chosun Gallery, the second-oldest art gallery in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPet80lf",
+          "name": "Pace Gallery Seoul",
+          "summary": "A leading global gallery representing contemporary art.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4khc7y",
+          "name": "Space K Seoul",
+          "summary": "A cultural and artistic sharing space that introduces the flow of contemporary visual arts.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cu6j1f4",
+      "level": 3,
+      "path": "Festivals/Events/Performances > Events > Expos",
+      "name": "Expos",
+      "total_count_en": 6,
+      "examples": [
+        {
+          "cid": "ENP040454",
+          "name": "21st Annual Seoul Cafe Show",
+          "summary": "A networking business platform connecting the global coffee industry",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP035379",
+          "name": "2020 Seoul Cafe Show",
+          "summary": "Asia's No. 1 coffee event, the Seoul Cafe Show!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034532",
+          "name": "28th Seoul Dessert Fair [Watermelon & Mango] Cancellation",
+          "summary": "Korea's largest handmade dessert fair! So long as it's delicious, who cares about the calories!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034259",
+          "name": "The 27th Seoul Dessert Fair",
+          "summary": "Welcome to the 27th Seoul Dessert Fair featuring the best of homemade sweets! What do calories matter when it tastes so good!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034070",
+          "name": "2020 Seoul International Wines & Spirits Expo",
+          "summary": "Everything you've ever wanted to know about alcohol! Welcome to Korea's one-and-only \"multi-spirited\" expo!",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP032694",
+          "name": "Salon du Chocolat Seoul 2020",
+          "summary": "A global chocolate exhibition event started in 1994 by Parisian Sylvie Douce and Francois Jeantet, Salon du Chocolat Seoul 2020 will take place at COEX, Hall D from Jan. 10th to Jan. 12th, 2020.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cb9c5i3",
+      "level": 3,
+      "path": "History > Historical Sites > Tombs & Mausoleums",
+      "name": "Tombs & Mausoleums",
+      "total_count_en": 8,
+      "examples": [
+        {
+          "cid": "ENP002299",
+          "name": "Taereung and Gangreung Royal Tombs",
+          "summary": "Taereung and Gangneung Royal Tombs are the burial sites of royalty from the Joseon Dynasty.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001965",
+          "name": "Seoul National Cemetery",
+          "summary": "Seoul National Cemetery is a park cemetery where men who made significant contributions to their country are laid to rest.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP005240",
+          "name": "Heonilleung",
+          "summary": "Heonilleung is a UNESCO World Heritage Site and the final resting place of two pairs of the Joseon Dynasty's kings and queens.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP005205",
+          "name": "Uireung",
+          "summary": "Uireung is the royal tomb of King Gyeongjong, the 20th king of the Joseon dynasty, and his wife Queen Seonui.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001414",
+          "name": "Seonjeongneung (Tomb)",
+          "summary": "Seonjeongneung is home to the royal tombs of King Seongjong (the 9th king of the Joseon Dynasty) and his family, including his second wife, Queen Consort Jeonghyeon, and his son, later to be king, King Jungjong.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP004524",
+          "name": "Yeonghwiwon and Sunginwon Royal Tombs",
+          "summary": "Yeonghwiwon and Sunginwon are the burial site of members of the Korean royal family and the site was designated Historic Site No. 361 in 1991.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP003459",
+          "name": "Jeongneung (A Royal Tomb)",
+          "summary": "Jeongneung is the royal tomb of Queen Sindeok. She was the second wife of King Taejo, the founder of the Joseon Dynasty.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002544",
+          "name": "Bangi-dong Ancient Baekje Tombs",
+          "summary": "The Bangi-dong Ancient Baekje Tombs are ancient tombs in located the Bangi-dong area that date back to the Hanseong Baekje era.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ch7l5i4",
+      "level": 3,
+      "path": "Cuisine > Foreign Restaurant > Japanese",
+      "name": "Japanese",
+      "total_count_en": 40,
+      "examples": [
+        {
+          "cid": "ENP53n6hr",
+          "name": "I.O MEAL",
+          "summary": "A one-plate Japanese home-style dining restaurant using seasonal ingredients.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3qxuik",
+          "name": "Namsan memories",
+          "summary": "A Japanese restaurant with a wonderful panoramic view of Namsan Tower unfolding above the rooftop.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPlqylq6",
+          "name": "Sun Tomato Ramen",
+          "summary": "Trendy ramen from Japan, Taiyo no Tomato Ramen",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPa5dv4z",
+          "name": "Kihoo",
+          "summary": "A Seongsu Omakase restaurant featuring seasonal dishes representing Korea’s four seasons",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPtelk0a",
+          "name": "Whitturu ",
+          "summary": "Whitturu, an odeng bar in Seongsu-dong is perfect for enjoying delicious fish cake dishes and a drink",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPf7618z",
+          "name": "Cochon Tonkatsu",
+          "summary": "A pork cutlet restaurant in Sinchon where you can eat a meal for 3,000 KRW",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP030913",
+          "name": "Sushi Hiroba (Samsung-dong Branch)",
+          "summary": "Sushi Hiroba is a domestic brand and one of the biggest conveyor belt sushi restaurants in Korea.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP025621",
+          "name": "Sushi Kaisin",
+          "summary": "Formerly a chef at one of Tokyo's 5-star hotel, the owner of Sushi Kaisin carefully selects the freshest fish to create the best omakase for his customers.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP012013",
+          "name": "Malta Chamchi ",
+          "summary": "Malta Chamchi specializes in tuna. The prices are reasonable, but cuts like otoro (front part of tuna abdomen), beggop (the underside of the chutoro cut) , and kamatoro (abdomen part around the gills of tuna) are of quite good quality.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP011593",
+          "name": "Izumi",
+          "summary": "Izumi offers fresh sushi and sashimi.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cr0q2v2",
+      "level": 3,
+      "path": "Culture > Cultural Facilities > Museums",
+      "name": "Museums",
+      "total_count_en": 57,
+      "examples": [
+        {
+          "cid": "ENPmvjbam",
+          "name": "Seoul City Wall Museum",
+          "summary": "A museum that introduces the history and value of the Seoul City Wall, which was constructed to display the authority of Hanyang, the capital during the Joseon Dynasty, and to defend against external",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPipn2pj",
+          "name": "Dongdaemun History Museum",
+          "summary": "A museum that retraces the history of the former Dongdaemun Stadium site.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPe4d3g1",
+          "name": "Dongdaemun Stadium Memorial",
+          "summary": "A museum where you can reminisce about the history of Dongdaemun Stadium, which opened as Gyeongseong Stadium during the Japanese colonial period and was demolished in 2007.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP44b0tv",
+          "name": "Eunpyeong History Hanok Museum",
+          "summary": "A place where the history and culture of Eunpyeong and the future of hanok dwell together",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP6eo011",
+          "name": "Netmarble Game Museum",
+          "summary": "An interactive game museum",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPeenv2i",
+          "name": "Seoul Baekje Children's Museum",
+          "summary": "The only children's museum in the Gangnam area that exhibits and educates about the ancient history and culture of Seoul's Han River basin",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP041926",
+          "name": "Songpa Book Museum",
+          "summary": "Book Culture experiencing through the Five Senses, Songpa Book Museum",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP038243",
+          "name": "Seoul Urban Life Museum",
+          "summary": "The Seoul Urban Life Museum is a modern life and history museum that focuses on exhibitions and programs that allow guests to reminisce and interact with the memories of Seoul's citizens.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP038092",
+          "name": "Seoul Museum of Craft",
+          "summary": "A museum that shares the value of craft and aims to be the key to unlocking the future of craft.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP038021",
+          "name": "National Aviation Museum of Korea ",
+          "summary": "The National Aviation Museum of Korea is the first museum of its kind in Korea and is located on the site of Gimpo Airport in Gangseo-gu, Seoul. The museum consists of various exhibitions and interactive displays where visitors can witness the past, present, and future of aviation come together.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cu9u5z7",
+      "level": 3,
+      "path": "Festivals/Events/Performances > Events > Exhibitions",
+      "name": "Exhibitions",
+      "total_count_en": 117,
+      "examples": [
+        {
+          "cid": "ENPbnvhzx",
+          "name": "Hohojae Seoul",
+          "summary": "A Hanok Gallery that introduces contemporary Korean artists.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPi7ar6v",
+          "name": "Touch Me Tell, A Children's Exhibition at Seoul Museum of Art by Melanie Bonajo",
+          "summary": "How many people do we interact with each day? Is holding hands an act of intimacy? You are invited to perceive your emotions in this Touch Me Tell exhibition. This exhibition is about realizing and ac",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP4i105w",
+          "name": "Reflective Space: Void Towards The Realm of The Mind",
+          "summary": "The Vivian Choi Gallery has been holding the Reflective Space: Void Towards The Realm of The Mind exhibition since March 16th",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPlim9ah",
+          "name": "[S-TCEP] Bag & Shoes Loved by Celebrities",
+          "summary": "An exhibition looking back on bag and shoe trends led by Michael Jordan, Michael Jackson, and other celebrities of the past",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP12kduj",
+          "name": "[S-TCEP] National Geographic Photo Exhibition: Photo Ark",
+          "summary": "A diverse photo exhibition featuring the world's animals currently walking the earth",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP3e60eb",
+          "name": "[S-TCEP] Hello, Creators! Seoul Design Incubating Center & Exhibition",
+          "summary": "The challenge and alliances formed on the road to becoming design entrepreneurs",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPg939wm",
+          "name": "[S-TCEP] Jin Dallae & Park Woohyuk: Cosmos",
+          "summary": "In line with the theme of typography, this exhibition displays the creative process of its subject matter and asks questions about the essence of typography while proposing a new kind of \"order\"",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPuucrur",
+          "name": "[S-TCEP] DDP Things Exhibition VOL. 1: TELE+VISION Memories of the Future",
+          "summary": "The first permanent exhibition of its kind at the Dongdaemun Design Plaza (DDP). The event puts the focus on the discourse surrounding the act of \"watching\" along with other modern design elements",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPhonaqg",
+          "name": "[S-TCEP] Circulation of Placeness: Media Artist Exhibition",
+          "summary": "An exhibition featuring media projection and 3D digital art through various time frames and methods of artists at the once heart of Seoul, Dongdaemun",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPqljohs",
+          "name": "[S-TCEP] DDP Design Archive KSVD: 1972-1993",
+          "summary": "An exhibition highlighting the transformation of social awareness of the development and concept of Korean modern-day visual design",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Ci7i9i6",
+      "level": 3,
+      "path": "History > Historical Sites > Modern Architecture",
+      "name": "Modern Architecture",
+      "total_count_en": 6,
+      "examples": [
+        {
+          "cid": "ENPnje8ve",
+          "name": "Gyeonggyojang",
+          "summary": "The final headquarters of the Provisional Government of the Republic of Korea and the momentous historical site of the assassination of Baekbum Kim Gu.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPjkm9y3",
+          "name": "Shina Memorial Hall",
+          "summary": "This place serves as a memorial to honor the founder, Jang Ki-bong and Shina Ilbo, after its forced closure.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP029722",
+          "name": "Yongsan Mill",
+          "summary": "Running its business near Ichon-dong's railroad for the past 30 years, Yongsan Mill was created by an owner who used to work in a rice cake factory.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP024591",
+          "name": "Seoul Central Post Office",
+          "summary": "Located in Myeongdong, in the heart of Seoul, the Seoul Central Post Office goes beyond the capabilities of a regular post office.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002962",
+          "name": "Korea University Main Hall & Old Main Library",
+          "summary": "Korea University is one of best universities in all of Korea. Visitors to Seoul can visit the Korea University Main Hall located in Anam-dong, Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP004198",
+          "name": "Wongudan Altar",
+          "summary": "Wongudan was built during the Joseon Dynasty to be an altar for performing divine harvest rituals.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cm1y8v1",
+      "level": 3,
+      "path": "Cuisine > Foreign Restaurant > Chinese",
+      "name": "Chinese",
+      "total_count_en": 65,
+      "examples": [
+        {
+          "cid": "ENP5j7jo8",
+          "name": "Kwanho Yeouido",
+          "summary": "“The True Taste of Premium Lamb Barbecue with Rich Smoky Flavor”",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPum8opd",
+          "name": "Bobae Banjum Myeongdong Branch",
+          "summary": "A Chinese restaurant where you can enjoy authentic Chinese cuisine in the heart of Myeongdong",
+          "has_photo": true
+        },
+        {
+          "cid": "ENPsknabd",
+          "name": "Janggagu",
+          "summary": "A Nostalgic Chinese Restaurant That Has Remained in the Same Spot for Over 40 Years",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9xvv34",
+          "name": "Yongyong Teacher Maradowon",
+          "summary": "Paradise for mara lovers",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP8g4m6k",
+          "name": "LaiLai Yeonhuidong Main Branch",
+          "summary": "A Chinese restaurant with delicious chili peppers located in Yeonhui-dong",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP1y7wri",
+          "name": "Gabongnu",
+          "summary": "A popular Chinese restaurant in Gwanghwamun known for its delicious Fried Pork",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP1rnlut",
+          "name": "Sinrakwon",
+          "summary": "A Chinese restaurant run by a culinary prodigy who once worked in the presidential kitchen at Chung Wa Dae",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042265",
+          "name": "[Baeknyeon-gage] Donghunkwan",
+          "summary": "The weight of 70 years in one place is piled up all over the store. Donghung, founded by a father of Chinese origin, has been passed down from son to grandson.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP042268",
+          "name": "[Baeknyeon-gage] Songjugjang ",
+          "summary": "Songjugjang, the first Chinese restaurant, started in 1952 and run by Shin Moo-song, former chairman of the Overseas Chinese Restaurant Association, has the taste of its food preserved by Shin Yeon-kyung, the eldest son.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP017695",
+          "name": "Modern Nülang",
+          "summary": "A modern and romantic Chinese restaurant decorated in the style of 1930s Shanghai.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cr6m1i5",
+      "level": 3,
+      "path": "History > Historical Sites > Others Historical Sites",
+      "name": "Others Historical Sites",
+      "total_count_en": 23,
+      "examples": [
+        {
+          "cid": "ENP037164",
+          "name": "Seokpajeong",
+          "summary": "A garden that was tended to by the ruling class during the Joseon Dynasty",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP036973",
+          "name": "Seosulla-gil",
+          "summary": "A nice path located in the vicinity of the Sulla-cheong that had patrolled the Jongmyo Shrine",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP032528",
+          "name": "Brothers' Blacksmith Workshop",
+          "summary": "A store run by a human cultural asset where intellectuals, artists, and professors visit",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP029945",
+          "name": "Seosomun Historical Park",
+          "summary": "Seosomun Historical Park includes a total area of 46,000 m².",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP027105",
+          "name": "Modern History Memorial Hall",
+          "summary": "A pillar of remembrance for Korea's independence and democratization movements.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023561",
+          "name": "Sewoon Shopping Center",
+          "summary": "The Sewoon Shopping Center was founded in 1968 as Korea's first electronics market under the mission of creating a thriving business community complex and has been around for over 40 years.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001399",
+          "name": "Manhae Han Yong-Un Simujang",
+          "summary": "Manhae Han Yong-un Simujang was the residence of the Korean Buddhist, poet and independence activist Han Yong-un.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001932",
+          "name": "Sulla-gil Road",
+          "summary": "Sulla-gil Road runs through Jongno-gu and is known as Seoul's Historical Literary Trail.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002027",
+          "name": "Heojun Neighborhood Park",
+          "summary": "Heojun Neighborhood Park is located in Gayang-dong, Seoul. The neighborhood is the birthplace of Heo Jun, a famous Joseon-era doctor and scholar.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002250",
+          "name": "Yonghakgeong (Mokdong Archery Club)",
+          "summary": "Yonghakgeong was once a military training ground, and is now known as the Mokdong Archery Club.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cx3e9k9",
+      "level": 3,
+      "path": "Cuisine > Foreign Restaurant > Fusion",
+      "name": "Fusion",
+      "total_count_en": 6,
+      "examples": [
+        {
+          "cid": "ENPlsskfb",
+          "name": "Italy Two-Story House",
+          "summary": "Fusion Western restaurant on Yongridan-gil famous for delicious pasta",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP9fsdzk",
+          "name": "Bermuda Samgakji",
+          "summary": "A fusion restaurant based on Mexican and Western cuisine",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP2osya6",
+          "name": "NOR",
+          "summary": "Immersive dining experience! This Crab Dining experience is intertwined with multimedia art, designed to engage all the senses, resulting in a unique and immersive gastronomic journey.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP034432",
+          "name": "Viking's Wharf (Coex Mall)",
+          "summary": "Korea's first lobster buffet with unlimited refills",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP030985",
+          "name": "Nammi Plant Lab",
+          "summary": "Nammi Plant Lab is a vegan restaurant run by a Colombian chef.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP029545",
+          "name": "Famille Station",
+          "summary": "Famille Station is a space of trendy, delicious restaurants all gathered in one place.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Cb9o5c4",
+      "level": 3,
+      "path": "History > Historical Sites > Historical Sites",
+      "name": "Historical Sites",
+      "total_count_en": 7,
+      "examples": [
+        {
+          "cid": "ENPcyd45f",
+          "name": "Site of Concubine Jang Huibin’s Well",
+          "summary": "Jang Huibin’s Well has been associated with Yeonhui Palace, a detached palace since the early Joseon Dynasty. It has been associated with palace grounds, courtyards and main buildings.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002395",
+          "name": "Segeomjeong Pavilion",
+          "summary": "Segeomjeong Pavilion is a well-known historic pavilion and was designated Monument of Seoul No. 4 in 1976.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023563",
+          "name": "Deoksugung Stonewall Walkway",
+          "summary": "The Deoksugung Stonewall Walkway is a picturesque pedestrian path that runs next to Deoksugung Palace.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP004281",
+          "name": "An Jung-geun Memorial Hall",
+          "summary": "The An Jung-geun Memorial Hall was established to memorialize the Korean patriot An Jung-geun.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP002174",
+          "name": "Amsa–dong Prehistoric Settlement Site",
+          "summary": "Amsa-dong Prehistoric Settlement Site reproduces the life of Koreans who lived over 6,000 years ago.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001831",
+          "name": "Seodaemun Prison History Hall",
+          "summary": "The Seodaemun Prison was used to intern Korean patriots during the Japanese Occupation.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001824",
+          "name": "Sajikdan (Sajik Altar)",
+          "summary": "Sajikdan (Sajik Altar) is an altar built during Joseon Dynasty that was used to pray to the gods for a good harvest.",
+          "has_photo": true
+        }
+      ]
+    },
+    {
+      "code": "Co2n1h7",
+      "level": 3,
+      "path": "History > Historical Sites > Fortresses & Gates",
+      "name": "Fortresses & Gates",
+      "total_count_en": 12,
+      "examples": [
+        {
+          "cid": "ENPldz98j",
+          "name": "Gyeongbokgung Stonewall Walkway ",
+          "summary": "The stonewall path surrounding Gyeongbokgung Palace",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023758",
+          "name": "Sodeokmun Gate (Seosomun)",
+          "summary": "Sodeokmun Gate was one of the 4 minor city gates of Seoul. It was constructed during the Joseon Dynasty in the reign of King Taejong.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023605",
+          "name": "Gwanghuimun Gate",
+          "summary": "Gwanghuimun Gate is one of the Seoul's 4 minor city gates. It is located along the southeastern boundary of Joseon-era Seoul.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023606",
+          "name": "Hyehwamun Gate",
+          "summary": "Hyehwamun Gate is one of Seoul's 4 minor city gates. It was built in 1397 along the famed Hanyangdoseong, Seoul City Wall along the Joseon-era eastern boundary of the city.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023760",
+          "name": "Sukjeongmun Gate",
+          "summary": "Sukjeongmun Gate is one of Seoul’s four historic great city gates. It is the city's northern gate and it can be visited today along the Hanyangdoseong, Seoul City Wall.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP023759",
+          "name": "Donuimun Gate (Seodaemun)",
+          "summary": "Donuimun Gate was one of the four minor city gates to Seoul and it stood at the Joseon-era western boundary to the city.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP022888",
+          "name": "Sungnyemun Gate (Namdaemun)",
+          "summary": "Sungnyemun Gate (Namdaemun) is one of Seoul's historic Four Great Gates and it was designated National Treasure no. 1 by the Korean government in 1962.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001999",
+          "name": "Heunginjimun Gate (Dongdaemun)",
+          "summary": "Heunginjimun Gate is a major historical site in Seoul. More commonly known as Dongdaemun Gate (Great Eastern Gate), it was deemed treasure no. 1 by the Korean government.",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP001953",
+          "name": "Pungnaptoseong Fortress",
+          "summary": "Pungnaptoseong Fortress is the site of earthern ramparts that date back to the Baekje period (18 BCE-660 AD).",
+          "has_photo": true
+        },
+        {
+          "cid": "ENP004101",
+          "name": "Hongjimun Gate and Tangchundaeseong Fortress",
+          "summary": "Tangchundaeseong Fortress was built in 1712 during the Joseon Dynasty to improve the defense of Hanyangdoseong, the Seoul City Wall, and Bukhansanseong Fortress.",
+          "has_photo": true
+        }
+      ]
+    }
+  ]
+}

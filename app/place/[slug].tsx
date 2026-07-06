@@ -6,6 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
+import { isSupabaseConfigured } from '@/lib/supabase';
+import { fetchPlace } from '@/data/remote';
 import { FOREIGNER_TAGS } from '@/data';
 import { ForeignerTagKey } from '@/data/types';
 import { T, H, IconButton, Button } from '@/components/base';
@@ -48,6 +50,18 @@ export default function PlaceDetail() {
   const [tagCounts, setTagCounts] = useState<Partial<Record<string, { yes: number; no: number }>>>({});
   useEffect(() => {
     setTagCounts(place?.votes ?? {});
+  }, [place?.slug]);
+
+  // The browse query omits `description` for payload size, so fetch the full
+  // record here. Seed/offline places already carry their own description.
+  const [description, setDescription] = useState(place?.description ?? '');
+  useEffect(() => {
+    if (!place) return;
+    if (place.description) { setDescription(place.description); return; }
+    if (!isSupabaseConfigured) return;
+    let alive = true;
+    fetchPlace(place.slug).then((full) => { if (alive && full?.description) setDescription(full.description); }).catch(() => {});
+    return () => { alive = false; };
   }, [place?.slug]);
 
   if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
@@ -226,7 +240,7 @@ export default function PlaceDetail() {
 
         {/* Description + info */}
         <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
-          <T style={{ fontSize: 14, lineHeight: 22, color: c.inkSoft }}>{place.description}</T>
+          <T style={{ fontSize: 14, lineHeight: 22, color: c.inkSoft }}>{description}</T>
           <View style={{ marginTop: 16, gap: 10 }}>
             <InfoRow icon="clock" text={place.hours} />
             <InfoRow icon="pin" text={place.address} />

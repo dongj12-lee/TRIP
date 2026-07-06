@@ -23,7 +23,7 @@ export function recommendedPlaces(places: Place[], posts: Post[], n = 12): Place
   }
 
   const prior = (p: Place) =>
-    (p.category === 'Attraction' || p.category === 'Culture' ? 1 : 0) +
+    (p.category === 'History' || p.category === 'Culture' || p.category === 'Nature' ? 1 : 0) +
     (p.freeEntry ? 0.5 : 0) +
     (p.englishSite ? 0.3 : 0) +
     (p.photoUrl ? 0.2 : 0);
