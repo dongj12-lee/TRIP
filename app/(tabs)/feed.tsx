@@ -43,7 +43,7 @@ export default function FeedScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 10 }}>
-        <H style={{ fontSize: 32, lineHeight: 36 }}>Community</H>
+        <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
       </View>
 
       {/* Inline composer prompt — one tap to share a thought */}
