@@ -9,6 +9,7 @@ import { FOREIGNER_TAGS, POST_TYPES, placeBySlug } from '@/data';
 import { Place, Post, RouteDay } from '@/data/types';
 import { Icon } from './Icon';
 import { Photo, Chip, Rating, TagPill, Flag } from './ui';
+import { Avatar } from './Avatar';
 import { T, H, Card } from './base';
 
 export function PostTypeBadge({ type }: { type: string }) {
@@ -129,31 +130,62 @@ export function PostCard({ post }: { post: Post }) {
   const { votes, toggleVote } = useStore();
   const voteKey = post.id ?? post.slug;
   const voted = votes.has(voteKey);
+  const open = () => router.push(`/post/${post.slug}`);
+  // A casual "thought" leads with its body (tweet-like); structured posts lead
+  // with their title.
+  const isThought = post.type === 'thought' || !post.title;
   return (
-    <Card onPress={() => router.push(`/post/${post.slug}`)} style={{ padding: 15 }}>
-      <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <PostTypeBadge type={post.type} />
-        {!!post.neighborhood && <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600' }}>📍 {post.neighborhood}</T>}
-      </View>
-      <H style={{ marginTop: 8, fontSize: 17, lineHeight: 21 }}>{post.title}</H>
-      <T numberOfLines={2} style={{ marginTop: 5, fontSize: 13.5, lineHeight: 20, color: c.inkSoft }}>{post.body}</T>
-      {post.routeDays && <RoutePreview days={post.routeDays} />}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 12 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-          <Flag country={post.author.country} size={22} />
-          <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600' }}>{post.author.name}</T>
-          <T style={{ fontSize: 12, color: c.muted }} numberOfLines={1}>· {post.when} · 💬 {post.comments}</T>
+    <Card onPress={open} style={{ padding: 15 }}>
+      {/* Author row */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <Avatar name={post.author.name} size={38} />
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <T style={{ fontSize: 13.5, fontWeight: '800', color: c.ink }} numberOfLines={1}>{post.author.name}</T>
+            <T style={{ fontSize: 13 }}>{post.author.country}</T>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 1 }}>
+            <T style={{ fontSize: 11.5, color: c.muted }}>{post.when}</T>
+            {!isThought && <PostTypeBadge type={post.type} />}
+            {!!post.neighborhood && <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600' }}>· 📍 {post.neighborhood}</T>}
+          </View>
         </View>
+      </View>
+
+      {/* Content */}
+      {isThought ? (
+        <T numberOfLines={6} style={{ marginTop: 10, fontSize: 15, lineHeight: 22, color: c.ink }}>{post.body}</T>
+      ) : (
+        <>
+          <H style={{ marginTop: 10, fontSize: 17, lineHeight: 21 }}>{post.title}</H>
+          {!!post.body && <T numberOfLines={2} style={{ marginTop: 5, fontSize: 13.5, lineHeight: 20, color: c.inkSoft }}>{post.body}</T>}
+        </>
+      )}
+      {post.routeDays && <RoutePreview days={post.routeDays} />}
+
+      {/* Action row */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
         <Pressable
           onPress={() => { haptic.tick(); toggleVote(post); }}
           hitSlop={6}
           style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: 999,
+            flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 999,
             borderWidth: 1, borderColor: voted ? c.rose : c.line, backgroundColor: voted ? c.rose50 : c.surface,
           }}
         >
-          <Icon name="heart" size={17} fill={voted ? c.rose : 'none'} stroke={voted ? c.rose : c.inkSoft} sw={1.9} />
+          <Icon name="heart" size={16} fill={voted ? c.rose : 'none'} stroke={voted ? c.rose : c.inkSoft} sw={1.9} />
           <T style={{ fontSize: 12.5, fontWeight: '700', color: voted ? c.rose700 : c.inkSoft }}>{post.votes + (voted ? 1 : 0)}</T>
+        </Pressable>
+        <Pressable
+          onPress={open}
+          hitSlop={6}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 999,
+            borderWidth: 1, borderColor: c.line, backgroundColor: c.surface,
+          }}
+        >
+          <Icon name="comment" size={16} stroke={c.inkSoft} sw={1.9} />
+          <T style={{ fontSize: 12.5, fontWeight: '700', color: c.inkSoft }}>{post.comments > 0 ? post.comments : 'Reply'}</T>
         </Pressable>
       </View>
     </Card>

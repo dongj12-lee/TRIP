@@ -101,9 +101,19 @@ export type Author = { name: string; country: string };
 
 export type RouteStop = { slug?: string; name?: string; note: string; time: string };
 export type RouteDay = { day: string; theme: string; stops: RouteStop[] };
-export type Comment = { id?: string; authorId?: string; name: string; country: string; body: string; when: string };
+export type Comment = {
+  id?: string;
+  authorId?: string;
+  name: string;
+  country: string;
+  body: string;
+  when: string;
+  parentId?: string | null; // one level of threaded replies
+  likeCount?: number;
+  likedByMe?: boolean;
+};
 
-export type PostType = 'tip' | 'route' | 'question' | 'review';
+export type PostType = 'thought' | 'tip' | 'route' | 'question' | 'review';
 
 export type Post = {
   id?: string; // Supabase row id, present once backed by the DB (see data/remote.ts)

@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { View, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { POST_TYPES } from '@/data';
-import { T, H, IconButton } from '@/components/base';
+import { T, H } from '@/components/base';
 import { PostCard } from '@/components/cards';
+import { Avatar } from '@/components/Avatar';
+import { QuickComposeSheet } from '@/components/QuickComposeSheet';
+import { haptic } from '@/lib/haptics';
 
 export default function FeedScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const { sharedPost } = useStore();
+  const { sharedPost, profile } = useStore();
   const { posts, refreshPosts } = useRemoteContent();
   const [type, setType] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [composeOpen, setComposeOpen] = useState(false);
   const onRefresh = async () => {
     setRefreshing(true);
     await refreshPosts();
@@ -36,28 +38,41 @@ export default function FeedScreen() {
       .map(([k, v]) => [k, `${v.emoji} ${v.label}`] as [string, string]),
   ];
 
+  const openCompose = () => { haptic.tick(); setComposeOpen(true); };
+
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 6, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View style={{ flex: 1 }}>
-          <H style={{ fontSize: 32, lineHeight: 36 }}>Community</H>
-          <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-            Routes, tips & questions — by travelers, for travelers
-          </T>
-        </View>
-        <IconButton name="plus" bg={c.accent} color="#fff" onPress={() => router.push('/compose?kind=post')} />
+      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 10 }}>
+        <H style={{ fontSize: 32, lineHeight: 36 }}>Community</H>
       </View>
 
-      <View style={{ height: 56 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 10, alignItems: 'center' }}>
+      {/* Inline composer prompt — one tap to share a thought */}
+      <View style={{ paddingHorizontal: 18, paddingBottom: 10 }}>
+        <Pressable
+          onPress={openCompose}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 11,
+            backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 16, padding: 11, paddingRight: 14,
+          }}
+        >
+          <Avatar name={profile.displayName || 'You'} uri={profile.avatarUrl} size={34} />
+          <T style={{ flex: 1, fontSize: 14.5, color: c.muted }}>What's on your mind?</T>
+          <View style={{ backgroundColor: c.accent, width: 30, height: 30, borderRadius: 999, alignItems: 'center', justifyContent: 'center' }}>
+            <T style={{ fontSize: 17, color: '#fff', fontWeight: '700', marginTop: -1 }}>✎</T>
+          </View>
+        </Pressable>
+      </View>
+
+      <View style={{ height: 52 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 8, alignItems: 'center' }}>
           {chips.map(([k, label]) => {
             const on = (k === 'all' && !type) || type === k;
             return (
               <Pressable
                 key={k}
-                onPress={() => setType(k === 'all' ? null : k)}
+                onPress={() => { haptic.tick(); setType(k === 'all' ? null : k); }}
                 style={{
-                  paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
+                  paddingVertical: 6.5, paddingHorizontal: 14, borderRadius: 999,
                   borderWidth: 1, borderColor: on ? c.accent : c.line,
                   backgroundColor: on ? c.accent : c.surface,
                 }}
@@ -74,10 +89,20 @@ export default function FeedScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
       >
-        {list.map((p) => (
-          <PostCard key={p.slug} post={p} />
-        ))}
+        {list.length === 0 ? (
+          <Pressable onPress={openCompose} style={{ alignItems: 'center', paddingVertical: 48, paddingHorizontal: 30 }}>
+            <T style={{ fontSize: 30 }}>💬</T>
+            <T style={{ fontSize: 15, fontWeight: '700', color: c.ink, marginTop: 10 }}>Nothing here yet</T>
+            <T style={{ fontSize: 13, color: c.muted, marginTop: 4, textAlign: 'center', lineHeight: 19 }}>
+              Be the first to share a thought with fellow travelers.
+            </T>
+          </Pressable>
+        ) : (
+          list.map((p) => <PostCard key={p.slug} post={p} />)
+        )}
       </ScrollView>
+
+      <QuickComposeSheet visible={composeOpen} onClose={() => setComposeOpen(false)} />
     </View>
   );
 }

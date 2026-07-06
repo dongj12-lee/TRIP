@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, ScrollView, TextInput, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
@@ -7,13 +7,15 @@ import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { addComment, fetchPostComments } from '@/data/remote';
+import { addComment, fetchPostComments, toggleCommentLike } from '@/data/remote';
 import { Comment } from '@/data/types';
-import { T, H, Screen, DetailHeader, Button } from '@/components/base';
-import { Flag } from '@/components/ui';
+import { T, H, Screen, DetailHeader } from '@/components/base';
+import { Icon } from '@/components/Icon';
+import { Avatar } from '@/components/Avatar';
 import { PostTypeBadge, PlaceCard } from '@/components/cards';
 import { ReportSheet } from '@/components/ReportSheet';
 import { RouteFeedbackBar } from '@/components/RouteFeedbackBar';
+import { haptic } from '@/lib/haptics';
 
 export default function PostDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -22,36 +24,68 @@ export default function PostDetail() {
   const { sharedPost, profile } = useStore();
   const { session } = useAuth();
   const { posts, placeBySlug } = useRemoteContent();
+  const inputRef = useRef<TextInput>(null);
 
-  const [liveComments, setLiveComments] = useState<Comment[] | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [draft, setDraft] = useState('');
   const [posting, setPosting] = useState(false);
+  const [replyTo, setReplyTo] = useState<Comment | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
 
   const post = sharedPost && sharedPost.slug === slug ? sharedPost : posts.find((p) => p.slug === slug);
 
   useEffect(() => {
-    if (!post?.id || !isSupabaseConfigured) return;
-    fetchPostComments(post.id).then(setLiveComments).catch(() => {});
+    if (!post?.id || !isSupabaseConfigured) { setComments(post?.commentList ?? []); return; }
+    fetchPostComments(post.id).then(setComments).catch(() => {});
   }, [post?.id]);
+
+  // Group into one level of threads: top-level comments, each with its replies.
+  const threads = useMemo(() => {
+    const tops = comments.filter((cm) => !cm.parentId);
+    const byParent = new Map<string, Comment[]>();
+    for (const cm of comments) {
+      if (cm.parentId) {
+        const arr = byParent.get(cm.parentId) ?? [];
+        arr.push(cm);
+        byParent.set(cm.parentId, arr);
+      }
+    }
+    return tops.map((cm) => ({ comment: cm, replies: cm.id ? byParent.get(cm.id) ?? [] : [] }));
+  }, [comments]);
 
   if (!post) return <Screen><DetailHeader title="Post" /></Screen>;
   const place = post.placeSlug ? placeBySlug[post.placeSlug] : null;
-  const commentList = liveComments ?? post.commentList;
+  const isThought = post.type === 'thought' || !post.title;
+  const canWrite = !!post.id && isSupabaseConfigured && !!session;
 
-  const submitComment = async () => {
+  const startReply = (cm: Comment) => {
+    haptic.tick();
+    setReplyTo(cm);
+    inputRef.current?.focus();
+  };
+
+  const submit = async () => {
     if (!draft.trim() || !post.id) return;
     setPosting(true);
     try {
-      await addComment(post.id, draft.trim(), 'You', profile.country);
-      const fresh = await fetchPostComments(post.id);
-      setLiveComments(fresh);
+      const created = await addComment(post.id, draft.trim(), profile.displayName || 'You', profile.country, replyTo?.id ?? null);
+      setComments((prev) => [...prev, created]);
       setDraft('');
+      setReplyTo(null);
+      haptic.success();
     } catch (e) {
       console.warn('addComment failed', e);
     } finally {
       setPosting(false);
     }
+  };
+
+  const likeComment = (cm: Comment) => {
+    if (!cm.id || !canWrite) return;
+    haptic.tick();
+    const willLike = !cm.likedByMe;
+    setComments((prev) => prev.map((x) => (x.id === cm.id ? { ...x, likedByMe: willLike, likeCount: Math.max(0, (x.likeCount ?? 0) + (willLike ? 1 : -1)) } : x)));
+    toggleCommentLike(cm.id, willLike).catch(() => {});
   };
 
   return (
@@ -65,17 +99,25 @@ export default function PostDetail() {
         }
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <View style={{ flexDirection: 'row' }}>
-            <PostTypeBadge type={post.type} />
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 24 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          {/* Author */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11, marginTop: 4 }}>
+            <Avatar name={post.author.name} size={44} />
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <T style={{ fontSize: 15, fontWeight: '800' }}>{post.author.name}</T>
+                <T style={{ fontSize: 14 }}>{post.author.country}</T>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 1 }}>
+                <T style={{ fontSize: 12.5, color: c.muted }}>{post.when}</T>
+                {!isThought && <PostTypeBadge type={post.type} />}
+              </View>
+            </View>
           </View>
-          <H style={{ fontSize: 25, lineHeight: 30, marginTop: 12 }}>{post.title}</H>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
-            <Flag country={post.author.country} size={26} />
-            <T style={{ fontSize: 13.5, fontWeight: '700' }}>{post.author.name}</T>
-            <T style={{ fontSize: 12.5, color: c.muted }}>· {post.when}</T>
-          </View>
-          <T style={{ fontSize: 15, lineHeight: 24, color: c.ink, marginTop: 16 }}>{post.body}</T>
+
+          {/* Content */}
+          {!isThought && <H style={{ fontSize: 23, lineHeight: 29, marginTop: 16 }}>{post.title}</H>}
+          {!!post.body && <T style={{ fontSize: 16, lineHeight: 25, color: c.ink, marginTop: isThought ? 14 : 10 }}>{post.body}</T>}
 
           {place && (
             <View style={{ marginTop: 18 }}>
@@ -113,45 +155,98 @@ export default function PostDetail() {
             </View>
           )}
 
-          {/* Structured one-click feedback — route posts only */}
           {post.type === 'route' && <RouteFeedbackBar postId={post.id} initialCounts={post.feedbackCounts} />}
 
           {/* Comments */}
-          <View style={{ marginTop: 12 }}>
-            <T style={{ fontSize: 14, fontWeight: '800', marginBottom: 12 }}>💬 {commentList.length} comments</T>
-            <View style={{ gap: 14 }}>
-              {commentList.map((cm, i) => (
-                <View key={cm.id ?? i} style={{ flexDirection: 'row', gap: 10 }}>
-                  <Flag country={cm.country} size={30} />
-                  <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                      <T style={{ fontSize: 13, fontWeight: '700' }}>{cm.name}</T>
-                      <T style={{ fontSize: 11.5, color: c.muted }}>· {cm.when}</T>
+          <View style={{ marginTop: 20, borderTopWidth: 1, borderTopColor: c.line, paddingTop: 18 }}>
+            <T style={{ fontSize: 14, fontWeight: '800', marginBottom: 14 }}>
+              {comments.length > 0 ? `${comments.length} ${comments.length === 1 ? 'comment' : 'comments'}` : 'Comments'}
+            </T>
+            {threads.length === 0 && (
+              <T style={{ fontSize: 13.5, color: c.muted, marginBottom: 8 }}>No replies yet — start the conversation.</T>
+            )}
+            <View style={{ gap: 16 }}>
+              {threads.map(({ comment, replies }) => (
+                <View key={comment.id}>
+                  <CommentRow cm={comment} onLike={() => likeComment(comment)} onReply={() => startReply(comment)} canInteract={canWrite} />
+                  {replies.length > 0 && (
+                    <View style={{ marginLeft: 40, marginTop: 12, gap: 12, borderLeftWidth: 1.5, borderLeftColor: c.line, paddingLeft: 12 }}>
+                      {replies.map((r) => (
+                        <CommentRow key={r.id} cm={r} small onLike={() => likeComment(r)} onReply={() => startReply(comment)} canInteract={canWrite} />
+                      ))}
                     </View>
-                    <T style={{ fontSize: 13.5, color: c.ink, marginTop: 3, lineHeight: 19 }}>{cm.body}</T>
-                  </View>
+                  )}
                 </View>
               ))}
             </View>
-
-            {post.id && isSupabaseConfigured && session && (
-              <View style={{ flexDirection: 'row', gap: 8, marginTop: 18 }}>
-                <TextInput
-                  value={draft}
-                  onChangeText={setDraft}
-                  placeholder="Add a comment…"
-                  placeholderTextColor={c.muted}
-                  style={{ flex: 1, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12, paddingHorizontal: 13, paddingVertical: 10, fontSize: 14, color: c.ink, fontFamily: 'Jakarta' }}
-                  multiline
-                />
-                <Button label={posting ? '…' : 'Post'} disabled={!draft.trim() || posting} onPress={submitComment} style={{ width: 84, height: 44 }} />
-              </View>
-            )}
           </View>
         </ScrollView>
+
+        {/* Sticky composer */}
+        {canWrite && (
+          <View style={{ borderTopWidth: 1, borderTopColor: c.line, backgroundColor: c.paper, paddingBottom: insets.bottom || 10 }}>
+            {replyTo && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 8 }}>
+                <T style={{ fontSize: 12.5, color: c.muted }}>Replying to <T style={{ fontWeight: '700', color: c.inkSoft }}>{replyTo.name}</T></T>
+                <Pressable onPress={() => setReplyTo(null)} hitSlop={8}>
+                  <Icon name="close" size={15} stroke={c.muted} sw={2.2} />
+                </Pressable>
+              </View>
+            )}
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10, paddingHorizontal: 14, paddingVertical: 10 }}>
+              <Avatar name={profile.displayName || 'You'} uri={profile.avatarUrl} size={32} />
+              <TextInput
+                ref={inputRef}
+                value={draft}
+                onChangeText={setDraft}
+                placeholder={replyTo ? `Reply to ${replyTo.name}…` : 'Add a comment…'}
+                placeholderTextColor={c.muted}
+                style={{ flex: 1, maxHeight: 110, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 18, paddingHorizontal: 14, paddingTop: 9, paddingBottom: 9, fontSize: 14.5, color: c.ink, fontFamily: 'Jakarta' }}
+                multiline
+              />
+              <Pressable
+                onPress={submit}
+                disabled={!draft.trim() || posting}
+                style={{ width: 40, height: 40, borderRadius: 999, backgroundColor: draft.trim() ? c.accent : c.surface2, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Icon name="arrow" size={19} stroke={draft.trim() ? '#fff' : c.muted} sw={2.4} />
+              </Pressable>
+            </View>
+          </View>
+        )}
       </KeyboardAvoidingView>
 
       <ReportSheet visible={reportOpen} onClose={() => setReportOpen(false)} target={{ type: 'post', id: post.id ?? post.slug, authorId: post.authorId }} />
     </Screen>
+  );
+}
+
+function CommentRow({
+  cm, small, onLike, onReply, canInteract,
+}: { cm: Comment; small?: boolean; onLike: () => void; onReply: () => void; canInteract: boolean }) {
+  const { c } = useTheme();
+  return (
+    <View style={{ flexDirection: 'row', gap: 10 }}>
+      <Avatar name={cm.name} size={small ? 28 : 34} />
+      <View style={{ flex: 1 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <T style={{ fontSize: 13, fontWeight: '800' }}>{cm.name}</T>
+          <T style={{ fontSize: 12 }}>{cm.country}</T>
+          <T style={{ fontSize: 11.5, color: c.muted }}>· {cm.when}</T>
+        </View>
+        <T style={{ fontSize: 14, color: c.ink, marginTop: 3, lineHeight: 20 }}>{cm.body}</T>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginTop: 6 }}>
+          <Pressable onPress={onLike} hitSlop={8} disabled={!canInteract} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <Icon name="heart" size={14} fill={cm.likedByMe ? c.rose : 'none'} stroke={cm.likedByMe ? c.rose : c.muted} sw={2} />
+            {(cm.likeCount ?? 0) > 0 && <T style={{ fontSize: 12, fontWeight: '700', color: cm.likedByMe ? c.rose700 : c.muted }}>{cm.likeCount}</T>}
+          </Pressable>
+          {canInteract && (
+            <Pressable onPress={onReply} hitSlop={8}>
+              <T style={{ fontSize: 12, fontWeight: '700', color: c.muted }}>Reply</T>
+            </Pressable>
+          )}
+        </View>
+      </View>
+    </View>
   );
 }

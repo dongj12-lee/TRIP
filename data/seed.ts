@@ -14,6 +14,7 @@ export const FOREIGNER_TAGS: ForeignerTag[] = [
 ];
 
 export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 'terra' | 'sage' | 'gold' | 'rose' }> = {
+  thought: { emoji: '💭', label: 'Thought', tone: 'terra' },
   tip: { emoji: '💡', label: 'Tip', tone: 'gold' },
   route: { emoji: '🧭', label: 'Route', tone: 'terra' },
   question: { emoji: '❓', label: 'Question', tone: 'sage' },

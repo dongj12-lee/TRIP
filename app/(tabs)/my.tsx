@@ -15,6 +15,7 @@ import { EditProfileSheet } from '@/components/EditProfileSheet';
 import { useToast } from '@/components/Toast';
 import { Icon } from '@/components/Icon';
 import { Photo } from '@/components/ui';
+import { Avatar } from '@/components/Avatar';
 
 export default function MyScreen() {
   const { c } = useTheme();
@@ -52,7 +53,7 @@ export default function MyScreen() {
 
         {/* Identity — tap to edit */}
         <Pressable onPress={() => setEditing(true)} style={{ paddingHorizontal: 18, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Avatar name={name} uri={profile.avatarUrl} />
+          <Avatar name={name} uri={profile.avatarUrl} size={56} />
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <H style={{ fontSize: 20 }} numberOfLines={1}>{name}</H>
@@ -180,19 +181,6 @@ export default function MyScreen() {
 }
 
 // Circular avatar: real photo if set, else initials on an accent tint.
-function Avatar({ name, uri }: { name: string; uri?: string }) {
-  const { c } = useTheme();
-  const initial = (name.trim()[0] || 'Y').toUpperCase();
-  if (uri) {
-    return <Image source={{ uri }} style={{ width: 56, height: 56, borderRadius: 999, borderWidth: 1, borderColor: c.line }} />;
-  }
-  return (
-    <View style={{ width: 56, height: 56, borderRadius: 999, backgroundColor: c.accent50, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' }}>
-      <H style={{ fontSize: 24, color: c.accent }}>{initial}</H>
-    </View>
-  );
-}
-
 function Stat({ n, label }: { n: number | string; label: string }) {
   const { c } = useTheme();
   return (

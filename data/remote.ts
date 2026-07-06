@@ -167,7 +167,7 @@ function mapPost(row: any): Post {
     authorId: row.author_id,
     slug: row.slug,
     type: row.type as PostType,
-    title: row.title,
+    title: row.title ?? '',
     body: row.body,
     neighborhood: row.neighborhood,
     placeSlug: row.place_slug ?? undefined,
@@ -215,29 +215,76 @@ export async function fetchPostComments(postId: string): Promise<Comment[]> {
     .eq('post_id', postId)
     .order('created_at', { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((row: any) => ({
+  const rows = data ?? [];
+
+  // Which of these comments the current viewer has liked.
+  let liked = new Set<string>();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user && rows.length) {
+    const { data: likes } = await supabase
+      .from('comment_likes')
+      .select('comment_id')
+      .eq('user_id', user.id)
+      .in('comment_id', rows.map((r: any) => r.id));
+    liked = new Set((likes ?? []).map((l: any) => l.comment_id as string));
+  }
+
+  return rows.map((row: any) => ({
     id: row.id,
     authorId: row.author_id,
     name: row.author_name,
     country: row.author_country || '🌐',
     body: row.body,
     when: timeAgo(row.created_at),
+    parentId: row.parent_id ?? null,
+    likeCount: row.like_count ?? 0,
+    likedByMe: liked.has(row.id),
   }));
 }
 
-export async function addComment(postId: string, body: string, authorName: string, authorCountry: string | null) {
+export async function addComment(
+  postId: string,
+  body: string,
+  authorName: string,
+  authorCountry: string | null,
+  parentId?: string | null,
+): Promise<Comment> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not signed in');
-  const { error } = await supabase.from('comments').insert({
-    post_id: postId,
-    author_id: user.id,
-    author_name: authorName,
-    author_country: authorCountry,
-    body,
-  });
+  const { data, error } = await supabase
+    .from('comments')
+    .insert({
+      post_id: postId,
+      author_id: user.id,
+      author_name: authorName,
+      author_country: authorCountry,
+      body,
+      parent_id: parentId ?? null,
+    })
+    .select()
+    .single();
   if (error) throw error;
+  return {
+    id: data.id,
+    authorId: data.author_id,
+    name: data.author_name,
+    country: data.author_country || '🌐',
+    body: data.body,
+    when: timeAgo(data.created_at),
+    parentId: data.parent_id ?? null,
+    likeCount: 0,
+    likedByMe: false,
+  };
+}
+
+export async function toggleCommentLike(commentId: string, on: boolean) {
+  const userId = await currentUserId();
+  if (on) await supabase.from('comment_likes').upsert({ user_id: userId, comment_id: commentId });
+  else await supabase.from('comment_likes').delete().eq('user_id', userId).eq('comment_id', commentId);
 }
 
 export async function createPost(input: {
@@ -254,13 +301,14 @@ export async function createPost(input: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not signed in');
-  const slug = slugify(input.title);
+  // Casual "thought" posts have no title — derive a slug from the body instead.
+  const slug = slugify(input.title || input.body.slice(0, 40) || 'post');
   const { data, error } = await supabase
     .from('posts')
     .insert({
       slug,
       type: input.type,
-      title: input.title,
+      title: input.title || null,
       body: input.body,
       neighborhood: input.neighborhood ?? null,
       place_slug: input.placeSlug ?? null,
