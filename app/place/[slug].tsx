@@ -42,9 +42,10 @@ export default function PlaceDetail() {
     setDislikeN(place?.dislikeCount ?? 0);
   }, [place?.likeCount, place?.dislikeCount]);
 
-  // Optimistic Foreigner Fit tag counts — seeded once per place, then nudged
-  // locally on each tap (the server trigger keeps the real count in sync).
-  const [tagCounts, setTagCounts] = useState<Partial<Record<string, number>>>({});
+  // Optimistic Foreigner Fit yes/no counts — seeded once per place, then
+  // nudged locally on each tap (the server trigger keeps the real counts in
+  // sync).
+  const [tagCounts, setTagCounts] = useState<Partial<Record<string, { yes: number; no: number }>>>({});
   useEffect(() => {
     setTagCounts(place?.votes ?? {});
   }, [place?.slug]);
@@ -66,13 +67,22 @@ export default function PlaceDetail() {
     if (r === 'like' && cur !== 'like') showToast('Added to your likes', '👍');
     togglePlaceReaction(place.slug, r);
   };
-  const onVoteTag = (key: ForeignerTagKey) => {
+  const onVoteTag = (key: ForeignerTagKey, vote: 'yes' | 'no') => {
     const votingKey = `${place.slug}:${key}`;
-    const mine = tagVotes.has(votingKey);
-    setTagCounts((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] ?? 0) + (mine ? -1 : 1)) }));
+    const current = tagVotes[votingKey]; // 'yes' | 'no' | undefined
+    setTagCounts((prev) => {
+      const c = prev[key] ?? { yes: 0, no: 0 };
+      const next = { ...c };
+      if (current === vote) next[vote] = Math.max(0, next[vote] - 1); // undo
+      else {
+        next[vote] += 1;
+        if (current) next[current] = Math.max(0, next[current] - 1); // switching sides
+      }
+      return { ...prev, [key]: next };
+    });
     haptic.tick();
-    if (!mine) showToast('Thanks for confirming', '✅');
-    toggleTagVote(place.slug, key);
+    if (current !== vote) showToast(vote === 'yes' ? 'Thanks for confirming' : 'Thanks for the heads-up', vote === 'yes' ? '✅' : '📝');
+    toggleTagVote(place.slug, key, vote);
   };
   const relatedPosts = posts.filter((p) => p.placeSlug === place.slug);
   const hasFacts = place.subway || place.freeEntry || place.englishSite || place.wheelchair;
@@ -175,34 +185,34 @@ export default function PlaceDetail() {
           <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
           <View style={{ gap: 2 }}>
             {FOREIGNER_TAGS.map((tag) => {
-              const count = tagCounts[tag.key] ?? 0;
-              const has = count > 0;
-              const mine = tagVotes.has(`${place.slug}:${tag.key}`);
+              const { yes = 0, no = 0 } = tagCounts[tag.key] ?? {};
+              const has = yes > no;
+              const votingKey = `${place.slug}:${tag.key}`;
+              const mineVote = tagVotes[votingKey];
               return (
-                <Pressable
-                  key={tag.key}
-                  onPress={() => onVoteTag(tag.key)}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}
-                >
+                <View key={tag.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
                   <T style={{ fontSize: 20 }}>{tag.emoji}</T>
                   <View style={{ flex: 1 }}>
                     <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
                     <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{tag.hint}</T>
                   </View>
-                  <View
-                    style={{
-                      flexDirection: 'row', alignItems: 'center', gap: 5,
-                      backgroundColor: mine ? c.sage : has ? c.sage50 : c.surface,
-                      borderWidth: mine ? 0 : 1, borderColor: c.line,
-                      paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999,
-                    }}
-                  >
-                    <T style={{ fontSize: 12 }}>{mine ? '✓' : '👍'}</T>
-                    <T style={{ fontSize: 12, fontWeight: '700', color: mine ? '#fff' : has ? c.sage700 : c.muted }}>
-                      {count > 0 ? count : 'Confirm'}
-                    </T>
-                  </View>
-                </Pressable>
+                  <TagVoteButton
+                    active={mineVote === 'yes'}
+                    count={yes}
+                    emoji="👍"
+                    activeBg={c.sage}
+                    idleTextColor={yes > 0 ? c.sage700 : c.muted}
+                    onPress={() => onVoteTag(tag.key, 'yes')}
+                  />
+                  <TagVoteButton
+                    active={mineVote === 'no'}
+                    count={no}
+                    emoji="👎"
+                    activeBg={c.rose}
+                    idleTextColor={no > 0 ? c.rose700 : c.muted}
+                    onPress={() => onVoteTag(tag.key, 'no')}
+                  />
+                </View>
               );
             })}
           </View>
@@ -300,6 +310,28 @@ function ReactionButton({
     >
       <T style={{ fontSize: 16 }}>{emoji}</T>
       <T style={{ fontSize: 13.5, fontWeight: '700', color: active ? activeColor : c.inkSoft }}>{label}</T>
+    </Pressable>
+  );
+}
+
+// Compact yes/no vote pill for a single Foreigner Fit tag. Shows the shared
+// count as soon as it's nonzero, regardless of whether this viewer cast it.
+function TagVoteButton({
+  active, count, emoji, activeBg, idleTextColor, onPress,
+}: { active: boolean; count: number; emoji: string; activeBg: string; idleTextColor: string; onPress: () => void }) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        flexDirection: 'row', alignItems: 'center', gap: 4,
+        backgroundColor: active ? activeBg : count > 0 ? `${activeBg}22` : c.surface,
+        borderWidth: active ? 0 : 1, borderColor: c.line,
+        paddingVertical: 5, paddingHorizontal: 9, borderRadius: 999, minWidth: 40, justifyContent: 'center',
+      }}
+    >
+      <T style={{ fontSize: 12 }}>{emoji}</T>
+      {count > 0 && <T style={{ fontSize: 12, fontWeight: '700', color: active ? '#fff' : idleTextColor }}>{count}</T>}
     </Pressable>
   );
 }

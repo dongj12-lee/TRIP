@@ -34,7 +34,7 @@ export type Place = {
   priceTransparent: boolean;
   cardOk: boolean;
   englishSpoken: boolean;
-  votes: Partial<Record<ForeignerTagKey, number>>;
+  votes: Partial<Record<ForeignerTagKey, { yes: number; no: number }>>;
   warnTip?: string;
   // K-content connection is the app's own curated layer (not sourced from any
   // public API) — optional because bulk-imported places won't have one yet.

@@ -94,7 +94,7 @@ function mapPlace(row: any): Place {
     priceTransparent: row.price_transparent,
     cardOk: row.card_ok,
     englishSpoken: row.english_spoken,
-    votes: row.votes as Partial<Record<ForeignerTagKey, number>>,
+    votes: row.votes as Partial<Record<ForeignerTagKey, { yes: number; no: number }>>,
     warnTip: row.warn_tip ?? undefined,
     kContentTitle: row.k_content_title ?? undefined,
     kContentType: row.k_content_type ?? undefined,
@@ -382,20 +382,23 @@ export async function fetchPlaceReactions(userId: string): Promise<Record<string
   return out;
 }
 
-// Real per-user confirmation of a Foreigner Fit tag ("Solo OK", "English
-// spoken", …). A DB trigger keeps places.votes and the matching boolean column
-// in sync (see migration-007) — this was previously a read-only display with
-// no way for a traveler to actually verify anything.
-export async function setPlaceTagVote(placeSlug: string, tagKey: ForeignerTagKey, on: boolean) {
+// Real per-user yes/no vote on a Foreigner Fit tag ("Solo OK", "English
+// spoken", …). Passing null clears the vote. A DB trigger keeps places.votes
+// ({ yes, no } per tag) and the matching boolean column (has = yes > no) in
+// sync (see migration-007/008) — this was previously a read-only display with
+// no way for a traveler to actually verify or dispute anything.
+export async function setPlaceTagVote(placeSlug: string, tagKey: ForeignerTagKey, vote: 'yes' | 'no' | null) {
   const userId = await currentUserId();
-  if (on) await supabase.from('place_tag_votes').upsert({ user_id: userId, place_slug: placeSlug, tag_key: tagKey });
+  if (vote) await supabase.from('place_tag_votes').upsert({ user_id: userId, place_slug: placeSlug, tag_key: tagKey, vote });
   else await supabase.from('place_tag_votes').delete().eq('user_id', userId).eq('place_slug', placeSlug).eq('tag_key', tagKey);
 }
 
-export async function fetchMyPlaceTagVotes(userId: string): Promise<Set<string>> {
-  const { data, error } = await supabase.from('place_tag_votes').select('place_slug, tag_key').eq('user_id', userId);
+export async function fetchMyPlaceTagVotes(userId: string): Promise<Record<string, 'yes' | 'no'>> {
+  const { data, error } = await supabase.from('place_tag_votes').select('place_slug, tag_key, vote').eq('user_id', userId);
   if (error) throw error;
-  return new Set((data ?? []).map((r: any) => `${r.place_slug}:${r.tag_key}`));
+  const out: Record<string, 'yes' | 'no'> = {};
+  for (const r of data ?? []) out[`${r.place_slug}:${r.tag_key}`] = r.vote as 'yes' | 'no';
+  return out;
 }
 
 export async function fetchUserRelations(userId: string) {

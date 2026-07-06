@@ -44,8 +44,8 @@ type StoreValue = {
   myPostCount: number;
   placeReactions: Record<string, 'like' | 'dislike'>;
   togglePlaceReaction: (slug: string, reaction: 'like' | 'dislike') => void;
-  tagVotes: Set<string>;
-  toggleTagVote: (slug: string, tagKey: ForeignerTagKey) => void;
+  tagVotes: Record<string, 'yes' | 'no'>;
+  toggleTagVote: (slug: string, tagKey: ForeignerTagKey, vote: 'yes' | 'no') => void;
   resetAll: () => void;
 };
 
@@ -72,7 +72,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [sharedPost, setSharedPost] = useState<Post | null>(null);
   const [myPostCount, setMyPostCount] = useState(0);
   const [placeReactions, setPlaceReactions] = useState<Record<string, 'like' | 'dislike'>>({});
-  const [tagVotes, setTagVotes] = useState<Set<string>>(new Set());
+  const [tagVotes, setTagVotes] = useState<Record<string, 'yes' | 'no'>>({});
 
   // hydrate from local cache first (instant paint, and the whole story when offline)
   useEffect(() => {
@@ -249,14 +249,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         });
       },
       tagVotes,
-      toggleTagVote: (slug, tagKey) => {
+      toggleTagVote: (slug, tagKey, vote) => {
         const key = `${slug}:${tagKey}`;
         setTagVotes((prev) => {
-          const next = new Set(prev);
-          const on = !next.has(key);
-          if (on) next.add(key);
-          else next.delete(key);
-          if (canWrite) remote.setPlaceTagVote(slug, tagKey, on).catch((e) => console.warn('setPlaceTagVote failed', e));
+          const next = { ...prev };
+          const cleared = prev[key] === vote; // tapping the active choice clears it
+          if (cleared) delete next[key];
+          else next[key] = vote;
+          if (canWrite) remote.setPlaceTagVote(slug, tagKey, cleared ? null : vote).catch((e) => console.warn('setPlaceTagVote failed', e));
           return next;
         });
       },
@@ -271,7 +271,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSharedPost(null);
         setMyPostCount(0);
         setPlaceReactions({});
-        setTagVotes(new Set());
+        setTagVotes({});
       },
     }),
     [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, placeReactions, tagVotes, canWrite, user, addLocalPost],

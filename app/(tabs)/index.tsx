@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { View, FlatList, ScrollView, Pressable, TextInput, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
-import { FOREIGNER_TAGS } from '@/data';
 import { useRemoteContent } from '@/lib/remoteData';
 import { useStore } from '@/lib/store';
 import { recommendedPlaces } from '@/lib/recommend';
@@ -11,7 +10,14 @@ import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
 import { ExploreMap } from '@/components/ExploreMap';
 import { Icon } from '@/components/Icon';
-import { Eyebrow, TagPill } from '@/components/ui';
+import { Eyebrow } from '@/components/ui';
+import { FiltersSheet } from '@/components/FiltersSheet';
+import { haptic } from '@/lib/haptics';
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  Culture: '🎭', Attraction: '🏯', Cafe: '☕', Shopping: '🛍️',
+  Activity: '🎟️', Nightlife: '🍺', Restaurant: '🍜',
+};
 
 // Cap map pins so the Seoul map doesn't turn into an unreadable pin-cloud
 // once hundreds of places are loaded.
@@ -36,6 +42,7 @@ export default function ExploreScreen() {
   const [category, setCategory] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const hoods = useMemo(() => Array.from(new Set(places.map((p) => p.neighborhood))).sort(), [places]);
 
@@ -59,6 +66,8 @@ export default function ExploreScreen() {
       return true;
     });
   }, [places, query, activeTags, hood, category]);
+
+  const activeFilterCount = activeTags.size + (hood ? 1 : 0);
 
   const toggleTag = (k: ForeignerTagKey) =>
     setActiveTags((prev) => {
@@ -138,28 +147,46 @@ export default function ExploreScreen() {
         </View>
       )}
 
-      {/* Category rail */}
+      {/* Category rail — the one filter kept always visible; icon-forward for quick scanning */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
         <Chip label="All types" active={!category} onPress={() => setCategory(null)} />
         {categories.map((cat) => (
-          <Chip key={cat} label={cat} active={category === cat} onPress={() => setCategory(category === cat ? null : cat)} />
+          <Chip
+            key={cat}
+            label={CATEGORY_EMOJI[cat] ? `${CATEGORY_EMOJI[cat]} ${cat}` : cat}
+            active={category === cat}
+            onPress={() => setCategory(category === cat ? null : cat)}
+          />
         ))}
       </ScrollView>
 
-      {/* Foreigner-tag rail */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
-        {FOREIGNER_TAGS.map((t) => (
-          <TagPill key={t.key} tag={t} active={activeTags.has(t.key)} onPress={() => toggleTag(t.key)} />
-        ))}
-      </ScrollView>
-
-      {/* Neighborhood rail */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 12 }}>
-        <Chip label="All areas" active={!hood} onPress={() => setHood(null)} dark />
-        {hoods.map((h) => (
-          <Chip key={h} label={h} active={hood === h} onPress={() => setHood(hood === h ? null : h)} dark />
-        ))}
-      </ScrollView>
+      {/* Everything else (foreigner-fit tags, neighborhood) lives behind one
+          Filters button, so the default view never shows more than one row
+          of pills at a time. */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 18, paddingBottom: 12 }}>
+        <Pressable
+          onPress={() => { haptic.tick(); setFiltersOpen(true); }}
+          style={{
+            flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
+            backgroundColor: activeFilterCount > 0 ? c.ink : c.surface,
+            borderWidth: 1, borderColor: activeFilterCount > 0 ? c.ink : c.line,
+          }}
+        >
+          <Icon name="filter" size={14} stroke={activeFilterCount > 0 ? c.paper : c.inkSoft} sw={2} />
+          <T style={{ fontSize: 13, fontWeight: '700', color: activeFilterCount > 0 ? c.paper : c.inkSoft }}>
+            {activeFilterCount > 0 ? `Filters · ${activeFilterCount}` : 'Filters'}
+          </T>
+        </Pressable>
+        {hood && (
+          <Pressable
+            onPress={() => setHood(null)}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.accent50 }}
+          >
+            <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>📍 {hood}</T>
+            <Icon name="close" size={12} stroke={c.accent} sw={2.4} />
+          </Pressable>
+        )}
+      </View>
 
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
@@ -203,6 +230,16 @@ export default function ExploreScreen() {
         windowSize={9}
         removeClippedSubviews
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
+      />
+      <FiltersSheet
+        visible={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        activeTags={activeTags}
+        toggleTag={toggleTag}
+        hood={hood}
+        setHood={setHood}
+        hoods={hoods}
+        resultCount={filtered.length}
       />
     </View>
   );
