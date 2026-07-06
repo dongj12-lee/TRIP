@@ -382,6 +382,22 @@ export async function fetchPlaceReactions(userId: string): Promise<Record<string
   return out;
 }
 
+// Real per-user confirmation of a Foreigner Fit tag ("Solo OK", "English
+// spoken", …). A DB trigger keeps places.votes and the matching boolean column
+// in sync (see migration-007) — this was previously a read-only display with
+// no way for a traveler to actually verify anything.
+export async function setPlaceTagVote(placeSlug: string, tagKey: ForeignerTagKey, on: boolean) {
+  const userId = await currentUserId();
+  if (on) await supabase.from('place_tag_votes').upsert({ user_id: userId, place_slug: placeSlug, tag_key: tagKey });
+  else await supabase.from('place_tag_votes').delete().eq('user_id', userId).eq('place_slug', placeSlug).eq('tag_key', tagKey);
+}
+
+export async function fetchMyPlaceTagVotes(userId: string): Promise<Set<string>> {
+  const { data, error } = await supabase.from('place_tag_votes').select('place_slug, tag_key').eq('user_id', userId);
+  if (error) throw error;
+  return new Set((data ?? []).map((r: any) => `${r.place_slug}:${r.tag_key}`));
+}
+
 export async function fetchUserRelations(userId: string) {
   const [saves, votes, joins, follows] = await Promise.all([
     supabase.from('saves').select('place_slug').eq('user_id', userId),

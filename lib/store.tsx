@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_ITINERARY, buildRoutePost } from '@/data';
-import { Itinerary, Post, Profile } from '@/data/types';
+import { ForeignerTagKey, Itinerary, Post, Profile } from '@/data/types';
 import { isSupabaseConfigured } from './supabase';
 import { useAuth } from './auth';
 import { useRemoteContent } from './remoteData';
@@ -44,6 +44,8 @@ type StoreValue = {
   myPostCount: number;
   placeReactions: Record<string, 'like' | 'dislike'>;
   togglePlaceReaction: (slug: string, reaction: 'like' | 'dislike') => void;
+  tagVotes: Set<string>;
+  toggleTagVote: (slug: string, tagKey: ForeignerTagKey) => void;
   resetAll: () => void;
 };
 
@@ -70,6 +72,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [sharedPost, setSharedPost] = useState<Post | null>(null);
   const [myPostCount, setMyPostCount] = useState(0);
   const [placeReactions, setPlaceReactions] = useState<Record<string, 'like' | 'dislike'>>({});
+  const [tagVotes, setTagVotes] = useState<Set<string>>(new Set());
 
   // hydrate from local cache first (instant paint, and the whole story when offline)
   useEffect(() => {
@@ -124,6 +127,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       .fetchPlaceReactions(user.id)
       .then(setPlaceReactions)
       .catch((e) => console.warn('fetchPlaceReactions failed', e));
+    remote
+      .fetchMyPlaceTagVotes(user.id)
+      .then(setTagVotes)
+      .catch((e) => console.warn('fetchMyPlaceTagVotes failed', e));
   }, [user?.id]);
 
   // persist to local cache on every change
@@ -241,6 +248,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           return next;
         });
       },
+      tagVotes,
+      toggleTagVote: (slug, tagKey) => {
+        const key = `${slug}:${tagKey}`;
+        setTagVotes((prev) => {
+          const next = new Set(prev);
+          const on = !next.has(key);
+          if (on) next.add(key);
+          else next.delete(key);
+          if (canWrite) remote.setPlaceTagVote(slug, tagKey, on).catch((e) => console.warn('setPlaceTagVote failed', e));
+          return next;
+        });
+      },
       resetAll: () => {
         setOnboarded(false);
         setProfile({ country: null, interests: [] });
@@ -252,9 +271,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSharedPost(null);
         setMyPostCount(0);
         setPlaceReactions({});
+        setTagVotes(new Set());
       },
     }),
-    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, placeReactions, canWrite, user, addLocalPost],
+    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, placeReactions, tagVotes, canWrite, user, addLocalPost],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

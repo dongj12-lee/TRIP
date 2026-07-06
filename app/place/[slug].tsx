@@ -7,6 +7,7 @@ import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { FOREIGNER_TAGS } from '@/data';
+import { ForeignerTagKey } from '@/data/types';
 import { T, H, IconButton, Button } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Photo, Chip, Rating } from '@/components/ui';
@@ -26,7 +27,7 @@ export default function PlaceDetail() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave, placeReactions, togglePlaceReaction } = useStore();
+  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
@@ -40,6 +41,13 @@ export default function PlaceDetail() {
     setLikeN(place?.likeCount ?? 0);
     setDislikeN(place?.dislikeCount ?? 0);
   }, [place?.likeCount, place?.dislikeCount]);
+
+  // Optimistic Foreigner Fit tag counts — seeded once per place, then nudged
+  // locally on each tap (the server trigger keeps the real count in sync).
+  const [tagCounts, setTagCounts] = useState<Partial<Record<string, number>>>({});
+  useEffect(() => {
+    setTagCounts(place?.votes ?? {});
+  }, [place?.slug]);
 
   if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
 
@@ -57,6 +65,14 @@ export default function PlaceDetail() {
     haptic.tick();
     if (r === 'like' && cur !== 'like') showToast('Added to your likes', '👍');
     togglePlaceReaction(place.slug, r);
+  };
+  const onVoteTag = (key: ForeignerTagKey) => {
+    const votingKey = `${place.slug}:${key}`;
+    const mine = tagVotes.has(votingKey);
+    setTagCounts((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] ?? 0) + (mine ? -1 : 1)) }));
+    haptic.tick();
+    if (!mine) showToast('Thanks for confirming', '✅');
+    toggleTagVote(place.slug, key);
   };
   const relatedPosts = posts.filter((p) => p.placeSlug === place.slug);
   const hasFacts = place.subway || place.freeEntry || place.englishSite || place.wheelchair;
@@ -156,26 +172,37 @@ export default function PlaceDetail() {
         {/* Foreigner Fit */}
         <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
           <H style={{ fontSize: 19, marginBottom: 4 }}>Foreigner Fit</H>
-          <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Traveler-verified, tag by tag</T>
+          <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
           <View style={{ gap: 2 }}>
             {FOREIGNER_TAGS.map((tag) => {
-              const has = (place as any)[tag.key];
-              const count = place.votes[tag.key];
+              const count = tagCounts[tag.key] ?? 0;
+              const has = count > 0;
+              const mine = tagVotes.has(`${place.slug}:${tag.key}`);
               return (
-                <View key={tag.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
+                <Pressable
+                  key={tag.key}
+                  onPress={() => onVoteTag(tag.key)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}
+                >
                   <T style={{ fontSize: 20 }}>{tag.emoji}</T>
                   <View style={{ flex: 1 }}>
                     <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
                     <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{tag.hint}</T>
                   </View>
-                  {has ? (
-                    <View style={{ backgroundColor: c.sage50, paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999 }}>
-                      <T style={{ fontSize: 12, fontWeight: '700', color: c.sage700 }}>👍 {count ?? 0}</T>
-                    </View>
-                  ) : (
-                    <T style={{ fontSize: 16, color: c.muted }}>—</T>
-                  )}
-                </View>
+                  <View
+                    style={{
+                      flexDirection: 'row', alignItems: 'center', gap: 5,
+                      backgroundColor: mine ? c.sage : has ? c.sage50 : c.surface,
+                      borderWidth: mine ? 0 : 1, borderColor: c.line,
+                      paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999,
+                    }}
+                  >
+                    <T style={{ fontSize: 12 }}>{mine ? '✓' : '👍'}</T>
+                    <T style={{ fontSize: 12, fontWeight: '700', color: mine ? '#fff' : has ? c.sage700 : c.muted }}>
+                      {count > 0 ? count : 'Confirm'}
+                    </T>
+                  </View>
+                </Pressable>
               );
             })}
           </View>
