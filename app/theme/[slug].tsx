@@ -75,7 +75,7 @@ export default function ThemeDetail() {
                     </View>
                     <Card style={{ flex: 1, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                       <View style={{ width: 44, height: 44, borderRadius: 10, overflow: 'hidden' }}>
-                        <Photo swatch={place.swatch} height={44} />
+                        <Photo uri={place.photoUrl} swatch={place.swatch} height={44} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <T style={{ fontSize: 14.5, fontWeight: '700' }} numberOfLines={1}>{place.name}</T>

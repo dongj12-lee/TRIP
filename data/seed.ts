@@ -22,28 +22,23 @@ export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 't
 
 export const THEMES: Theme[] = [
   {
+    // Stops are real Visit Seoul places (vs- slugs), so this walk only
+    // resolves stops when live Supabase data is loaded — matches the DB copy
+    // of this theme, kept in sync manually (see supabase/themes update).
     slug: 'euljiro-after-dark', kind: 'walk', category: 'K-Content',
     title: 'Euljiro After Dark', subtitle: 'A local night crawl',
     kContent: 'K-Variety / K-Drama', kType: 'Variety', stops: 6, hours: '≈ 4 hrs',
     description: "The retro-industrial backstreets of Euljiro that keep showing up in Korean dramas and variety shows. Eat, drink, and wander like a local — not a tourist stuck in Myeongdong.",
-    placeSlugs: ['nogari-alley-manseon', 'euljiro-coffee-hanyak', 'eulji-myeonok', 'gs25-euljiro-combo', 'gwangjang-yukhoe', 'siloam-sauna'],
+    placeSlugs: ['vs-ENPf8bj59', 'vs-ENPyiaqhs', 'vs-ENP025376', 'vs-ENP000286', 'vs-ENPqlv92h', 'vs-ENP32nfdl'],
     swatch: ['#3a2c22', '#c26b4a'],
   },
   {
     slug: 'kdrama-cafe-hop', kind: 'walk', category: 'K-Content',
     title: 'K-Drama Café Hop', subtitle: 'Where the scenes were shot',
-    kContent: 'K-Drama', kType: 'Drama', stops: 5, hours: '≈ 3 hrs',
-    description: 'Moody hidden cafés and rooftop spots that drama directors keep coming back to. Recreate the scene, order what they ordered.',
-    placeSlugs: ['euljiro-coffee-hanyak', 'eulji-myeonok'],
+    kContent: 'K-Drama', kType: 'Drama', stops: 2, hours: '≈ 1.5 hrs',
+    description: 'Moody hidden cafés in reclaimed Euljiro workshops that drama directors keep coming back to. Recreate the scene, order what they ordered.',
+    placeSlugs: ['vs-ENPyiaqhs', 'vs-ENP025376'],
     swatch: ['#5f6d53', '#a9bf94'],
-  },
-  {
-    slug: 'idol-convenience-combos', kind: 'walk', category: 'K-Content',
-    title: 'Idol Convenience Combos', subtitle: 'Eat like your bias',
-    kContent: 'K-Pop', kType: 'KPop', stops: 4, hours: '≈ 2 hrs',
-    description: 'The viral convenience-store ramyeon hacks and snack combos your favorite idols rave about. Cheap, solo-friendly, open 24h.',
-    placeSlugs: ['gs25-euljiro-combo', 'nogari-alley-manseon'],
-    swatch: ['#8a6a1f', '#e3c25f'],
   },
   {
     slug: 'olive-young-must-buys', kind: 'guide', category: 'Shopping',
