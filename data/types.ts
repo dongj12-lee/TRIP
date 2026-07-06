@@ -43,6 +43,15 @@ export type Place = {
   kContentNote?: string;
   swatch: Swatch;
   photoUrl?: string; // real photo (e.g. from TourAPI); falls back to swatch gradient when absent
+  // Objective "Good to know" facts, sourced from Visit Seoul (distinct from the
+  // community-voted Foreigner Fit tags above).
+  subway?: string;
+  freeEntry?: boolean;
+  englishSite?: boolean;
+  wheelchair?: boolean;
+  // Community satisfaction — powers the "Recommended" rail.
+  likeCount?: number;
+  dislikeCount?: number;
 };
 
 export type GuideItem = {

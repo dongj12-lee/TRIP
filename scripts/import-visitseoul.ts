@@ -227,13 +227,19 @@ async function main() {
       lat,
       lng,
       swatch: item._cat.swatch,
-      // Only claim what the API actually evidences (per the "don't assume" rule):
+      // Foreigner Fit stays a purely community-voted layer — no auto pre-fills,
+      // so a fresh place starts honestly blank and travelers verify it.
       solo_ok: false,
       english_menu: false,
-      price_transparent: fee === 'F' || fee === 'C', // official published admission
+      price_transparent: false,
       card_ok: false,
-      english_spoken: /en|english/.test(homepageLang), // runs an English homepage
+      english_spoken: false,
       votes: {},
+      // Objective "Good to know" facts, straight from the API:
+      subway: (tr.subway_info || '').trim() || null,
+      free_entry: fee === 'F',
+      english_site: /en/.test(homepageLang), // operates an English website
+      wheelchair: Array.isArray(ex.disabled_facility) && ex.disabled_facility.length > 0,
       photo_url: d.main_img || item.main_img || null,
     });
   });

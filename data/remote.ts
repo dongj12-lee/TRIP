@@ -101,6 +101,12 @@ function mapPlace(row: any): Place {
     kContentNote: row.k_content_note ?? undefined,
     swatch: row.swatch,
     photoUrl: row.photo_url ?? undefined,
+    subway: row.subway ?? undefined,
+    freeEntry: row.free_entry ?? undefined,
+    englishSite: row.english_site ?? undefined,
+    wheelchair: row.wheelchair ?? undefined,
+    likeCount: row.like_count ?? 0,
+    dislikeCount: row.dislike_count ?? 0,
   };
 }
 
@@ -358,6 +364,22 @@ export async function setFollowed(creatorId: string, followed: boolean) {
   const userId = await currentUserId();
   if (followed) await supabase.from('follows').upsert({ follower_id: userId, creator_id: creatorId });
   else await supabase.from('follows').delete().eq('follower_id', userId).eq('creator_id', creatorId);
+}
+
+// Per-user like/dislike on a place. Passing null clears it. A DB trigger keeps
+// places.like_count / dislike_count in sync (see migration-006).
+export async function setPlaceReaction(placeSlug: string, reaction: 'like' | 'dislike' | null) {
+  const userId = await currentUserId();
+  if (reaction) await supabase.from('place_reactions').upsert({ user_id: userId, place_slug: placeSlug, reaction });
+  else await supabase.from('place_reactions').delete().eq('user_id', userId).eq('place_slug', placeSlug);
+}
+
+export async function fetchPlaceReactions(userId: string): Promise<Record<string, 'like' | 'dislike'>> {
+  const { data, error } = await supabase.from('place_reactions').select('place_slug, reaction').eq('user_id', userId);
+  if (error) throw error;
+  const out: Record<string, 'like' | 'dislike'> = {};
+  for (const r of data ?? []) out[r.place_slug as string] = r.reaction as 'like' | 'dislike';
+  return out;
 }
 
 export async function fetchUserRelations(userId: string) {

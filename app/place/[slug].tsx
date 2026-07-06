@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Pressable, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -26,12 +26,21 @@ export default function PlaceDetail() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave } = useStore();
+  const { saved, toggleSave, placeReactions, togglePlaceReaction } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
 
   const place = placeBySlug[slug!];
+  // Optimistic like/dislike counts — seed from the server counts and re-sync
+  // whenever they change (fires once when the place data loads).
+  const [likeN, setLikeN] = useState(0);
+  const [dislikeN, setDislikeN] = useState(0);
+  useEffect(() => {
+    setLikeN(place?.likeCount ?? 0);
+    setDislikeN(place?.dislikeCount ?? 0);
+  }, [place?.likeCount, place?.dislikeCount]);
+
   if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
 
   const isSaved = saved.has(place.slug);
@@ -40,7 +49,17 @@ export default function PlaceDetail() {
     if (!isSaved) showToast('Saved to your spots', '🔖');
     toggleSave(place.slug);
   };
+  const myReaction = placeReactions[place.slug];
+  const react = (r: 'like' | 'dislike') => {
+    const cur = placeReactions[place.slug];
+    setLikeN((n) => n + (r === 'like' ? (cur === 'like' ? -1 : 1) : cur === 'like' ? -1 : 0));
+    setDislikeN((n) => n + (r === 'dislike' ? (cur === 'dislike' ? -1 : 1) : cur === 'dislike' ? -1 : 0));
+    haptic.tick();
+    if (r === 'like' && cur !== 'like') showToast('Added to your likes', '👍');
+    togglePlaceReaction(place.slug, r);
+  };
   const relatedPosts = posts.filter((p) => p.placeSlug === place.slug);
+  const hasFacts = place.subway || place.freeEntry || place.englishSite || place.wheelchair;
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
@@ -91,6 +110,40 @@ export default function PlaceDetail() {
             </>
           )}
         </View>
+
+        {/* Like / dislike — the community satisfaction signal */}
+        <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 16 }}>
+          <ReactionButton
+            active={myReaction === 'like'}
+            emoji="👍"
+            label={likeN > 0 ? `Like · ${likeN}` : 'Like'}
+            activeBg={c.sage50}
+            activeColor={c.sage700}
+            onPress={() => react('like')}
+          />
+          <ReactionButton
+            active={myReaction === 'dislike'}
+            emoji="👎"
+            label={dislikeN > 0 ? `${dislikeN}` : 'Not for me'}
+            activeBg={c.rose50}
+            activeColor={c.rose700}
+            onPress={() => react('dislike')}
+          />
+        </View>
+
+        {/* Good to know — objective facts from Visit Seoul (distinct from the
+            community-voted Foreigner Fit below) */}
+        {hasFacts && (
+          <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
+            <H style={{ fontSize: 19, marginBottom: 10 }}>Good to know</H>
+            <View style={{ gap: 8 }}>
+              {!!place.subway && <FactRow emoji="🚇" text={place.subway} />}
+              {place.freeEntry && <FactRow emoji="🎟️" text="Free entry" />}
+              {place.englishSite && <FactRow emoji="🌐" text="English website available" />}
+              {place.wheelchair && <FactRow emoji="♿" text="Step-free / accessible facilities" />}
+            </View>
+          </View>
+        )}
 
         {/* K-content connection */}
         {!!place.kContentTitle && (
@@ -191,5 +244,35 @@ function InfoRow({ icon, text }: { icon: any; text: string }) {
       <Icon name={icon} size={17} stroke={c.muted} sw={1.9} />
       <T style={{ flex: 1, fontSize: 13.5, color: c.inkSoft, fontWeight: '600' }}>{text}</T>
     </View>
+  );
+}
+
+function FactRow({ emoji, text }: { emoji: string; text: string }) {
+  const { c } = useTheme();
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+      <T style={{ fontSize: 16, lineHeight: 20 }}>{emoji}</T>
+      <T style={{ flex: 1, fontSize: 13.5, color: c.inkSoft, fontWeight: '600', lineHeight: 20 }}>{text}</T>
+    </View>
+  );
+}
+
+function ReactionButton({
+  active, emoji, label, activeBg, activeColor, onPress,
+}: { active: boolean; emoji: string; label: string; activeBg: string; activeColor: string; onPress: () => void }) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
+        paddingVertical: 11, borderRadius: 13,
+        backgroundColor: active ? activeBg : c.surface,
+        borderWidth: 1, borderColor: active ? 'transparent' : c.line,
+      }}
+    >
+      <T style={{ fontSize: 16 }}>{emoji}</T>
+      <T style={{ fontSize: 13.5, fontWeight: '700', color: active ? activeColor : c.inkSoft }}>{label}</T>
+    </Pressable>
   );
 }

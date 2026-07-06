@@ -42,6 +42,8 @@ type StoreValue = {
   shareTrip: (message: string) => Promise<void>;
   updateProfile: (fields: Partial<Profile>) => Promise<void>;
   myPostCount: number;
+  placeReactions: Record<string, 'like' | 'dislike'>;
+  togglePlaceReaction: (slug: string, reaction: 'like' | 'dislike') => void;
   resetAll: () => void;
 };
 
@@ -67,6 +69,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [itinerary, setItineraryState] = useState<Itinerary>(DEFAULT_ITINERARY);
   const [sharedPost, setSharedPost] = useState<Post | null>(null);
   const [myPostCount, setMyPostCount] = useState(0);
+  const [placeReactions, setPlaceReactions] = useState<Record<string, 'like' | 'dislike'>>({});
 
   // hydrate from local cache first (instant paint, and the whole story when offline)
   useEffect(() => {
@@ -117,6 +120,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       .fetchMyPostCount(user.id)
       .then(setMyPostCount)
       .catch((e) => console.warn('fetchMyPostCount failed', e));
+    remote
+      .fetchPlaceReactions(user.id)
+      .then(setPlaceReactions)
+      .catch((e) => console.warn('fetchPlaceReactions failed', e));
   }, [user?.id]);
 
   // persist to local cache on every change
@@ -223,6 +230,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (canWrite) await remote.updateProfile(fields).catch((e) => console.warn('updateProfile failed', e));
       },
       myPostCount,
+      placeReactions,
+      togglePlaceReaction: (slug, reaction) => {
+        setPlaceReactions((prev) => {
+          const next = { ...prev };
+          const cleared = prev[slug] === reaction; // tapping the active one clears it
+          if (cleared) delete next[slug];
+          else next[slug] = reaction;
+          if (canWrite) remote.setPlaceReaction(slug, cleared ? null : reaction).catch((e) => console.warn('setPlaceReaction failed', e));
+          return next;
+        });
+      },
       resetAll: () => {
         setOnboarded(false);
         setProfile({ country: null, interests: [] });
@@ -233,9 +251,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setItineraryState(DEFAULT_ITINERARY);
         setSharedPost(null);
         setMyPostCount(0);
+        setPlaceReactions({});
       },
     }),
-    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, canWrite, user, addLocalPost],
+    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, placeReactions, canWrite, user, addLocalPost],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -5,7 +5,7 @@ import { useTheme } from '@/theme/theme';
 import { FOREIGNER_TAGS } from '@/data';
 import { useRemoteContent } from '@/lib/remoteData';
 import { useStore } from '@/lib/store';
-import { personalizedPlaces } from '@/lib/personalize';
+import { recommendedPlaces } from '@/lib/recommend';
 import { ForeignerTagKey, Place } from '@/data/types';
 import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
@@ -20,7 +20,7 @@ const MAX_MAP_PINS = 40;
 export default function ExploreScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { places, refreshAll } = useRemoteContent();
+  const { places, posts, refreshAll } = useRemoteContent();
   const { profile } = useStore();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -69,11 +69,11 @@ export default function ExploreScreen() {
 
   const mapPlaces = useMemo(() => filtered.slice(0, MAX_MAP_PINS), [filtered]);
 
-  // "For you" is only meaningful when the user hasn't narrowed the list themselves.
+  // "Recommended" only shows when the user hasn't narrowed the list themselves.
   const noFilters = !query && !hood && !category && activeTags.size === 0;
-  const forYou = useMemo(
-    () => (noFilters ? personalizedPlaces(places, profile.interests, 12) : []),
-    [noFilters, places, profile.interests],
+  const recommended = useMemo(
+    () => (noFilters ? recommendedPlaces(places, posts, 12) : []),
+    [noFilters, places, posts],
   );
 
   const header = (
@@ -113,17 +113,18 @@ export default function ExploreScreen() {
         </View>
       </View>
 
-      {/* For you (only when nothing is filtered/searched) */}
-      {forYou.length > 0 && (
+      {/* Recommended (only when nothing is filtered/searched) — driven by what
+          other travelers liked and put in their routes. */}
+      {recommended.length > 0 && (
         <View style={{ paddingBottom: 16 }}>
           <View style={{ paddingHorizontal: 18, marginBottom: 10 }}>
-            <Eyebrow>For you</Eyebrow>
+            <Eyebrow>Recommended</Eyebrow>
             <T style={{ fontSize: 12.5, color: c.muted, marginTop: 2 }}>
-              {profile.interests.length ? 'Picked from your interests' : 'K-content spots to start with'}
+              Liked by travelers & in their routes
             </T>
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 18 }}>
-            {forYou.map((p) => (
+            {recommended.map((p) => (
               <PlaceCardCompact key={p.slug} place={p} />
             ))}
           </ScrollView>
