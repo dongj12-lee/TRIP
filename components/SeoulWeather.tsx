@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { useTheme } from '@/theme/theme';
 import { T } from './base';
+import { Icon } from './Icon';
+import { WeatherSheet } from './WeatherSheet';
+import { haptic } from '@/lib/haptics';
 import { fetchSeoulWeather, weatherDesc, weatherTip, Weather } from '@/lib/weather';
 
 // Compact live-weather strip for the top of Explore — a traveler's first
@@ -12,6 +15,7 @@ export function SeoulWeather() {
   const { c, dark } = useTheme();
   const [w, setW] = useState<Weather | null>(null);
   const [failed, setFailed] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -28,7 +32,8 @@ export function SeoulWeather() {
 
   return (
     <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
-      <View
+      <Pressable
+        onPress={() => { if (w) { haptic.tick(); setOpen(true); } }}
         style={{
           flexDirection: 'row', alignItems: 'center', gap: 14,
           backgroundColor: dark ? '#1f2937' : '#eef3f8',
@@ -54,11 +59,13 @@ export function SeoulWeather() {
           )}
         </View>
         {tip && (
-          <View style={{ backgroundColor: dark ? '#2b3a4d' : '#dbe6f0', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999, maxWidth: 120 }}>
+          <View style={{ backgroundColor: dark ? '#2b3a4d' : '#dbe6f0', paddingVertical: 5, paddingHorizontal: 10, borderRadius: 999, maxWidth: 116 }}>
             <T style={{ fontSize: 11, fontWeight: '700', color: dark ? '#aebdd6' : '#42537a', textAlign: 'center' }} numberOfLines={2}>{tip}</T>
           </View>
         )}
-      </View>
+        {w && <Icon name="chevron" size={16} stroke={c.muted} sw={2} />}
+      </Pressable>
+      <WeatherSheet visible={open} onClose={() => setOpen(false)} weather={w} />
     </View>
   );
 }

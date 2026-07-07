@@ -1,5 +1,13 @@
 // Seoul weather via Open-Meteo (open-meteo.com) — free, no API key, CORS-open,
 // so the client fetches it directly. Verified live for Seoul (37.5665, 126.978).
+export type DayForecast = {
+  date: string; // ISO yyyy-mm-dd (Asia/Seoul)
+  code: number;
+  hi: number;
+  lo: number;
+  rain: number; // max precipitation probability %
+};
+
 export type Weather = {
   temp: number;
   feels: number;
@@ -8,12 +16,14 @@ export type Weather = {
   isDay: boolean;
   hi: number;
   lo: number;
+  daily: DayForecast[]; // 7-day forecast incl. today
 };
 
 const URL =
   'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.978' +
   '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day' +
-  '&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FSeoul&forecast_days=1';
+  '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+  '&timezone=Asia%2FSeoul&forecast_days=7';
 
 // Weather changes slowly; cache for 10 min so re-entering Explore doesn't refetch.
 let cache: { at: number; data: Weather } | null = null;
@@ -23,17 +33,34 @@ export async function fetchSeoulWeather(): Promise<Weather> {
   const res = await fetch(URL);
   if (!res.ok) throw new Error(`weather ${res.status}`);
   const j = await res.json();
+  const d = j.daily;
+  const daily: DayForecast[] = (d.time as string[]).map((date, i) => ({
+    date,
+    code: d.weather_code[i],
+    hi: Math.round(d.temperature_2m_max[i]),
+    lo: Math.round(d.temperature_2m_min[i]),
+    rain: d.precipitation_probability_max?.[i] ?? 0,
+  }));
   const data: Weather = {
     temp: Math.round(j.current.temperature_2m),
     feels: Math.round(j.current.apparent_temperature),
     humidity: Math.round(j.current.relative_humidity_2m),
     code: j.current.weather_code,
     isDay: j.current.is_day === 1,
-    hi: Math.round(j.daily.temperature_2m_max[0]),
-    lo: Math.round(j.daily.temperature_2m_min[0]),
+    hi: daily[0]?.hi ?? Math.round(j.current.temperature_2m),
+    lo: daily[0]?.lo ?? Math.round(j.current.temperature_2m),
+    daily,
   };
   cache = { at: Date.now(), data };
   return data;
+}
+
+// "Mon", "Tue" … from an ISO date (Asia/Seoul); today shown as "Today".
+export function dayLabel(iso: string, index: number): string {
+  if (index === 0) return 'Today';
+  // Parse as local calendar date without TZ shift.
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short' });
 }
 
 // WMO code → a plain-English label + emoji (night-aware for clear/cloudy).
