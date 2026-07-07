@@ -36,7 +36,7 @@ export default function PlaceDetail() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote } = useStore();
+  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote, itinerary, setItinerary } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
@@ -108,6 +108,32 @@ export default function PlaceDetail() {
   const relatedPosts = posts.filter((p) => p.placeSlug === place.slug);
   const hasFacts = place.subway || place.freeEntry || place.englishSite || place.wheelchair;
 
+  // One-tap browse→plan: drop this place into the last itinerary day.
+  const inTrip = itinerary.days.some((d) => d.stops.some((s) => s.slug === place.slug));
+  const addToTrip = () => {
+    haptic.tick();
+    if (inTrip) {
+      showToast('Already in your trip', '🗓');
+      return;
+    }
+    setItinerary((prev) => {
+      const days = prev.days.length ? [...prev.days] : [{ label: 'Day 1', date: '', theme: '', stops: [] }];
+      const di = days.length - 1;
+      days[di] = {
+        ...days[di],
+        stops: [
+          ...days[di].stops,
+          {
+            time: '', part: '', name: place.name, note: '', slug: place.slug,
+            swatch: place.swatch, lat: place.lat, lng: place.lng, category: place.category, photoUrl: place.photoUrl,
+          },
+        ],
+      };
+      return { ...prev, days };
+    });
+    showToast(`Added to ${itinerary.days[itinerary.days.length - 1]?.label ?? 'Day 1'}`, '✨');
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
@@ -174,6 +200,14 @@ export default function PlaceDetail() {
             activeBg={c.rose50}
             activeColor={c.rose700}
             onPress={() => react('dislike')}
+          />
+          <ReactionButton
+            active={inTrip}
+            emoji="🗓"
+            label={inTrip ? 'In trip' : 'Add to trip'}
+            activeBg={c.accent50}
+            activeColor={c.accent}
+            onPress={addToTrip}
           />
         </View>
 

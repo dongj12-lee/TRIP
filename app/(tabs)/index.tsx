@@ -17,6 +17,7 @@ import { haptic } from '@/lib/haptics';
 import { guLabel } from '@/lib/format';
 import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { DayPlanSheet } from '@/components/DayPlanSheet';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   Culture: '🎭', History: '🏯', Nature: '🌳', Shopping: '🛍️',
@@ -49,6 +50,7 @@ export default function ExploreScreen() {
   const [selected, setSelected] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
 
   const hoods = useMemo(() => Array.from(new Set(places.map((p) => p.neighborhood))).sort(), [places]);
 
@@ -195,6 +197,35 @@ export default function ExploreScreen() {
 
       {/* Live Seoul weather — shown at the top of the default Explore view */}
       {noFilters && <SeoulWeather />}
+
+      {/* "Plan my day" — the one-tap route generator, the app's magic moment */}
+      {noFilters && (
+        <View style={{ paddingHorizontal: 18, paddingBottom: 16 }}>
+          <Pressable
+            onPress={() => { haptic.tick(); setPlanOpen(true); }}
+            accessibilityRole="button"
+            accessibilityLabel="Plan my day"
+            style={({ pressed }) => [
+              {
+                borderRadius: 18, padding: 16, backgroundColor: c.ink,
+                flexDirection: 'row', alignItems: 'center', gap: 13,
+              },
+              pressed && { opacity: 0.92, transform: [{ scale: 0.99 }] },
+            ]}
+          >
+            <View style={{ width: 44, height: 44, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="sparkle" size={22} stroke={c.paper} sw={1.8} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <T style={{ fontSize: 16.5, fontWeight: '800', color: c.paper }}>Plan my day</T>
+              <T style={{ fontSize: 12.5, color: c.paper, opacity: 0.75, marginTop: 2, fontWeight: '600' }}>
+                A full day route in one tap — from {places.length.toLocaleString()} real spots
+              </T>
+            </View>
+            <Icon name="chevron" size={20} stroke={c.paper} sw={2.2} />
+          </Pressable>
+        </View>
+      )}
 
       {/* Recommended (only when nothing is filtered/searched) — driven by what
           other travelers liked and put in their routes. */}
@@ -345,6 +376,7 @@ export default function ExploreScreen() {
         hoods={hoods}
         resultCount={filtered.length}
       />
+      <DayPlanSheet visible={planOpen} onClose={() => setPlanOpen(false)} />
     </View>
   );
 }

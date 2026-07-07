@@ -7,7 +7,7 @@ export type IconName =
   | 'chevron' | 'search' | 'pin' | 'star' | 'heart' | 'up' | 'comment'
   | 'clock' | 'won' | 'globe' | 'sparkle' | 'translate' | 'check' | 'plus'
   | 'arrow' | 'filter' | 'walk' | 'route' | 'info' | 'user' | 'trophy'
-  | 'lock' | 'bolt' | 'settings' | 'share' | 'edit';
+  | 'lock' | 'bolt' | 'settings' | 'share' | 'edit' | 'refresh';
 
 type Props = {
   name: IconName;
@@ -36,6 +36,7 @@ const paths: Record<IconName, (p: { stroke: string; sw: number }) => React.React
   won: () => <Path d="M5 7l2.5 9L12 8l4.5 8L19 7M4 11h16" />,
   globe: () => (<><Circle cx={12} cy={12} r={9} /><Path d="M3 12h18M12 3c2.6 2.4 4 5.6 4 9s-1.4 6.6-4 9c-2.6-2.4-4-5.6-4-9s1.4-6.6 4-9z" /></>),
   sparkle: () => <Path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6L12 3z" />,
+  refresh: () => <Path d="M20.5 12a8.5 8.5 0 1 1-2.5-6M20.5 3v6h-6" />,
   translate: () => (<><Path d="M4 6h9M8.5 4v2M10.5 6c-.6 4-3 6.5-6 8M6 9.5c1 2.2 3 3.5 5.5 4.2" /><Path d="M13 20l4-9 4 9M14.4 17h5.2" /></>),
   check: () => <Path d="M5 12.5l4.5 4.5L19 7" />,
   plus: () => <Path d="M12 5v14M5 12h14" />,

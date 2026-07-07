@@ -13,6 +13,7 @@ import { T, H, Screen, DetailHeader, Button, IconButton } from '@/components/bas
 import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { AddStopSheet } from '@/components/AddStopSheet';
+import { DayPlanSheet } from '@/components/DayPlanSheet';
 import { TimePickerSheet } from '@/components/TimePickerSheet';
 import { useToast } from '@/components/Toast';
 import { haptic } from '@/lib/haptics';
@@ -29,6 +30,7 @@ export default function TripPlanner() {
 
   const [sheetDay, setSheetDay] = useState<number | null>(null);
   const [timeTarget, setTimeTarget] = useState<{ di: number; si: number } | null>(null);
+  const [genOpen, setGenOpen] = useState(false);
   const coOccurrence = useMemo(() => buildCoOccurrence(posts), [posts]);
   const suggestions = useMemo(
     () =>
@@ -142,7 +144,10 @@ export default function TripPlanner() {
             );
           })}
 
-          <Button label="+ Add a day" variant="soft" style={{ marginTop: 18 }} onPress={addDay} />
+          <View style={{ flexDirection: 'row', gap: 10, marginTop: 18 }}>
+            <Button label="+ Add a day" variant="soft" style={{ flex: 1 }} onPress={addDay} />
+            <Button label="✨ Generate a day" variant="soft" style={{ flex: 1.2 }} onPress={() => setGenOpen(true)} />
+          </View>
 
           {/* Trip health */}
           {(health.warnings.length > 0 || health.positives.length > 0) && (
@@ -179,6 +184,8 @@ export default function TripPlanner() {
         onAddCustom={() => sheetDay !== null && addCustomToDay(sheetDay)}
         suggestions={suggestions}
       />
+
+      <DayPlanSheet visible={genOpen} onClose={() => setGenOpen(false)} />
 
       <TimePickerSheet
         visible={timeTarget !== null}
