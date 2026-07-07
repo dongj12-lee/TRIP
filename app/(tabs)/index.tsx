@@ -12,6 +12,7 @@ import { ExploreMap } from '@/components/ExploreMap';
 import { Icon } from '@/components/Icon';
 import { Eyebrow } from '@/components/ui';
 import { FiltersSheet } from '@/components/FiltersSheet';
+import { SeoulWeather } from '@/components/SeoulWeather';
 import { haptic } from '@/lib/haptics';
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -165,6 +166,9 @@ export default function ExploreScreen() {
           )}
         </View>
       </View>
+
+      {/* Live Seoul weather — shown at the top of the default Explore view */}
+      {noFilters && <SeoulWeather />}
 
       {/* Recommended (only when nothing is filtered/searched) — driven by what
           other travelers liked and put in their routes. */}
