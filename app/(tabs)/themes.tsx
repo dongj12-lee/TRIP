@@ -11,7 +11,7 @@ import { T, H, Card } from '@/components/base';
 import { Photo, Chip } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 
-const CATEGORIES = ['All', 'K-Content', 'Shopping', 'Street Food', 'Getting Around', 'Culture', 'Festivals'];
+const CATEGORIES = ['All', 'Essentials', 'Food & Drink', 'K-Content', 'Culture', 'Shopping', 'Getting Around', 'Day Trips', 'Festivals'];
 
 export default function ThemesScreen() {
   const { c } = useTheme();
@@ -74,7 +74,7 @@ function ThemeCard({ theme }: { theme: Theme }) {
   return (
     <Card onPress={() => router.push(`/theme/${theme.slug}`)} style={{ overflow: 'hidden' }}>
       <View>
-        <Photo swatch={theme.swatch} height={150} />
+        <Photo uri={theme.photoUrl} swatch={theme.swatch} height={150} />
         <View style={{ position: 'absolute', top: 12, left: 12, flexDirection: 'row', gap: 6 }}>
           <View style={{ backgroundColor: 'rgba(28,20,14,.55)', paddingVertical: 4, paddingHorizontal: 9, borderRadius: 999 }}>
             <T style={{ color: '#fff', fontSize: 11.5, fontWeight: '700' }}>

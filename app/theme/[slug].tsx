@@ -24,7 +24,8 @@ export default function ThemeDetail() {
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
         <View style={{ height: 200 }}>
-          <Photo swatch={theme.swatch} height={200} />
+          <Photo uri={theme.photoUrl} swatch={theme.swatch} height={200} />
+          <View style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.18)' }} />
           <View style={{ position: 'absolute', top: insets.top, left: 8 }}>
             <Pressable onPress={() => router.back()} hitSlop={8} style={{ width: 38, height: 38, borderRadius: 999, backgroundColor: 'rgba(255,253,250,0.85)', alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="back" size={22} stroke={c.ink} sw={2} />

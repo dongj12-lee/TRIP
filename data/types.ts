@@ -82,6 +82,7 @@ export type Theme = {
   badge?: string;
   description: string;
   swatch: Swatch;
+  photoUrl?: string; // real cover photo; falls back to the swatch gradient
   // walk-only
   kContent?: string;
   kType?: string;
