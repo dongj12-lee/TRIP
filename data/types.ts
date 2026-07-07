@@ -135,6 +135,25 @@ export type Post = {
   feedbackCounts?: Record<string, number>;
 };
 
+// A request to join a buddy plan. Contact (the group chat) is gated on the
+// host accepting — see migration-012.
+export type BuddyInterest = {
+  userId?: string;
+  name: string;
+  country: string;
+  message: string;
+  status: 'pending' | 'accepted' | 'declined';
+};
+
+export type BuddyMessage = {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderCountry: string;
+  body: string;
+  when: string;
+};
+
 export type Buddy = {
   id: string;
   authorId?: string;
@@ -147,7 +166,7 @@ export type Buddy = {
   groupSize: number;
   note: string;
   interested: number;
-  interestedList: { name: string; country: string; message: string }[];
+  interestedList: BuddyInterest[];
 };
 
 export type ItineraryStop = {

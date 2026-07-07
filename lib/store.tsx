@@ -36,7 +36,7 @@ type StoreValue = {
   completeOnboarding: (profile: Profile) => void;
   toggleSave: (slug: string) => void;
   toggleVote: (post: Post) => void;
-  toggleJoin: (buddyId: string) => void;
+  toggleJoin: (buddyId: string, message?: string) => void;
   toggleFollow: (id: string) => void;
   setItinerary: (next: Itinerary | ((prev: Itinerary) => Itinerary)) => void;
   shareTrip: (message: string) => Promise<void>;
@@ -189,12 +189,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           return toggleInSet(prev, key);
         });
       },
-      toggleJoin: (buddyId) => {
+      toggleJoin: (buddyId, message) => {
         setJoined((prev) => {
           const willJoin = !prev.has(buddyId);
           if (canWrite) {
             remote
-              .setJoined(buddyId, willJoin, { authorName: profile.displayName || 'You', authorCountry: profile.country })
+              .setJoined(buddyId, willJoin, { message, authorName: profile.displayName || 'Traveler', authorCountry: profile.country })
               .catch((e) => console.warn('setJoined failed', e));
           }
           return toggleInSet(prev, buddyId);

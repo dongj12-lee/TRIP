@@ -2,7 +2,7 @@
 // (see data/types.ts). Every function here is safe to call only when
 // isSupabaseConfigured — callers should check that first (see lib/remoteData.tsx).
 import { supabase } from '@/lib/supabase';
-import { Buddy, Comment, ForeignerTagKey, Place, Post, PostType, Profile, Theme } from './types';
+import { Buddy, BuddyInterest, BuddyMessage, Comment, ForeignerTagKey, Place, Post, PostType, Profile, Theme } from './types';
 
 // ─────────────────────────── Profile ───────────────────────────
 export async function fetchProfile(userId: string): Promise<Partial<Profile> | null> {
@@ -347,14 +347,64 @@ export async function fetchBuddies(): Promise<Buddy[]> {
   return (data ?? []).map(mapBuddy);
 }
 
-export async function fetchBuddyInterests(buddyId: string): Promise<{ name: string; country: string; message: string }[]> {
-  const { data, error } = await supabase.from('buddy_interests').select('*').eq('buddy_id', buddyId);
+export async function fetchBuddyInterests(buddyId: string): Promise<BuddyInterest[]> {
+  const { data, error } = await supabase
+    .from('buddy_interests')
+    .select('*')
+    .eq('buddy_id', buddyId)
+    .order('created_at', { ascending: true });
   if (error) throw error;
   return (data ?? []).map((row: any) => ({
+    userId: row.user_id,
     name: row.author_name || 'Traveler',
     country: row.author_country || '🌐',
     message: row.message || '',
+    status: (row.status ?? 'pending') as BuddyInterest['status'],
   }));
+}
+
+// Host decision on a join request. RLS restricts this to the plan's host.
+export async function setInterestStatus(buddyId: string, userId: string, status: 'accepted' | 'declined') {
+  const { error } = await supabase
+    .from('buddy_interests')
+    .update({ status })
+    .eq('buddy_id', buddyId)
+    .eq('user_id', userId);
+  if (error) throw error;
+}
+
+// ── Buddy group chat — participants only (host + accepted), enforced by RLS ──
+function mapBuddyMessage(row: any): BuddyMessage {
+  return {
+    id: row.id,
+    senderId: row.sender_id,
+    senderName: row.sender_name,
+    senderCountry: row.sender_country || '🌐',
+    body: row.body,
+    when: timeAgo(row.created_at),
+  };
+}
+
+export async function fetchBuddyMessages(buddyId: string): Promise<BuddyMessage[]> {
+  const { data, error } = await supabase
+    .from('buddy_messages')
+    .select('*')
+    .eq('buddy_id', buddyId)
+    .order('created_at', { ascending: true })
+    .limit(200);
+  if (error) throw error;
+  return (data ?? []).map(mapBuddyMessage);
+}
+
+export async function sendBuddyMessage(buddyId: string, body: string, senderName: string, senderCountry: string | null): Promise<BuddyMessage> {
+  const userId = await currentUserId();
+  const { data, error } = await supabase
+    .from('buddy_messages')
+    .insert({ buddy_id: buddyId, sender_id: userId, sender_name: senderName, sender_country: senderCountry, body })
+    .select()
+    .single();
+  if (error) throw error;
+  return mapBuddyMessage(data);
 }
 
 export async function createBuddy(input: {

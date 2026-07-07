@@ -250,8 +250,8 @@ export const BUDDIES: Buddy[] = [
     note: 'First night in Seoul, want the proper chimaek experience. English ok, all welcome!',
     interested: 2,
     interestedList: [
-      { name: 'Leo', country: '🇫🇷', message: "I'm in! I know a good spot." },
-      { name: 'Sora', country: '🇯🇵', message: 'Count me in 🙌' },
+      { name: 'Leo', country: '🇫🇷', message: "I'm in! I know a good spot.", status: 'accepted' as const },
+      { name: 'Sora', country: '🇯🇵', message: 'Count me in 🙌', status: 'pending' as const },
     ],
   },
   {
@@ -260,7 +260,7 @@ export const BUDDIES: Buddy[] = [
     note: 'Day trip to Gyeongju temples + tombs. Split a taxi there. Easygoing pace.',
     interested: 1,
     interestedList: [
-      { name: 'Mia', country: '🇺🇸', message: 'Always wanted to see Gyeongju!' },
+      { name: 'Mia', country: '🇺🇸', message: 'Always wanted to see Gyeongju!', status: 'accepted' as const },
     ],
   },
   {
