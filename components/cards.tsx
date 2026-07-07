@@ -84,10 +84,11 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
           hitSlop={6}
           style={{
             position: 'absolute', top: 8, right: 8, width: 38, height: 38, borderRadius: 999,
-            backgroundColor: 'rgba(255,253,250,.85)', alignItems: 'center', justifyContent: 'center',
+            backgroundColor: 'rgba(20,16,12,0.42)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+            alignItems: 'center', justifyContent: 'center',
           }}
         >
-          <Icon name="heart" size={20} fill={isSaved ? c.rose : 'none'} stroke={isSaved ? c.rose : c.inkSoft} sw={2} />
+          <Icon name="heart" size={20} fill={isSaved ? c.rose : 'none'} stroke={isSaved ? c.rose : '#fff'} sw={2} />
         </Pressable>
       </View>
       <View style={{ padding: 15, paddingTop: 13 }}>
