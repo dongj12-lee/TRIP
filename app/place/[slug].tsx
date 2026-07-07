@@ -8,9 +8,9 @@ import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { fetchPlace } from '@/data/remote';
-import { FOREIGNER_TAGS } from '@/data';
+import { FIT_TAGS, fitTagsFor } from '@/data';
 import { ForeignerTagKey } from '@/data/types';
-import { T, H, IconButton, Button } from '@/components/base';
+import { T, H, Button } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Photo, Chip, Rating } from '@/components/ui';
 import { PostCardMini } from '@/components/cards';
@@ -23,6 +23,13 @@ const PHRASES = [
   { en: 'Do you have an English menu?', ko: '영어 메뉴 있어요?', ro: 'Yeong-eo menyu isseoyo?' },
   { en: 'Please take me to this address.', ko: '이 주소로 가주세요.', ro: 'I juso-ro gajuseyo.' },
 ];
+
+// Over-photo hero controls — a dark scrim circle so they read on any cover
+// (a light button vanished on bright photos).
+const heroBtn = {
+  width: 38, height: 38, borderRadius: 999, alignItems: 'center', justifyContent: 'center',
+  backgroundColor: 'rgba(20,16,12,0.45)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+} as const;
 
 export default function PlaceDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -109,13 +116,12 @@ export default function PlaceDetail() {
           <Photo uri={place.photoUrl} swatch={place.swatch} height={280} />
           <LinearGradient colors={['rgba(0,0,0,0.35)', 'transparent', 'rgba(0,0,0,0.5)']} style={{ position: 'absolute', inset: 0 }} />
           <View style={{ position: 'absolute', top: insets.top, left: 8, right: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
-            <IconButton name="back" bg="rgba(255,253,250,0.85)" onPress={() => router.back()} />
-            <IconButton
-              name="heart"
-              bg="rgba(255,253,250,0.85)"
-              color={isSaved ? c.rose : c.ink}
-              onPress={onSave}
-            />
+            <Pressable onPress={() => router.back()} hitSlop={8} style={heroBtn}>
+              <Icon name="back" size={22} stroke="#fff" sw={2.2} />
+            </Pressable>
+            <Pressable onPress={onSave} hitSlop={8} style={heroBtn}>
+              <Icon name="heart" size={22} fill={isSaved ? c.rose : 'none'} stroke={isSaved ? c.rose : '#fff'} sw={2.2} />
+            </Pressable>
           </View>
           <View style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>
             {!!place.kContentTitle && (
@@ -193,18 +199,19 @@ export default function PlaceDetail() {
           </View>
         )}
 
-        {/* Foreigner Fit */}
+        {/* Foreigner Fit — tags tailored to this place's category */}
         <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
           <H style={{ fontSize: 19, marginBottom: 4 }}>Foreigner Fit</H>
           <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
           <View style={{ gap: 2 }}>
-            {FOREIGNER_TAGS.map((tag) => {
-              const { yes = 0, no = 0 } = tagCounts[tag.key] ?? {};
+            {fitTagsFor(place.category, place.categoryL2).map((key) => {
+              const tag = FIT_TAGS[key];
+              const { yes = 0, no = 0 } = tagCounts[key] ?? {};
               const has = yes > no;
-              const votingKey = `${place.slug}:${tag.key}`;
+              const votingKey = `${place.slug}:${key}`;
               const mineVote = tagVotes[votingKey];
               return (
-                <View key={tag.key} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
+                <View key={key} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
                   <T style={{ fontSize: 20 }}>{tag.emoji}</T>
                   <View style={{ flex: 1 }}>
                     <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
@@ -216,7 +223,7 @@ export default function PlaceDetail() {
                     emoji="👍"
                     activeBg={c.sage}
                     idleTextColor={yes > 0 ? c.sage700 : c.muted}
-                    onPress={() => onVoteTag(tag.key, 'yes')}
+                    onPress={() => onVoteTag(key, 'yes')}
                   />
                   <TagVoteButton
                     active={mineVote === 'no'}
@@ -224,7 +231,7 @@ export default function PlaceDetail() {
                     emoji="👎"
                     activeBg={c.rose}
                     idleTextColor={no > 0 ? c.rose700 : c.muted}
-                    onPress={() => onVoteTag(tag.key, 'no')}
+                    onPress={() => onVoteTag(key, 'no')}
                   />
                 </View>
               );

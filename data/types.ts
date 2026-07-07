@@ -4,7 +4,11 @@ import { Tone } from '@/theme/tokens';
 export type Swatch = string[];
 
 export type ForeignerTagKey =
-  | 'soloOk' | 'englishMenu' | 'priceTransparent' | 'cardOk' | 'englishSpoken';
+  // The original five — these have boolean columns and drive the Explore filter.
+  | 'soloOk' | 'englishMenu' | 'priceTransparent' | 'cardOk' | 'englishSpoken'
+  // Category-specific verification tags (vote counts live in `votes` jsonb only).
+  | 'vegFriendly' | 'halalFriendly' | 'laptopOk' | 'englishInfo' | 'worthIt'
+  | 'photoOk' | 'notCrowded' | 'taxFree' | 'beginnerOk' | 'bookingNeeded' | 'goodFacilities';
 
 export type ForeignerTag = {
   key: ForeignerTagKey;

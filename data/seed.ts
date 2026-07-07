@@ -1,10 +1,12 @@
 // Seed / mock data ported verbatim from source/data.jsx.
 // This doubles as the initial content used to seed Supabase (see supabase/seed.sql).
 import {
-  Buddy, Country, Creator, ForeignerTag, Interest, Itinerary, Place, Post,
+  Buddy, Country, Creator, ForeignerTag, ForeignerTagKey, Interest, Itinerary, Place, Post,
   Region, Theme, Tier,
 } from './types';
 
+// The filterable five — these have boolean columns and power the Explore
+// "Foreigner-friendly" filter + the quick pills on place cards.
 export const FOREIGNER_TAGS: ForeignerTag[] = [
   { key: 'soloOk', emoji: '🧍', label: 'Solo OK', hint: 'Order / be seated as one person', tone: 'sage' },
   { key: 'englishMenu', emoji: '📋', label: 'English menu', hint: 'An English menu is available', tone: 'gold' },
@@ -12,6 +14,48 @@ export const FOREIGNER_TAGS: ForeignerTag[] = [
   { key: 'cardOk', emoji: '💳', label: 'Card OK', hint: 'Foreign cards accepted', tone: 'sage' },
   { key: 'englishSpoken', emoji: '💬', label: 'English spoken', hint: 'Staff can communicate in English', tone: 'gold' },
 ];
+
+// Full registry of Foreigner-Fit tags (the five above + category-specific ones).
+// The place-detail checklist is built per category from this, so a museum asks
+// about English audio guides while a restaurant asks about vegetarian options.
+export const FIT_TAGS: Record<ForeignerTagKey, { emoji: string; label: string; hint: string }> = {
+  soloOk: { emoji: '🧍', label: 'Solo OK', hint: 'Comfortable to visit / dine alone' },
+  englishMenu: { emoji: '📋', label: 'English menu', hint: 'An English menu is available' },
+  priceTransparent: { emoji: '💸', label: 'Fair price', hint: 'No tourist markup — prices clear' },
+  cardOk: { emoji: '💳', label: 'Card OK', hint: 'Foreign cards accepted' },
+  englishSpoken: { emoji: '💬', label: 'English spoken', hint: 'Staff can communicate in English' },
+  vegFriendly: { emoji: '🥗', label: 'Veg-friendly', hint: 'Vegetarian / vegan options' },
+  halalFriendly: { emoji: '🕌', label: 'Halal-friendly', hint: 'Halal or no-pork options' },
+  laptopOk: { emoji: '💻', label: 'Laptop-friendly', hint: 'Wi-Fi, outlets, OK to linger' },
+  englishInfo: { emoji: '🪧', label: 'English info', hint: 'English signage or audio guide' },
+  worthIt: { emoji: '👍', label: 'Worth it', hint: 'Worth the time / ticket price' },
+  photoOk: { emoji: '📸', label: 'Photos OK', hint: 'Photography allowed' },
+  notCrowded: { emoji: '😌', label: 'Not too crowded', hint: 'Rarely overwhelming' },
+  taxFree: { emoji: '🧾', label: 'Tax-free', hint: 'Tourist tax refund available' },
+  beginnerOk: { emoji: '🌱', label: 'Beginner OK', hint: 'Fine for first-timers' },
+  bookingNeeded: { emoji: '📅', label: 'Booking ahead', hint: 'Reserve before you go' },
+  goodFacilities: { emoji: '🚻', label: 'Good facilities', hint: 'Clean restrooms & amenities' },
+};
+
+// Which tags a place shows, by its Visit Seoul L1 category (with a couple of
+// L2 refinements for cafés/bars). Order matters — most relevant first.
+const FIT_BY_CATEGORY: Record<string, ForeignerTagKey[]> = {
+  Cuisine: ['soloOk', 'englishMenu', 'vegFriendly', 'halalFriendly', 'englishSpoken', 'cardOk', 'priceTransparent'],
+  Shopping: ['englishSpoken', 'cardOk', 'taxFree', 'priceTransparent'],
+  Culture: ['englishInfo', 'englishSpoken', 'worthIt', 'photoOk', 'notCrowded'],
+  History: ['englishInfo', 'englishSpoken', 'worthIt', 'photoOk', 'notCrowded'],
+  Nature: ['beginnerOk', 'goodFacilities', 'worthIt', 'notCrowded'],
+  'Experience Programs': ['bookingNeeded', 'beginnerOk', 'englishSpoken', 'soloOk', 'cardOk'],
+};
+const FIT_DEFAULT: ForeignerTagKey[] = ['englishSpoken', 'cardOk', 'worthIt'];
+
+export function fitTagsFor(category: string, categoryL2?: string | null): ForeignerTagKey[] {
+  if (category === 'Cuisine') {
+    if (categoryL2 === 'Cafes & Tea Shops') return ['soloOk', 'englishMenu', 'laptopOk', 'vegFriendly', 'englishSpoken', 'cardOk'];
+    if (categoryL2 === 'Bars & Clubs') return ['soloOk', 'englishSpoken', 'cardOk', 'priceTransparent', 'notCrowded'];
+  }
+  return FIT_BY_CATEGORY[category] ?? FIT_DEFAULT;
+}
 
 export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 'terra' | 'sage' | 'gold' | 'rose' | 'blue' }> = {
   thought: { emoji: '💭', label: 'Thought', tone: 'blue' },
