@@ -14,6 +14,7 @@ import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { AddStopSheet } from '@/components/AddStopSheet';
 import { DayPlanSheet } from '@/components/DayPlanSheet';
+import { RouteMap } from '@/components/RouteMap';
 import { TimePickerSheet } from '@/components/TimePickerSheet';
 import { useToast } from '@/components/Toast';
 import { haptic } from '@/lib/haptics';
@@ -110,6 +111,13 @@ export default function TripPlanner() {
                   <IconButton name="close" size={18} color={c.muted} label="Remove day" onPress={() => removeDay(di)} />
                 </View>
                 <TextInput value={day.theme} onChangeText={(v) => setDay(di, 'theme', v)} placeholder="Day theme (e.g. Palaces & old Seoul)" style={[field, { marginTop: 8 }]} placeholderTextColor={c.muted} />
+
+                {/* Route preview — appears once two placed stops give it a shape */}
+                {day.stops.filter((s) => s.lat != null).length >= 2 && (
+                  <View style={{ marginTop: 12, borderRadius: 13, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
+                    <RouteMap stops={day.stops} height={130} />
+                  </View>
+                )}
 
                 {day.stops.map((stop, si) => (
                   <StopCard

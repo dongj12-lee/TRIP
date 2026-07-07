@@ -8,6 +8,7 @@ import { GuideItem } from '@/data/types';
 import { T, H, Screen, DetailHeader, Card } from '@/components/base';
 import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
+import { RouteMap } from '@/components/RouteMap';
 import { guLabel } from '@/lib/format';
 
 export default function ThemeDetail() {
@@ -70,6 +71,12 @@ export default function ThemeDetail() {
         {isWalk && theme.placeSlugs && (
           <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
             <H style={{ fontSize: 18, marginBottom: 14 }}>The walk</H>
+            <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 14 }}>
+              <RouteMap
+                stops={theme.placeSlugs.map((ps) => placeBySlug[ps]).filter(Boolean).map((p) => ({ name: p.name, lat: p.lat, lng: p.lng }))}
+                height={140}
+              />
+            </View>
             <View style={{ gap: 12 }}>
               {theme.placeSlugs.map((ps, i) => {
                 const place = placeBySlug[ps];

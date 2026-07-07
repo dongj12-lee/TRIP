@@ -6,26 +6,30 @@ import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
-import { plural } from '@/lib/format';
-import { CREATORS, creatorById, tierFor } from '@/data';
-import { Creator } from '@/data/types';
+import { plural, guLabel } from '@/lib/format';
+import { CREATORS, creatorById, tierFor, TIERS } from '@/data';
+import { Creator, Place } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
-import { PlaceCard, PostCardMini } from '@/components/cards';
+import { PlaceCardCompact, PostCardMini } from '@/components/cards';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
+import { DayPlanSheet } from '@/components/DayPlanSheet';
+import { ExploreMap } from '@/components/ExploreMap';
 import { useToast } from '@/components/Toast';
 import { Icon } from '@/components/Icon';
 import { Photo } from '@/components/ui';
 import { Avatar } from '@/components/Avatar';
+import { haptic } from '@/lib/haptics';
 
 export default function MyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount } = useStore();
+  const { saved, toggleSave, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount, placeReactions } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
 
   const onFollowToggle = (cr: Creator) => {
     const wasFollowing = following.has(cr.id);
@@ -37,7 +41,14 @@ export default function MyScreen() {
   const handle = profile.handle || 'traveler';
   const points = profile.points ?? 0;
   const tier = tierFor(points);
+  const nextTier = TIERS[TIERS.findIndex((t) => t.key === tier.key) + 1];
   const savedPlaces = [...saved].map((s) => placeBySlug[s]).filter(Boolean);
+  const likedPlaces = Object.entries(placeReactions)
+    .filter(([, r]) => r === 'like')
+    .map(([slug]) => placeBySlug[slug])
+    .filter(Boolean);
+  // Every place the user has marked in some way — their personal Seoul.
+  const mySpots: Place[] = [...new Map([...savedPlaces, ...likedPlaces].map((p) => [p.slug, p])).values()];
   const followingList = CREATORS.filter((cr) => following.has(cr.id));
   const suggestions = CREATORS.filter((cr) => !following.has(cr.id));
   // The user's own posts — real, not the seeded mock contributions.
@@ -69,12 +80,59 @@ export default function MyScreen() {
           </View>
         </Pressable>
 
+        {/* Tier progress — the path to the next badge */}
+        {nextTier && (
+          <View style={{ paddingHorizontal: 18, paddingTop: 12 }}>
+            <View style={{ backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 12 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 7 }}>
+                <T style={{ fontSize: 12, fontWeight: '700', color: c.inkSoft }}>{tier.emoji} {tier.label}</T>
+                <T style={{ fontSize: 12, fontWeight: '600', color: c.muted }}>
+                  {nextTier.min - points} pts to {nextTier.emoji} {nextTier.label}
+                </T>
+              </View>
+              <View style={{ height: 6, borderRadius: 999, backgroundColor: c.surface2, overflow: 'hidden' }}>
+                <View
+                  style={{
+                    height: 6, borderRadius: 999, backgroundColor: c.accent,
+                    width: `${Math.min(100, Math.max(4, ((points - tier.min) / (nextTier.min - tier.min)) * 100))}%`,
+                  }}
+                />
+              </View>
+              <T style={{ fontSize: 11, color: c.muted, marginTop: 7 }}>Earn points by posting tips, routes and voting on Foreigner Fit.</T>
+            </View>
+          </View>
+        )}
+
         {/* Stats — real usage */}
         <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 14 }}>
           <Stat n={myPostCount} label="Posts" />
           <Stat n={saved.size} label="Saved" />
           <Stat n={following.size} label="Following" />
         </View>
+
+        {/* Quick actions — the three things worth doing every day */}
+        <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 12 }}>
+          <QuickAction emoji="✨" label="Plan a day" onPress={() => { haptic.tick(); setPlanOpen(true); }} />
+          <QuickAction emoji="✍️" label="Share a tip" onPress={() => router.push('/compose?kind=post')} />
+          <QuickAction emoji="👋" label="Find buddies" onPress={() => router.push('/(tabs)/buddy')} />
+        </View>
+
+        {/* Your Seoul — every saved & liked spot on one map */}
+        {mySpots.length > 0 && (
+          <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
+            <View style={{ borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
+              <ExploreMap
+                places={mySpots.slice(0, 40)}
+                selectedSlug={null}
+                onSelect={(slug) => slug && router.push(`/place/${slug}`)}
+                height={170}
+              />
+            </View>
+            <T style={{ fontSize: 11.5, color: c.muted, marginTop: 6, textAlign: 'center' }}>
+              Your Seoul — {plural(mySpots.length, 'spot')} you've saved or liked
+            </T>
+          </View>
+        )}
 
         {/* Itinerary card */}
         <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
@@ -158,17 +216,33 @@ export default function MyScreen() {
           )}
         </Section>
 
-        {/* Saved places */}
-        <Section title="Saved places">
+        {/* Liked spots — quick jump back to what resonated */}
+        {likedPlaces.length > 0 && (
+          <Section title="Liked spots">
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 18 }}>
+              {likedPlaces.map((p) => (
+                <PlaceCardCompact key={p.slug} place={p} />
+              ))}
+            </ScrollView>
+          </Section>
+        )}
+
+        {/* Saved places — compact scannable rows (full cards buried the list) */}
+        <Section title={savedPlaces.length > 0 ? `Saved places · ${savedPlaces.length}` : 'Saved places'}>
           {savedPlaces.length === 0 ? (
             <View style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line }}>
               <T style={{ fontSize: 26 }}>🔖</T>
               <T style={{ color: c.muted, marginTop: 6, fontWeight: '600' }}>Start exploring — tap ♥ on any spot.</T>
             </View>
           ) : (
-            <View style={{ gap: 12 }}>
+            <View style={{ gap: 9 }}>
               {savedPlaces.map((p) => (
-                <PlaceCard key={p.slug} place={p} />
+                <SavedRow
+                  key={p.slug}
+                  place={p}
+                  onOpen={() => router.push(`/place/${p.slug}`)}
+                  onUnsave={() => { haptic.tick(); toggleSave(p.slug); showToast('Removed from saved', '🗑'); }}
+                />
               ))}
             </View>
           )}
@@ -176,7 +250,49 @@ export default function MyScreen() {
       </ScrollView>
 
       <EditProfileSheet visible={editing} onClose={() => setEditing(false)} />
+      <DayPlanSheet visible={planOpen} onClose={() => setPlanOpen(false)} />
     </View>
+  );
+}
+
+function QuickAction({ emoji, label, onPress }: { emoji: string; label: string; onPress: () => void }) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed }) => [
+        { flex: 1, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, paddingVertical: 12, alignItems: 'center', gap: 3 },
+        pressed && { opacity: 0.85 },
+      ]}
+    >
+      <T style={{ fontSize: 19 }}>{emoji}</T>
+      <T style={{ fontSize: 11.5, fontWeight: '700', color: c.inkSoft }}>{label}</T>
+    </Pressable>
+  );
+}
+
+function SavedRow({ place, onOpen, onUnsave }: { place: Place; onOpen: () => void; onUnsave: () => void }) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      onPress={onOpen}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 10 }}
+    >
+      <View style={{ width: 46, height: 46, borderRadius: 11, overflow: 'hidden' }}>
+        <Photo uri={place.photoUrl} swatch={place.swatch} height={46} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <T style={{ fontSize: 14, fontWeight: '700' }} numberOfLines={1}>{place.name}</T>
+        <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600' }} numberOfLines={1}>
+          {place.category} · {guLabel(place.neighborhood)}
+        </T>
+      </View>
+      <Pressable onPress={onUnsave} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Remove ${place.name} from saved`} style={{ padding: 4 }}>
+        <Icon name="heart" size={18} fill={c.rose} stroke={c.rose} sw={1.6} />
+      </Pressable>
+    </Pressable>
   );
 }
 

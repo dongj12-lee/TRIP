@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Pressable, RefreshControl } from 'react-native';
+import { View, ScrollView, FlatList, Pressable, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
@@ -109,12 +109,17 @@ export default function FeedScreen() {
         </ScrollView>
       </View>
 
-      <ScrollView
+      {/* FlatList (not ScrollView): posts are unbounded — keep scrolling cheap */}
+      <FlatList
+        data={list}
+        keyExtractor={(p) => p.slug}
+        renderItem={({ item }) => <PostCard post={item} />}
         contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12 }}
         showsVerticalScrollIndicator={false}
+        initialNumToRender={7}
+        windowSize={9}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
-      >
-        {list.length === 0 ? (
+        ListEmptyComponent={
           <Pressable onPress={openCompose} style={{ alignItems: 'center', paddingVertical: 48, paddingHorizontal: 30 }}>
             <T style={{ fontSize: 30 }}>💬</T>
             <T style={{ fontSize: 15, fontWeight: '700', color: c.ink, marginTop: 10 }}>Nothing here yet</T>
@@ -122,10 +127,8 @@ export default function FeedScreen() {
               Be the first to share a thought with fellow travelers.
             </T>
           </Pressable>
-        ) : (
-          list.map((p) => <PostCard key={p.slug} post={p} />)
-        )}
-      </ScrollView>
+        }
+      />
 
       <QuickComposeSheet visible={composeOpen} onClose={() => setComposeOpen(false)} />
     </View>

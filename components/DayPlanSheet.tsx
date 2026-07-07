@@ -13,6 +13,7 @@ import { haptic } from '@/lib/haptics';
 import { T, H, Button } from './base';
 import { Photo } from './ui';
 import { Icon } from './Icon';
+import { RouteMap } from './RouteMap';
 import { useToast } from './Toast';
 
 // "Plan my day" — the one-tap bridge from browsing to a shareable route.
@@ -141,6 +142,9 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
                   <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>
                     ~{plan.totalKm.toFixed(1)}km on foot{plan.usedSaved > 0 ? ` · ♥ ${plan.usedSaved} of your saves` : ''}
                   </T>
+                </View>
+                <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
+                  <RouteMap stops={plan.stops.map((s) => ({ name: s.place.name, lat: s.place.lat, lng: s.place.lng }))} height={140} />
                 </View>
                 <View style={{ gap: 10 }}>
                   {plan.stops.map((s, i) => (

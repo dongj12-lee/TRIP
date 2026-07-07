@@ -15,6 +15,7 @@ import { Avatar } from '@/components/Avatar';
 import { PostTypeBadge, PlaceCard } from '@/components/cards';
 import { ReportSheet } from '@/components/ReportSheet';
 import { RouteFeedbackBar } from '@/components/RouteFeedbackBar';
+import { RouteMap } from '@/components/RouteMap';
 import { haptic } from '@/lib/haptics';
 
 export default function PostDetail() {
@@ -136,6 +137,18 @@ export default function PostDetail() {
                     </View>
                     <T style={{ fontSize: 14, fontWeight: '700' }}>{d.theme}</T>
                   </View>
+                  {(() => {
+                    // Stops in shared posts may carry only a slug — resolve coords for the map.
+                    const mapStops = d.stops.map((s) => {
+                      const p = s.slug ? placeBySlug[s.slug] : null;
+                      return { name: s.name ?? p?.name ?? '', lat: p?.lat, lng: p?.lng };
+                    });
+                    return mapStops.filter((s) => s.lat != null).length >= 2 ? (
+                      <View style={{ borderRadius: 13, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
+                        <RouteMap stops={mapStops} height={130} />
+                      </View>
+                    ) : null;
+                  })()}
                   <View style={{ borderLeftWidth: 2, borderLeftColor: c.line, marginLeft: 10, paddingLeft: 16, gap: 12 }}>
                     {d.stops.map((s, si) => {
                       const name = s.slug && placeBySlug[s.slug] ? placeBySlug[s.slug].name : s.name;

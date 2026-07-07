@@ -79,9 +79,14 @@ export default function ThemesScreen() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 14 }} showsVerticalScrollIndicator={false}>
-        {list.map((t) => (
-          <ThemeCard key={t.slug} theme={t} />
-        ))}
+        {list.length === 0 ? (
+          <View style={{ alignItems: 'center', paddingVertical: 44 }}>
+            <T style={{ fontSize: 28 }}>🧳</T>
+            <T style={{ color: c.muted, marginTop: 8, fontSize: 13 }}>No guides in this category yet.</T>
+          </View>
+        ) : (
+          list.map((t) => <ThemeCard key={t.slug} theme={t} />)
+        )}
       </ScrollView>
     </View>
   );
