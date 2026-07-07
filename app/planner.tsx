@@ -105,7 +105,7 @@ export default function TripPlanner() {
                       </View>
                     )}
                   </View>
-                  <IconButton name="close" size={18} color={c.muted} onPress={() => removeDay(di)} />
+                  <IconButton name="close" size={18} color={c.muted} label="Remove day" onPress={() => removeDay(di)} />
                 </View>
                 <TextInput value={day.theme} onChangeText={(v) => setDay(di, 'theme', v)} placeholder="Day theme (e.g. Palaces & old Seoul)" style={[field, { marginTop: 8 }]} placeholderTextColor={c.muted} />
 
@@ -238,7 +238,7 @@ function StopCard({
             </Pressable>
           </View>
         </View>
-        <IconButton name="close" size={16} color={c.muted} onPress={onRemove} />
+        <IconButton name="close" size={16} color={c.muted} label="Remove stop" onPress={onRemove} />
       </View>
 
       {/* Time pill (tap to pick) + auto-derived part-of-day + optional note toggle */}

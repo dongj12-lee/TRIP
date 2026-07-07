@@ -30,6 +30,8 @@ export default function ThemeDetail() {
             <Pressable
               onPress={() => router.back()}
               hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
               style={{ width: 38, height: 38, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(20,16,12,0.45)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' }}
             >
               <Icon name="back" size={22} stroke="#fff" sw={2.2} />

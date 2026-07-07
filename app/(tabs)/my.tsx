@@ -48,7 +48,7 @@ export default function MyScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 90 }} showsVerticalScrollIndicator={false}>
         <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <H style={{ fontSize: 32 }}>My TRIP</H>
-          <IconButton name="settings" onPress={() => router.push('/settings')} color={c.inkSoft} />
+          <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} color={c.inkSoft} />
         </View>
 
         {/* Identity — tap to edit */}

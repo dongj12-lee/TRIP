@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, RefreshControl } from 'react-native';
+import { View, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -8,12 +8,14 @@ import { useRemoteContent } from '@/lib/remoteData';
 import { Buddy } from '@/data/types';
 import { T, H, Card, IconButton } from '@/components/base';
 import { Flag } from '@/components/ui';
+import { SkeletonList, SkeletonBuddyCard } from '@/components/Skeleton';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 export default function BuddyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { buddies, refreshBuddies } = useRemoteContent();
+  const { buddies, refreshBuddies, loading } = useRemoteContent();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = async () => {
     setRefreshing(true);
@@ -30,14 +32,19 @@ export default function BuddyScreen() {
             Short-notice plans other travelers can join
           </T>
         </View>
-        <IconButton name="plus" bg={c.accent} color="#fff" onPress={() => router.push('/compose?kind=buddy')} />
+        <IconButton name="plus" bg={c.accent} color="#fff" label="Post a plan" onPress={() => router.push('/compose?kind=buddy')} />
       </View>
 
+      {loading ? (
+        <SkeletonList card={SkeletonBuddyCard} n={4} />
+      ) : (
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12, paddingTop: 6 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
       >
+        <OfflineBanner />
+
         {/* Safety banner */}
         <View style={{ backgroundColor: c.gold50, borderRadius: 14, padding: 12, flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
           <T style={{ fontSize: 18 }}>🛟</T>
@@ -46,10 +53,26 @@ export default function BuddyScreen() {
           </T>
         </View>
 
-        {buddies.map((b) => (
-          <BuddyCard key={b.id} buddy={b} />
-        ))}
+        {buddies.length === 0 ? (
+          <Pressable
+            onPress={() => router.push('/compose?kind=buddy')}
+            accessibilityRole="button"
+            style={{ alignItems: 'center', paddingVertical: 44, paddingHorizontal: 30 }}
+          >
+            <T style={{ fontSize: 30 }}>👋</T>
+            <T style={{ fontSize: 15, fontWeight: '700', color: c.ink, marginTop: 10 }}>No plans yet</T>
+            <T style={{ fontSize: 13, color: c.muted, marginTop: 4, textAlign: 'center', lineHeight: 19 }}>
+              Post the first one — dinner tonight, a palace walk tomorrow, anything.
+            </T>
+            <View style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}>
+              <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Post a plan</T>
+            </View>
+          </Pressable>
+        ) : (
+          buddies.map((b) => <BuddyCard key={b.id} buddy={b} />)
+        )}
       </ScrollView>
+      )}
     </View>
   );
 }

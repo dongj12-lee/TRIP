@@ -10,13 +10,15 @@ import { Theme } from '@/data/types';
 import { T, H, Card } from '@/components/base';
 import { Photo, Chip } from '@/components/ui';
 import { Icon } from '@/components/Icon';
+import { SkeletonList, SkeletonThemeCard } from '@/components/Skeleton';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 const CATEGORIES = ['All', 'Essentials', 'Food & Drink', 'K-Content', 'Culture', 'Shopping', 'Getting Around', 'Day Trips', 'Festivals'];
 
 export default function ThemesScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { themes } = useRemoteContent();
+  const { themes, loading } = useRemoteContent();
   const { profile } = useStore();
   const [cat, setCat] = useState('All');
 
@@ -29,6 +31,20 @@ export default function ThemesScreen() {
     return [...ranked, ...themes.filter((t) => !seen.has(t.slug))];
   }, [themes, cat, profile.interests]);
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: c.paper }}>
+        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
+          <H style={{ fontSize: 32, lineHeight: 36 }}>Themes</H>
+          <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
+            Curated walks & guides for the trip you came for
+          </T>
+        </View>
+        <SkeletonList card={SkeletonThemeCard} n={3} />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 6 }}>
@@ -38,6 +54,8 @@ export default function ThemesScreen() {
         </T>
       </View>
 
+      <OfflineBanner />
+
       <View style={{ height: 56 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 10, alignItems: 'center' }}>
           {CATEGORIES.map((k) => {
@@ -46,6 +64,8 @@ export default function ThemesScreen() {
               <Pressable
                 key={k}
                 onPress={() => setCat(k)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
                 style={{
                   paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
                   borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent : c.surface,

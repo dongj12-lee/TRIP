@@ -15,6 +15,8 @@ import { FiltersSheet } from '@/components/FiltersSheet';
 import { SeoulWeather } from '@/components/SeoulWeather';
 import { haptic } from '@/lib/haptics';
 import { guLabel } from '@/lib/format';
+import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   Culture: '🎭', History: '🏯', Nature: '🌳', Shopping: '🛍️',
@@ -28,7 +30,7 @@ const MAX_MAP_PINS = 40;
 export default function ExploreScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { places, posts, refreshAll } = useRemoteContent();
+  const { places, posts, refreshAll, loading } = useRemoteContent();
   const { profile } = useStore();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -131,6 +133,27 @@ export default function ExploreScreen() {
     [noFilters, places, posts],
   );
 
+  // Initial live fetch — show breathing placeholders instead of flashing the
+  // bundled seed list that would then swap to real content.
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: c.paper }}>
+        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
+          <H style={{ fontSize: 32, lineHeight: 36 }}>Explore</H>
+          <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>Finding spots…</T>
+        </View>
+        <SkeletonList card={SkeletonPlaceCard} n={4} />
+      </View>
+    );
+  }
+
+  const clearAll = () => {
+    setQuery('');
+    setActiveTags(new Set());
+    setSelectedHoods(new Set());
+    selectCategory(null);
+  };
+
   const header = (
     <>
       {/* Header */}
@@ -140,6 +163,8 @@ export default function ExploreScreen() {
           {filtered.length} of {places.length} spots
         </T>
       </View>
+
+      <OfflineBanner />
 
       {/* Search bar — primary discovery tool, kept at the top */}
       <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
@@ -161,7 +186,7 @@ export default function ExploreScreen() {
             returnKeyType="search"
           />
           {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8}>
+            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
               <Icon name="close" size={18} stroke={c.muted} sw={2} />
             </Pressable>
           )}
@@ -291,6 +316,13 @@ export default function ExploreScreen() {
             <T style={{ color: c.muted, marginTop: 8, textAlign: 'center' }}>
               {query ? `No spots match "${query}".` : 'No spots match those filters.'}
             </T>
+            <Pressable
+              onPress={() => { haptic.tick(); clearAll(); }}
+              accessibilityRole="button"
+              style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}
+            >
+              <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Clear all filters</T>
+            </Pressable>
           </View>
         }
         contentContainerStyle={{ paddingBottom: insets.bottom + 90 }}
@@ -334,6 +366,8 @@ function Chip({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
       style={{
         paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
         backgroundColor: active ? activeBg : c.surface,

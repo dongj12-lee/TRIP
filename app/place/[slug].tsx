@@ -116,10 +116,10 @@ export default function PlaceDetail() {
           <Photo uri={place.photoUrl} swatch={place.swatch} height={280} />
           <LinearGradient colors={['rgba(0,0,0,0.35)', 'transparent', 'rgba(0,0,0,0.5)']} style={{ position: 'absolute', inset: 0 }} />
           <View style={{ position: 'absolute', top: insets.top, left: 8, right: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Pressable onPress={() => router.back()} hitSlop={8} style={heroBtn}>
+            <Pressable onPress={() => router.back()} hitSlop={8} accessibilityRole="button" accessibilityLabel="Go back" style={heroBtn}>
               <Icon name="back" size={22} stroke="#fff" sw={2.2} />
             </Pressable>
-            <Pressable onPress={onSave} hitSlop={8} style={heroBtn}>
+            <Pressable onPress={onSave} hitSlop={8} accessibilityRole="button" accessibilityLabel={isSaved ? 'Remove from saved' : 'Save this place'} style={heroBtn}>
               <Icon name="heart" size={22} fill={isSaved ? c.rose : 'none'} stroke={isSaved ? c.rose : '#fff'} sw={2.2} />
             </Pressable>
           </View>

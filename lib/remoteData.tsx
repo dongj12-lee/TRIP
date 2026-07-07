@@ -8,6 +8,7 @@ import { Buddy, Place, Post, Theme } from '@/data/types';
 type RemoteContentValue = {
   live: boolean; // true once real Supabase data has loaded (vs. seed fallback)
   loading: boolean;
+  error: boolean; // initial live fetch failed — screens may offer a retry
   places: Place[];
   themes: Theme[];
   posts: Post[];
@@ -26,6 +27,7 @@ const RemoteContentContext = createContext<RemoteContentValue | null>(null);
 export function RemoteContentProvider({ children }: { children: React.ReactNode }) {
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [error, setError] = useState(false);
   const [places, setPlaces] = useState<Place[]>(SEED_PLACES);
   const [themes, setThemes] = useState<Theme[]>(SEED_THEMES);
   const [posts, setPosts] = useState<Post[]>(SEED_POSTS);
@@ -50,8 +52,10 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
       if (po.length) setPosts(po);
       if (b.length) setBuddies(b);
       setLive(p.length > 0);
+      setError(false);
     } catch (e) {
       console.warn('Remote content load failed, using local seed data:', (e as Error).message);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -93,6 +97,7 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
     () => ({
       live,
       loading,
+      error,
       places,
       themes,
       posts,
@@ -105,7 +110,7 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
       addLocalPost,
       addLocalBuddy,
     }),
-    [live, loading, places, themes, posts, buddies, placeBySlug, themeBySlug, refreshPosts, refreshBuddies, refreshAll, addLocalPost, addLocalBuddy],
+    [live, loading, error, places, themes, posts, buddies, placeBySlug, themeBySlug, refreshPosts, refreshBuddies, refreshAll, addLocalPost, addLocalBuddy],
   );
 
   return <RemoteContentContext.Provider value={value}>{children}</RemoteContentContext.Provider>;

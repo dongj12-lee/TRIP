@@ -26,6 +26,7 @@ import { AuthProvider, useAuth } from '@/lib/auth';
 import { RemoteContentProvider } from '@/lib/remoteData';
 import { registerForPushNotifications } from '@/lib/notifications';
 import { ToastProvider } from '@/components/Toast';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -104,6 +105,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
       <SafeAreaProvider>
         <ThemeProvider>
           <ToastProvider>
@@ -117,6 +119,7 @@ export default function RootLayout() {
           </ToastProvider>
         </ThemeProvider>
       </SafeAreaProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

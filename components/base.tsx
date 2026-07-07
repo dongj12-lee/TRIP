@@ -115,7 +115,7 @@ export function DetailHeader({ title, right }: { title?: string; right?: React.R
   const router = useRouter();
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 8 }}>
-      <IconButton name="back" onPress={() => router.back()} />
+      <IconButton name="back" label="Go back" onPress={() => router.back()} />
       {title ? <H style={{ fontSize: 19, flex: 1 }} numberOfLines={1}>{title}</H> : <View style={{ flex: 1 }} />}
       {right}
     </View>
@@ -129,6 +129,7 @@ export function IconButton({
   color,
   bg,
   style,
+  label,
 }: {
   name: IconName;
   onPress?: () => void;
@@ -136,12 +137,15 @@ export function IconButton({
   color?: string;
   bg?: string;
   style?: StyleProp<ViewStyle>;
+  label?: string; // screen-reader name; falls back to the icon name
 }) {
   const { c } = useTheme();
   return (
     <Pressable
       onPress={onPress}
       hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={label ?? name}
       style={({ pressed }) => [
         {
           width: 38, height: 38, borderRadius: 999, alignItems: 'center', justifyContent: 'center',
@@ -178,6 +182,9 @@ export function Button({
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: !!disabled }}
       style={({ pressed }) => [
         {
           height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8,

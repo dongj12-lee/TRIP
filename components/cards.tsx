@@ -83,6 +83,8 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
         <Pressable
           onPress={onSave}
           hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={isSaved ? `Remove ${place.name} from saved` : `Save ${place.name}`}
           style={{
             position: 'absolute', top: 8, right: 8, width: 38, height: 38, borderRadius: 999,
             backgroundColor: 'rgba(20,16,12,0.42)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
@@ -179,6 +181,8 @@ export function PostCard({ post }: { post: Post }) {
         <Pressable
           onPress={() => { haptic.tick(); toggleVote(post); }}
           hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={voted ? 'Unlike post' : 'Like post'}
           style={{
             flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 999,
             borderWidth: 1, borderColor: voted ? c.rose : c.line, backgroundColor: voted ? c.rose50 : c.surface,
@@ -190,6 +194,8 @@ export function PostCard({ post }: { post: Post }) {
         <Pressable
           onPress={open}
           hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel="View replies"
           style={{
             flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 999,
             borderWidth: 1, borderColor: c.line, backgroundColor: c.surface,

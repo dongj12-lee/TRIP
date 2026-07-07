@@ -9,13 +9,15 @@ import { T, H } from '@/components/base';
 import { PostCard } from '@/components/cards';
 import { Avatar } from '@/components/Avatar';
 import { QuickComposeSheet } from '@/components/QuickComposeSheet';
+import { SkeletonList, SkeletonPostCard } from '@/components/Skeleton';
+import { OfflineBanner } from '@/components/OfflineBanner';
 import { haptic } from '@/lib/haptics';
 
 export default function FeedScreen() {
   const { c, tone } = useTheme();
   const insets = useSafeAreaInsets();
   const { sharedPost, profile } = useStore();
-  const { posts, refreshPosts } = useRemoteContent();
+  const { posts, refreshPosts, loading } = useRemoteContent();
   const [type, setType] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
@@ -40,16 +42,31 @@ export default function FeedScreen() {
 
   const openCompose = () => { haptic.tick(); setComposeOpen(true); };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: c.paper }}>
+        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 10 }}>
+          <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
+        </View>
+        <SkeletonList card={SkeletonPostCard} n={4} />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 10 }}>
         <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
       </View>
 
+      <OfflineBanner />
+
       {/* Inline composer prompt — one tap to share a thought */}
       <View style={{ paddingHorizontal: 18, paddingBottom: 10 }}>
         <Pressable
           onPress={openCompose}
+          accessibilityRole="button"
+          accessibilityLabel="Write a post"
           style={{
             flexDirection: 'row', alignItems: 'center', gap: 11,
             backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 16, padding: 11, paddingRight: 14,
@@ -77,6 +94,8 @@ export default function FeedScreen() {
               <Pressable
                 key={k}
                 onPress={() => { haptic.tick(); setType(k === 'all' ? null : k); }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
                 style={{
                   paddingVertical: 6.5, paddingHorizontal: 14, borderRadius: 999,
                   borderWidth: 1, borderColor: on ? activeBg : tint ? tint.solid + '30' : c.line,
