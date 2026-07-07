@@ -14,6 +14,7 @@ import { Eyebrow } from '@/components/ui';
 import { FiltersSheet } from '@/components/FiltersSheet';
 import { SeoulWeather } from '@/components/SeoulWeather';
 import { haptic } from '@/lib/haptics';
+import { guLabel } from '@/lib/format';
 
 const CATEGORY_EMOJI: Record<string, string> = {
   Culture: '🎭', History: '🏯', Nature: '🌳', Shopping: '🛍️',
@@ -251,7 +252,7 @@ export default function ExploreScreen() {
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.accent50 }}
           >
             <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>
-              📍 {selectedHoods.size === 1 ? [...selectedHoods][0] : `${selectedHoods.size} areas`}
+              📍 {selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : `${selectedHoods.size} areas`}
             </T>
             <Icon name="close" size={12} stroke={c.accent} sw={2.4} />
           </Pressable>
@@ -261,7 +262,7 @@ export default function ExploreScreen() {
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {subsubcategory || subcategory || category || (selectedHoods.size === 1 ? [...selectedHoods][0] : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
+          {subsubcategory || subcategory || category || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
         </T>
         {!query && (
           <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>

@@ -8,6 +8,7 @@ import { Suggestion } from '@/lib/routeSuggest';
 import { Icon } from './Icon';
 import { Photo, Eyebrow } from './ui';
 import { T, Button } from './base';
+import { guLabel } from '@/lib/format';
 
 // Bottom-sheet place picker for the trip planner. Searching the real place DB
 // means an added stop carries coordinates/category/photo (so route-health and
@@ -141,7 +142,7 @@ export function AddStopSheet({
               <View style={{ flex: 1 }}>
                 <T style={{ fontSize: 14.5, fontWeight: '700' }} numberOfLines={1}>{item.name}</T>
                 <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }} numberOfLines={1}>
-                  {item.category} · {item.neighborhood}
+                  {item.category} · {guLabel(item.neighborhood)}
                 </T>
               </View>
               <Icon name="plus" size={20} stroke={c.accent} sw={2.2} />

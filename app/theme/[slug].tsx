@@ -8,6 +8,7 @@ import { GuideItem } from '@/data/types';
 import { T, H, Screen, DetailHeader, Card } from '@/components/base';
 import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
+import { guLabel } from '@/lib/format';
 
 export default function ThemeDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -82,7 +83,7 @@ export default function ThemeDetail() {
                       </View>
                       <View style={{ flex: 1 }}>
                         <T style={{ fontSize: 14.5, fontWeight: '700' }} numberOfLines={1}>{place.name}</T>
-                        <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{place.category} · {place.neighborhood}</T>
+                        <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{place.category} · {guLabel(place.neighborhood)}</T>
                       </View>
                       <Icon name="chevron" size={18} stroke={c.muted} sw={2} />
                     </Card>
