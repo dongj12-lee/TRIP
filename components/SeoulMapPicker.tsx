@@ -15,21 +15,22 @@ const LABEL_NUDGE: Record<string, [number, number]> = {
 // data/seoulDistricts.ts) — unmistakably Seoul, unlike floating name chips.
 // Tap a district to filter; districts with no imported places are dimmed.
 export function SeoulMapPicker({
-  active,
-  onSelect,
+  selected,
+  onToggle,
   available,
 }: {
-  active: string | null; // district *name without -gu* (matches place.neighborhood, e.g. "Gangnam")
-  onSelect: (name: string | null) => void;
+  selected: Set<string>; // district names without -gu (match place.neighborhood, e.g. "Gangnam")
+  onToggle: (name: string) => void;
   available?: Set<string>;
 }) {
   const { c, dark } = useTheme();
   // place.neighborhood is the bare gu name ("Gangnam"); map data is "Gangnam-gu".
   const bare = (name: string) => name.replace(/-gu$/, '');
   const has = (name: string) => !available || available.has(bare(name));
+  const isOn = (name: string) => selected.has(bare(name));
 
   const fillFor = (name: string) => {
-    if (active === bare(name)) return c.accent;
+    if (isOn(name)) return c.accent;
     if (!has(name)) return dark ? '#2b2824' : '#eceae4';
     return dark ? '#3a4a44' : '#e4ede3'; // soft land tint
   };
@@ -39,7 +40,7 @@ export function SeoulMapPicker({
       <Svg width="100%" height="100%" viewBox={`-1 -1 ${SEOUL_MAP_W + 2} ${SEOUL_MAP_H + 2}`}>
         <G strokeLinejoin="round">
           {SEOUL_DISTRICTS.map((d) => {
-            const on = active === bare(d.name);
+            const on = isOn(d.name);
             return (
               <Path
                 key={d.name}
@@ -48,7 +49,7 @@ export function SeoulMapPicker({
                 stroke={on ? c.accent : c.paper}
                 strokeWidth={on ? 0.8 : 0.7}
                 opacity={has(d.name) ? 1 : 0.55}
-                onPress={() => has(d.name) && onSelect(on ? null : bare(d.name))}
+                onPress={() => has(d.name) && onToggle(bare(d.name))}
               />
             );
           })}
@@ -69,7 +70,7 @@ export function SeoulMapPicker({
       {/* Labels overlaid at each district's centroid. Kept compact; the full
           "-gu" name is shown per the map convention. */}
       {SEOUL_DISTRICTS.map((d) => {
-        const on = active === bare(d.name);
+        const on = isOn(d.name);
         const dim = !has(d.name);
         const [nx, ny] = LABEL_NUDGE[d.name] ?? [0, 0];
         return (

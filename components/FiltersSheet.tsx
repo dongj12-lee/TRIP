@@ -16,26 +16,27 @@ import { haptic } from '@/lib/haptics';
 export function FiltersSheet({
   visible, onClose,
   activeTags, toggleTag,
-  hood, setHood, hoods,
+  selectedHoods, toggleHood, clearHoods, hoods,
   resultCount,
 }: {
   visible: boolean;
   onClose: () => void;
   activeTags: Set<ForeignerTagKey>;
   toggleTag: (k: ForeignerTagKey) => void;
-  hood: string | null;
-  setHood: (h: string | null) => void;
+  selectedHoods: Set<string>;
+  toggleHood: (h: string) => void;
+  clearHoods: () => void;
   hoods: string[];
   resultCount: number;
 }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const hasActive = activeTags.size > 0 || !!hood;
+  const hasActive = activeTags.size > 0 || selectedHoods.size > 0;
 
   const clearAll = () => {
     haptic.tick();
     activeTags.forEach((t) => toggleTag(t));
-    setHood(null);
+    clearHoods();
   };
 
   return (
@@ -62,16 +63,18 @@ export function FiltersSheet({
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <T style={{ fontSize: 12, fontWeight: '800', color: c.muted, letterSpacing: 0.6 }}>NEIGHBORHOOD</T>
-            {hood && (
-              <Pressable onPress={() => { haptic.tick(); setHood(null); }} hitSlop={6}>
-                <T style={{ fontSize: 12.5, fontWeight: '700', color: c.accent }}>Clear · {hood}</T>
+            {selectedHoods.size > 0 && (
+              <Pressable onPress={() => { haptic.tick(); clearHoods(); }} hitSlop={6}>
+                <T style={{ fontSize: 12.5, fontWeight: '700', color: c.accent }}>
+                  Clear · {selectedHoods.size === 1 ? [...selectedHoods][0] : `${selectedHoods.size} areas`}
+                </T>
               </Pressable>
             )}
           </View>
-          <T style={{ fontSize: 12, color: c.muted, marginBottom: 10 }}>Tap a district on the map — laid out where it actually sits in the city.</T>
+          <T style={{ fontSize: 12, color: c.muted, marginBottom: 10 }}>Tap districts on the map — pick as many as you like.</T>
           <SeoulMapPicker
-            active={hood}
-            onSelect={(h) => { haptic.tick(); setHood(h); }}
+            selected={selectedHoods}
+            onToggle={(h) => { haptic.tick(); toggleHood(h); }}
             available={new Set(hoods)}
           />
         </ScrollView>

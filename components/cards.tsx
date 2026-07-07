@@ -17,6 +17,14 @@ export function PostTypeBadge({ type }: { type: string }) {
   return <Chip tone={t.tone}>{`${t.emoji} ${t.label}`}</Chip>;
 }
 
+// Soft pastel card fill per post type — blue / cream / peach / green. Drawn
+// from the SAME tone as the type's filter chip and badge (POST_TYPES.tone via
+// the theme tone fn), so chips, badges and cards read as one colour per type.
+function postTint(toneFn: (t: any) => { bg: string; solid: string }, type: string): { bg: string; border: string } {
+  const t = toneFn((POST_TYPES[type] || POST_TYPES.tip).tone);
+  return { bg: t.bg, border: t.solid + '33' };
+}
+
 // Compact fixed-width card for horizontal carousels (e.g. the "For you" rail).
 export function PlaceCardCompact({ place }: { place: Place }) {
   const { c } = useTheme();
@@ -125,7 +133,7 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
 }
 
 export function PostCard({ post }: { post: Post }) {
-  const { c } = useTheme();
+  const { c, tone } = useTheme();
   const router = useRouter();
   const { votes, toggleVote } = useStore();
   const voteKey = post.id ?? post.slug;
@@ -134,8 +142,9 @@ export function PostCard({ post }: { post: Post }) {
   // A casual "thought" leads with its body (tweet-like); structured posts lead
   // with their title.
   const isThought = post.type === 'thought' || !post.title;
+  const tint = postTint(tone, post.type);
   return (
-    <Card onPress={open} style={{ padding: 15 }}>
+    <Card onPress={open} style={{ padding: 15, backgroundColor: tint.bg, borderColor: tint.border }}>
       {/* Author row */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <Avatar name={post.author.name} size={38} />
@@ -193,15 +202,16 @@ export function PostCard({ post }: { post: Post }) {
 }
 
 export function PostCardMini({ post }: { post: Post }) {
-  const { c } = useTheme();
+  const { c, tone } = useTheme();
   const router = useRouter();
+  const tint = postTint(tone, post.type);
   return (
     <Pressable
       onPress={() => router.push(`/post/${post.slug}`)}
-      style={{ padding: 14, paddingVertical: 12, borderRadius: 14, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
+      style={{ padding: 14, paddingVertical: 12, borderRadius: 14, backgroundColor: tint.bg, borderWidth: 1, borderColor: tint.border }}
     >
       <PostTypeBadge type={post.type} />
-      <T style={{ marginTop: 8, fontSize: 14.5, fontWeight: '700', lineHeight: 19 }}>{post.title}</T>
+      <T style={{ marginTop: 8, fontSize: 14.5, fontWeight: '700', lineHeight: 19 }}>{post.title || post.body}</T>
       <T style={{ marginTop: 5, fontSize: 12, color: c.muted, fontWeight: '600' }}>
         {post.author ? `${post.author.country} ${post.author.name} · ` : ''}▲ {post.votes} · 💬 {post.comments}
       </T>

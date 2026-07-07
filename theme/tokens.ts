@@ -35,6 +35,7 @@ const LIGHT = {
   sage50: '#eceee6', sage: '#79876b', sage700: '#5f6d53',
   gold50: '#f7efd8', gold: '#c39b42', gold700: '#8a6a1f',
   rose50: '#f9e7e3', rose: '#c75c54', rose700: '#b04942',
+  blue50: '#e8edf5', blue: '#5b6f9c', blue700: '#42537a',
   mapBg: '#eaf0ee', mapRoad: '#ffffff', mapWater: '#bcd6e6', mapPark: '#cfe3c4',
   // scrim / overlay helpers (RN-specific additions)
   scrim: 'rgba(46,42,36,0.45)',
@@ -52,6 +53,7 @@ const DARK: typeof LIGHT = {
   sage50: '#2a3225', sage: '#93a182', sage700: '#b6c6a2',
   gold50: '#3a2f16', gold: '#d4ab52', gold700: '#e8cd86',
   rose50: '#3a2320', rose: '#d97a72', rose700: '#eb9b93',
+  blue50: '#212a3a', blue: '#8296bd', blue700: '#aebdd6',
   mapBg: '#222a2c', mapRoad: '#3c474a', mapWater: '#27424f', mapPark: '#2c3d2e',
   scrim: 'rgba(0,0,0,0.55)',
 };
@@ -74,13 +76,14 @@ export function buildPalette(dark: boolean, accent: AccentKey): Palette {
 }
 
 // Tone map used by TagPill / Chip (source/ui.jsx TONE).
-export type Tone = 'terra' | 'sage' | 'gold' | 'rose';
+export type Tone = 'terra' | 'sage' | 'gold' | 'rose' | 'blue';
 export function toneColors(c: Palette, tone: Tone) {
   const map: Record<Tone, { bg: string; fg: string; solid: string }> = {
     terra: { bg: c.terra50, fg: c.terra700, solid: c.terra },
     sage: { bg: c.sage50, fg: c.sage700, solid: c.sage },
     gold: { bg: c.gold50, fg: c.gold700, solid: c.gold },
     rose: { bg: c.rose50, fg: c.rose700, solid: c.rose },
+    blue: { bg: c.blue50, fg: c.blue700, solid: c.blue },
   };
   return map[tone] || map.sage;
 }

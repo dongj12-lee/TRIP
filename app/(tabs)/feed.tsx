@@ -12,7 +12,7 @@ import { QuickComposeSheet } from '@/components/QuickComposeSheet';
 import { haptic } from '@/lib/haptics';
 
 export default function FeedScreen() {
-  const { c } = useTheme();
+  const { c, tone } = useTheme();
   const insets = useSafeAreaInsets();
   const { sharedPost, profile } = useStore();
   const { posts, refreshPosts } = useRemoteContent();
@@ -67,17 +67,23 @@ export default function FeedScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 8, alignItems: 'center' }}>
           {chips.map(([k, label]) => {
             const on = (k === 'all' && !type) || type === k;
+            // Each type chip carries its own colour (the same tone as its cards
+            // & badge); "All" stays neutral accent.
+            const tint = k === 'all' ? null : tone(POST_TYPES[k].tone);
+            const activeBg = tint ? tint.solid : c.accent;
+            const idleBg = tint ? tint.bg : c.surface;
+            const idleFg = tint ? tint.fg : c.inkSoft;
             return (
               <Pressable
                 key={k}
                 onPress={() => { haptic.tick(); setType(k === 'all' ? null : k); }}
                 style={{
                   paddingVertical: 6.5, paddingHorizontal: 14, borderRadius: 999,
-                  borderWidth: 1, borderColor: on ? c.accent : c.line,
-                  backgroundColor: on ? c.accent : c.surface,
+                  borderWidth: 1, borderColor: on ? activeBg : tint ? tint.solid + '30' : c.line,
+                  backgroundColor: on ? activeBg : idleBg,
                 }}
               >
-                <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : c.inkSoft }}>{label}</T>
+                <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : idleFg }}>{label}</T>
               </Pressable>
             );
           })}

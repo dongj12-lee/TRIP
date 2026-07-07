@@ -38,7 +38,7 @@ export default function ExploreScreen() {
 
   const [query, setQuery] = useState('');
   const [activeTags, setActiveTags] = useState<Set<ForeignerTagKey>>(new Set());
-  const [hood, setHood] = useState<string | null>(null);
+  const [selectedHoods, setSelectedHoods] = useState<Set<string>>(new Set());
   const [category, setCategory] = useState<string | null>(null);
   const [subcategory, setSubcategory] = useState<string | null>(null);
   const [subsubcategory, setSubsubcategory] = useState<string | null>(null);
@@ -91,7 +91,7 @@ export default function ExploreScreen() {
     const q = query.trim().toLowerCase();
     return places.filter((p) => {
       if (![...activeTags].every((t) => (p as any)[t])) return false;
-      if (hood && p.neighborhood !== hood) return false;
+      if (selectedHoods.size && !selectedHoods.has(p.neighborhood)) return false;
       if (category && p.category !== category) return false;
       if (subcategory && p.categoryL2 !== subcategory) return false;
       if (subsubcategory && p.categoryL3 !== subsubcategory) return false;
@@ -101,9 +101,9 @@ export default function ExploreScreen() {
       }
       return true;
     });
-  }, [places, query, activeTags, hood, category, subcategory, subsubcategory]);
+  }, [places, query, activeTags, selectedHoods, category, subcategory, subsubcategory]);
 
-  const activeFilterCount = activeTags.size + (hood ? 1 : 0);
+  const activeFilterCount = activeTags.size + selectedHoods.size;
 
   const toggleTag = (k: ForeignerTagKey) =>
     setActiveTags((prev) => {
@@ -112,10 +112,18 @@ export default function ExploreScreen() {
       return n;
     });
 
+  const toggleHood = (h: string) =>
+    setSelectedHoods((prev) => {
+      const n = new Set(prev);
+      n.has(h) ? n.delete(h) : n.add(h);
+      return n;
+    });
+  const clearHoods = () => setSelectedHoods(new Set());
+
   const mapPlaces = useMemo(() => filtered.slice(0, MAX_MAP_PINS), [filtered]);
 
   // "Recommended" only shows when the user hasn't narrowed the list themselves.
-  const noFilters = !query && !hood && !category && activeTags.size === 0;
+  const noFilters = !query && selectedHoods.size === 0 && !category && activeTags.size === 0;
   const recommended = useMemo(
     () => (noFilters ? recommendedPlaces(places, posts, 12) : []),
     [noFilters, places, posts],
@@ -233,12 +241,14 @@ export default function ExploreScreen() {
             {activeFilterCount > 0 ? `Filters · ${activeFilterCount}` : 'Filters'}
           </T>
         </Pressable>
-        {hood && (
+        {selectedHoods.size > 0 && (
           <Pressable
-            onPress={() => setHood(null)}
+            onPress={clearHoods}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.accent50 }}
           >
-            <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>📍 {hood}</T>
+            <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>
+              📍 {selectedHoods.size === 1 ? [...selectedHoods][0] : `${selectedHoods.size} areas`}
+            </T>
             <Icon name="close" size={12} stroke={c.accent} sw={2.4} />
           </Pressable>
         )}
@@ -247,7 +257,7 @@ export default function ExploreScreen() {
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {subsubcategory || subcategory || category || hood || 'All spots'} · {filtered.length}
+          {subsubcategory || subcategory || category || (selectedHoods.size === 1 ? [...selectedHoods][0] : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
         </T>
         {!query && (
           <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -292,8 +302,9 @@ export default function ExploreScreen() {
         onClose={() => setFiltersOpen(false)}
         activeTags={activeTags}
         toggleTag={toggleTag}
-        hood={hood}
-        setHood={setHood}
+        selectedHoods={selectedHoods}
+        toggleHood={toggleHood}
+        clearHoods={clearHoods}
         hoods={hoods}
         resultCount={filtered.length}
       />

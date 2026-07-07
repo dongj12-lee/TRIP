@@ -13,8 +13,8 @@ export const FOREIGNER_TAGS: ForeignerTag[] = [
   { key: 'englishSpoken', emoji: '💬', label: 'English spoken', hint: 'Staff can communicate in English', tone: 'gold' },
 ];
 
-export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 'terra' | 'sage' | 'gold' | 'rose' }> = {
-  thought: { emoji: '💭', label: 'Thought', tone: 'terra' },
+export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 'terra' | 'sage' | 'gold' | 'rose' | 'blue' }> = {
+  thought: { emoji: '💭', label: 'Thought', tone: 'blue' },
   tip: { emoji: '💡', label: 'Tip', tone: 'gold' },
   route: { emoji: '🧭', label: 'Route', tone: 'terra' },
   question: { emoji: '❓', label: 'Question', tone: 'sage' },
