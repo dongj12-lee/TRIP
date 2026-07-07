@@ -40,5 +40,7 @@ yarn-error.*
 /ios
 /android
 
-# local env
+# local env — every variant except the committed .env.example
 .env
+.env.development
+.env.production

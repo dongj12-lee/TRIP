@@ -56,7 +56,8 @@
     "predeploy": "expo export -p web",
     "deploy": "gh-pages --nojekyll -d dist",
     "seed:themes": "tsx scripts/seed-themes.ts",
-    "prune:events": "tsx scripts/prune-expired-events.ts"
+    "prune:events": "tsx scripts/prune-expired-events.ts",
+    "db:setup-sql": "node scripts/print-setup-sql.mjs"
   },
   "private": true
 }

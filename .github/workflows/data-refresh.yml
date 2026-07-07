@@ -1,0 +1,55 @@
+# Keeps the live place catalog fresh without anyone's laptop involved.
+#
+#   Daily  (05:00 KST): prune expired time-bound events (candidates scan).
+#   Weekly (Tue 03:00 KST): full Visit Seoul re-import (upsert by slug —
+#     picks up new places and updated hours/photos), then a FULL expiry
+#     sweep. Order matters: the importer can re-add an ended event that
+#     lives under a permanent category, so pruning runs after it.
+#
+# Secrets (repo Settings → Secrets → Actions):
+#   EXPO_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VISITSEOUL_API_KEY
+name: Data refresh
+
+on:
+  schedule:
+    - cron: '0 20 * * *' # daily 05:00 KST — prune expired events
+    - cron: '0 18 * * 1' # Mon 18:00 UTC = Tue 03:00 KST — full import + sweep
+  workflow_dispatch:
+    inputs:
+      full:
+        description: 'Run the full weekly job (import + full sweep)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      VISITSEOUL_API_KEY: ${{ secrets.VISITSEOUL_API_KEY }}
+      FULL: ${{ (github.event.schedule == '0 18 * * 1' || inputs.full == true) && 'yes' || 'no' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Import Visit Seoul catalog (weekly)
+        if: env.FULL == 'yes'
+        run: npm run import:visitseoul
+
+      - name: Prune expired events
+        run: |
+          if [ "$FULL" = "yes" ]; then
+            npm run prune:events -- --all
+          else
+            npm run prune:events
+          fi
