@@ -25,25 +25,23 @@ export default function ThemeDetail() {
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
         <View style={{ height: 200 }}>
           <Photo uri={theme.photoUrl} swatch={theme.swatch} height={200} />
-          <View style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.18)' }} />
           <View style={{ position: 'absolute', top: insets.top, left: 8 }}>
-            <Pressable onPress={() => router.back()} hitSlop={8} style={{ width: 38, height: 38, borderRadius: 999, backgroundColor: 'rgba(255,253,250,0.85)', alignItems: 'center', justifyContent: 'center' }}>
+            <Pressable onPress={() => router.back()} hitSlop={8} style={{ width: 38, height: 38, borderRadius: 999, backgroundColor: 'rgba(255,253,250,0.9)', alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="back" size={22} stroke={c.ink} sw={2} />
             </Pressable>
           </View>
-          <View style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>
-            {!!theme.badge && (
-              <View style={{ alignSelf: 'flex-start', backgroundColor: 'rgba(28,20,14,.55)', paddingVertical: 4, paddingHorizontal: 9, borderRadius: 999, marginBottom: 8 }}>
-                <T style={{ color: '#fff', fontSize: 11.5, fontWeight: '700' }}>{theme.badge}</T>
-              </View>
-            )}
-            <H style={{ fontSize: 26, color: '#fff', lineHeight: 30 }}>{theme.title}</H>
-            <T style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.9)', fontWeight: '600', marginTop: 2 }}>{theme.subtitle}</T>
-          </View>
+          {!!theme.badge && (
+            <View style={{ position: 'absolute', top: insets.top, right: 14, backgroundColor: 'rgba(28,20,14,.6)', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
+              <T style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>{theme.badge}</T>
+            </View>
+          )}
         </View>
 
+        {/* Title + description below the photo, in dark text for readability */}
         <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
-          <T style={{ fontSize: 14.5, lineHeight: 22, color: c.inkSoft }}>{theme.description}</T>
+          <H style={{ fontSize: 26, color: c.ink, lineHeight: 31 }}>{theme.title}</H>
+          <T style={{ fontSize: 14, color: c.accent, fontWeight: '700', marginTop: 3 }}>{theme.subtitle}</T>
+          <T style={{ fontSize: 14.5, lineHeight: 22, color: c.inkSoft, marginTop: 12 }}>{theme.description}</T>
         </View>
 
         {/* Know before you go */}

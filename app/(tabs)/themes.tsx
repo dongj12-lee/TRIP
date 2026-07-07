@@ -76,26 +76,27 @@ function ThemeCard({ theme }: { theme: Theme }) {
       <View>
         <Photo uri={theme.photoUrl} swatch={theme.swatch} height={150} />
         <View style={{ position: 'absolute', top: 12, left: 12, flexDirection: 'row', gap: 6 }}>
-          <View style={{ backgroundColor: 'rgba(28,20,14,.55)', paddingVertical: 4, paddingHorizontal: 9, borderRadius: 999 }}>
+          <View style={{ backgroundColor: 'rgba(28,20,14,.6)', paddingVertical: 4, paddingHorizontal: 9, borderRadius: 999 }}>
             <T style={{ color: '#fff', fontSize: 11.5, fontWeight: '700' }}>
               {theme.badge || (isWalk ? `🚶 ${theme.kContent}` : theme.category)}
             </T>
           </View>
         </View>
-        <View style={{ position: 'absolute', bottom: 12, left: 14, right: 14 }}>
-          <H style={{ fontSize: 22, color: '#fff', lineHeight: 26 }}>{theme.title}</H>
-          <T style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: '600', marginTop: 2 }}>{theme.subtitle}</T>
-        </View>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, flexWrap: 'wrap' }}>
-        {isWalk ? (
-          <>
-            <MetaBit icon="walk" label={`${theme.stops} stops`} />
-            <MetaBit icon="clock" label={theme.hours || ''} />
-          </>
-        ) : (
-          theme.meta?.map((m, i) => <MetaBit key={i} icon={m.icon} label={m.label} />)
-        )}
+      {/* Text lives below the photo, so it stays readable on any cover */}
+      <View style={{ padding: 14, paddingBottom: 13 }}>
+        <H style={{ fontSize: 20, color: c.ink, lineHeight: 25 }}>{theme.title}</H>
+        <T style={{ fontSize: 13, color: c.inkSoft, fontWeight: '600', marginTop: 2 }}>{theme.subtitle}</T>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+          {isWalk ? (
+            <>
+              <MetaBit icon="walk" label={`${theme.stops} stops`} />
+              <MetaBit icon="clock" label={theme.hours || ''} />
+            </>
+          ) : (
+            theme.meta?.map((m, i) => <MetaBit key={i} icon={m.icon} label={m.label} />)
+          )}
+        </View>
       </View>
     </Card>
   );
