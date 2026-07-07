@@ -12,7 +12,6 @@ import { Creator, Place } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
 import { PlaceCardCompact, PostCardMini } from '@/components/cards';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
-import { DayPlanSheet } from '@/components/DayPlanSheet';
 import { ExploreMap } from '@/components/ExploreMap';
 import { useToast } from '@/components/Toast';
 import { Icon } from '@/components/Icon';
@@ -29,7 +28,6 @@ export default function MyScreen() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
-  const [planOpen, setPlanOpen] = useState(false);
 
   const onFollowToggle = (cr: Creator) => {
     const wasFollowing = following.has(cr.id);
@@ -108,13 +106,6 @@ export default function MyScreen() {
           <Stat n={myPostCount} label="Posts" />
           <Stat n={saved.size} label="Saved" />
           <Stat n={following.size} label="Following" />
-        </View>
-
-        {/* Quick actions — the three things worth doing every day */}
-        <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 12 }}>
-          <QuickAction emoji="✨" label="Plan a day" onPress={() => { haptic.tick(); setPlanOpen(true); }} />
-          <QuickAction emoji="✍️" label="Share a tip" onPress={() => router.push('/compose?kind=post')} />
-          <QuickAction emoji="👋" label="Find buddies" onPress={() => router.push('/(tabs)/buddy')} />
         </View>
 
         {/* Your Seoul — every saved & liked spot on one map */}
@@ -250,26 +241,7 @@ export default function MyScreen() {
       </ScrollView>
 
       <EditProfileSheet visible={editing} onClose={() => setEditing(false)} />
-      <DayPlanSheet visible={planOpen} onClose={() => setPlanOpen(false)} />
     </View>
-  );
-}
-
-function QuickAction({ emoji, label, onPress }: { emoji: string; label: string; onPress: () => void }) {
-  const { c } = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      style={({ pressed }) => [
-        { flex: 1, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, paddingVertical: 12, alignItems: 'center', gap: 3 },
-        pressed && { opacity: 0.85 },
-      ]}
-    >
-      <T style={{ fontSize: 19 }}>{emoji}</T>
-      <T style={{ fontSize: 11.5, fontWeight: '700', color: c.inkSoft }}>{label}</T>
-    </Pressable>
   );
 }
 
