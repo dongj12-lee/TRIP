@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Pressable, Alert, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
+import { isAdmin } from '@/data/remote';
 import { ACCENTS, AccentKey } from '@/theme/tokens';
 import { T, H, Screen, DetailHeader, Card } from '@/components/base';
 import { Icon } from '@/components/Icon';
@@ -20,6 +21,11 @@ export default function Settings() {
   const { resetAll } = useStore();
   const { configured, session, signOut, deleteAccount } = useAuth();
   const [busy, setBusy] = useState(false);
+  const [admin, setAdmin] = useState(false);
+
+  useEffect(() => {
+    if (configured && session) isAdmin().then(setAdmin).catch(() => {});
+  }, [configured, session]);
 
   const handleSignOut = () => {
     Alert.alert('Sign out', 'You can sign back in any time.', [
@@ -104,6 +110,16 @@ export default function Settings() {
           <Divider />
           <LinkRow label="Community Guidelines" onPress={() => Linking.openURL(GUIDELINES_URL)} />
         </Card>
+
+        {/* Moderation — admins only */}
+        {admin && (
+          <>
+            <SectionLabel>Moderation</SectionLabel>
+            <Card>
+              <LinkRow label="Report queue" onPress={() => router.push('/admin')} />
+            </Card>
+          </>
+        )}
 
         {/* Account */}
         <SectionLabel>Account</SectionLabel>

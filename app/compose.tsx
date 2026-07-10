@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { createBuddy, createPost } from '@/data/remote';
+import { createBuddy, createPost, friendlyError } from '@/data/remote';
 import { POST_TYPES } from '@/data';
 import { PostType } from '@/data/types';
 import { T, H, Screen, DetailHeader, Button } from '@/components/base';
@@ -76,7 +76,7 @@ export default function Compose() {
         router.replace('/(tabs)/feed');
       }
     } catch (e) {
-      Alert.alert('Could not publish', (e as Error).message);
+      Alert.alert('Could not publish', friendlyError(e, (e as Error).message));
     } finally {
       setBusy(false);
     }

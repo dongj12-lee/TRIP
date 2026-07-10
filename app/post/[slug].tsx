@@ -7,7 +7,8 @@ import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { addComment, fetchPostComments, toggleCommentLike } from '@/data/remote';
+import { addComment, fetchPostComments, toggleCommentLike, friendlyError } from '@/data/remote';
+import { useToast } from '@/components/Toast';
 import { Comment } from '@/data/types';
 import { T, H, Screen, DetailHeader } from '@/components/base';
 import { Icon } from '@/components/Icon';
@@ -25,6 +26,7 @@ export default function PostDetail() {
   const { sharedPost, profile } = useStore();
   const { session } = useAuth();
   const { posts, placeBySlug } = useRemoteContent();
+  const { showToast } = useToast();
   const inputRef = useRef<TextInput>(null);
 
   const [comments, setComments] = useState<Comment[]>([]);
@@ -76,6 +78,7 @@ export default function PostDetail() {
       haptic.success();
     } catch (e) {
       console.warn('addComment failed', e);
+      showToast(friendlyError(e, "Couldn't post your comment — try again."));
     } finally {
       setPosting(false);
     }

@@ -7,12 +7,13 @@ import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { fetchBuddyMessages, sendBuddyMessage } from '@/data/remote';
+import { fetchBuddyMessages, sendBuddyMessage, friendlyError } from '@/data/remote';
 import { BuddyMessage } from '@/data/types';
 import { T, Screen, DetailHeader } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Avatar } from '@/components/Avatar';
 import { ReportSheet } from '@/components/ReportSheet';
+import { useToast } from '@/components/Toast';
 import { haptic } from '@/lib/haptics';
 
 const POLL_MS = 4000;
@@ -28,6 +29,7 @@ export default function BuddyChat() {
   const { profile } = useStore();
   const { user } = useAuth();
   const { buddies } = useRemoteContent();
+  const { showToast } = useToast();
   const scrollRef = useRef<ScrollView>(null);
 
   const [messages, setMessages] = useState<BuddyMessage[]>([]);
@@ -65,6 +67,7 @@ export default function BuddyChat() {
     } catch (e) {
       setDraft(body); // give the text back rather than losing it
       console.warn('sendBuddyMessage failed', e);
+      showToast(friendlyError(e, "Couldn't send — try again."));
     } finally {
       setSending(false);
     }

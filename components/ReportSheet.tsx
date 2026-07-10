@@ -3,7 +3,7 @@ import { View, Modal, Pressable, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { useAuth } from '@/lib/auth';
-import { fileReport, setBlocked } from '@/data/remote';
+import { fileReport, setBlocked, friendlyError } from '@/data/remote';
 import { T, Button } from './base';
 
 const REASONS = ['Spam', 'Harassment or hate', 'Scam or tourist-trap pricing', 'Inappropriate content', 'Something else'];
@@ -34,7 +34,7 @@ export function ReportSheet({ visible, onClose, target }: { visible: boolean; on
       onClose();
       Alert.alert('Report submitted', "Thanks — we'll review this.");
     } catch (e) {
-      Alert.alert('Could not submit report', (e as Error).message);
+      Alert.alert('Could not submit report', friendlyError(e, (e as Error).message));
     } finally {
       setBusy(false);
     }

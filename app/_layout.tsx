@@ -84,6 +84,7 @@ function RootStack() {
         <Stack.Screen name="planner" />
         <Stack.Screen name="compose" options={{ presentation: 'modal' }} />
         <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="admin" options={{ presentation: 'modal' }} />
       </Stack>
     </>
   );

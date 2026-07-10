@@ -6,7 +6,7 @@ import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { createPost } from '@/data/remote';
+import { createPost, friendlyError } from '@/data/remote';
 import { PostType } from '@/data/types';
 import { T, H } from './base';
 import { Avatar } from './Avatar';
@@ -62,7 +62,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
       showToast('Shared to the community', '🎉');
       onClose();
     } catch (e) {
-      showToast('Could not post — try again', '⚠️');
+      showToast(friendlyError(e, 'Could not post — try again'), '⚠️');
     } finally {
       setBusy(false);
     }

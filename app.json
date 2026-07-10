@@ -39,6 +39,12 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "TRIP uses your photos so you can set a profile picture."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#fbf6ee",

@@ -4,6 +4,15 @@
 import { supabase } from '@/lib/supabase';
 import { Buddy, BuddyInterest, BuddyMessage, Comment, ForeignerTagKey, Place, Post, PostType, Profile, Theme } from './types';
 
+// Turn a raw Supabase/Postgres error into a short user-facing message. The
+// server-side rate-limit triggers (migration-015) raise a "rate limit: …"
+// message; surface that as a calm nudge rather than a scary error.
+export function friendlyError(error: unknown, fallback = 'Something went wrong. Please try again.'): string {
+  const msg = (error as { message?: string })?.message ?? '';
+  if (/rate limit/i.test(msg)) return "You're doing that a bit too fast — take a breather and try again.";
+  return fallback;
+}
+
 // ─────────────────────────── Profile ───────────────────────────
 export async function fetchProfile(userId: string): Promise<Partial<Profile> | null> {
   const { data, error } = await supabase
@@ -23,7 +32,7 @@ export async function fetchProfile(userId: string): Promise<Partial<Profile> | n
   };
 }
 
-export async function updateProfile(fields: { displayName?: string; handle?: string; country?: string | null; interests?: string[] }) {
+export async function updateProfile(fields: { displayName?: string; handle?: string; country?: string | null; interests?: string[]; avatarUrl?: string | null }) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -33,8 +42,31 @@ export async function updateProfile(fields: { displayName?: string; handle?: str
   if (fields.handle !== undefined) row.handle = fields.handle;
   if (fields.country !== undefined) row.country = fields.country;
   if (fields.interests !== undefined) row.interests = fields.interests;
+  if (fields.avatarUrl !== undefined) row.avatar_url = fields.avatarUrl;
   const { error } = await supabase.from('profiles').update(row).eq('id', user.id);
   if (error) throw error;
+}
+
+// Uploads an avatar image (from a local file URI) to the avatars bucket under
+// the user's own uid prefix, and returns its public URL. RLS (migration-017)
+// enforces that a user can only write under avatars/<their-uid>/.
+export async function uploadAvatar(localUri: string): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not signed in');
+
+  const res = await fetch(localUri);
+  const blob = await res.blob();
+  const contentType = blob.type || 'image/jpeg';
+  const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
+  // Timestamped filename busts CDN/Image caches so a new avatar shows instantly.
+  const path = `${user.id}/${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage.from('avatars').upload(path, blob, { contentType, upsert: true });
+  if (error) throw error;
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  return data.publicUrl;
 }
 
 // Count of a user's own non-removed posts (for the profile "Posts" stat).
@@ -561,4 +593,51 @@ export async function setBlocked(blockedId: string, blocked: boolean) {
   const userId = await currentUserId();
   if (blocked) await supabase.from('blocks').upsert({ blocker_id: userId, blocked_id: blockedId });
   else await supabase.from('blocks').delete().eq('blocker_id', userId).eq('blocked_id', blockedId);
+}
+
+// ─────────────────────────── Admin moderation ───────────────────────────
+// All gated server-side by is_admin() (migration-016); a non-admin just gets an
+// error. Safe to call from the client — the RPCs are the security boundary.
+export type ReportRow = {
+  reportId: string;
+  targetType: 'post' | 'comment' | 'buddy' | 'profile';
+  targetId: string;
+  reason: string | null;
+  reportedAt: string;
+  reporterName: string | null;
+  preview: string | null;
+  author: string | null;
+  removed: boolean;
+};
+
+export async function isAdmin(): Promise<boolean> {
+  const { data, error } = await supabase.rpc('is_admin');
+  if (error) return false;
+  return data === true;
+}
+
+export async function adminListReports(): Promise<ReportRow[]> {
+  const { data, error } = await supabase.rpc('admin_list_reports');
+  if (error) throw error;
+  return (data ?? []).map((r: Record<string, unknown>) => ({
+    reportId: r.report_id as string,
+    targetType: r.target_type as ReportRow['targetType'],
+    targetId: r.target_id as string,
+    reason: (r.reason as string) ?? null,
+    reportedAt: r.reported_at as string,
+    reporterName: (r.reporter_name as string) ?? null,
+    preview: (r.content_preview as string) ?? null,
+    author: (r.content_author as string) ?? null,
+    removed: !!r.content_removed,
+  }));
+}
+
+export async function adminSetRemoved(type: string, id: string, removed: boolean) {
+  const { error } = await supabase.rpc('admin_set_removed', { p_type: type, p_id: id, p_removed: removed });
+  if (error) throw error;
+}
+
+export async function adminDismissReport(reportId: string) {
+  const { error } = await supabase.rpc('admin_dismiss_report', { p_report_id: reportId });
+  if (error) throw error;
 }
