@@ -100,7 +100,7 @@ export function WeatherSheet({ visible, onClose, weather }: { visible: boolean; 
           })}
         </View>
 
-        <T style={{ fontSize: 11, color: c.muted, textAlign: 'center', marginTop: 14 }}>Live forecast · Open-Meteo</T>
+        <T style={{ fontSize: 11, color: c.muted, textAlign: 'center', marginTop: 14 }}>Live forecast · {weather.source ?? '기상청 KMA'}</T>
       </View>
     </Modal>
   );

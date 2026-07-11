@@ -1,5 +1,8 @@
-// Seoul weather via Open-Meteo (open-meteo.com) — free, no API key, CORS-open,
-// so the client fetches it directly. Verified live for Seoul (37.5665, 126.978).
+// Seoul weather via the KMA (기상청) short- + mid-term forecast APIs, proxied by
+// the `seoul-weather` Supabase Edge Function (which holds the data.go.kr key
+// server-side and normalizes the response to this shape). KOGL Type-1 license →
+// commercial use OK with attribution ("기상청").
+
 export type DayForecast = {
   date: string; // ISO yyyy-mm-dd (Asia/Seoul)
   code: number;
@@ -25,64 +28,24 @@ export type Weather = {
   hi: number;
   lo: number;
   hourly: HourForecast[]; // next 24 hours from now
-  daily: DayForecast[]; // 7-day forecast incl. today
+  daily: DayForecast[]; // forecast from today forward (up to 7 days)
+  source?: string; // attribution, e.g. "기상청"
 };
-
-const URL =
-  'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.978' +
-  '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day' +
-  '&hourly=temperature_2m,weather_code,precipitation_probability,is_day' +
-  '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-  '&timezone=Asia%2FSeoul&forecast_days=7';
 
 // Weather changes slowly; cache for 10 min so re-entering Explore doesn't refetch.
 let cache: { at: number; data: Weather } | null = null;
 
 export async function fetchSeoulWeather(): Promise<Weather> {
   if (cache && Date.now() - cache.at < 10 * 60 * 1000) return cache.data;
-  const res = await fetch(URL);
+  // Plain GET (no custom headers) so the browser skips the CORS preflight; the
+  // function is deployed --no-verify-jwt and returns Access-Control-Allow-Origin.
+  const base = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
+  const res = await fetch(`${base}/functions/v1/seoul-weather`);
   if (!res.ok) throw new Error(`weather ${res.status}`);
-  const j = await res.json();
-  const d = j.daily;
-  const daily: DayForecast[] = (d.time as string[]).map((date, i) => ({
-    date,
-    code: d.weather_code[i],
-    hi: Math.round(d.temperature_2m_max[i]),
-    lo: Math.round(d.temperature_2m_min[i]),
-    rain: d.precipitation_probability_max?.[i] ?? 0,
-  }));
-
-  // Hourly: slice the next 24 hours starting at the current hour. All times are
-  // Asia/Seoul ISO strings (no offset), so a lexical compare avoids TZ pitfalls.
-  const h = j.hourly;
-  const nowHour = (j.current.time as string).slice(0, 13); // "yyyy-mm-ddTHH"
-  const times = (h?.time as string[]) ?? [];
-  let start = times.findIndex((t) => t.slice(0, 13) >= nowHour);
-  if (start < 0) start = 0;
-  const hourly: HourForecast[] = times.slice(start, start + 24).map((time, k) => {
-    const idx = start + k;
-    return {
-      time,
-      temp: Math.round(h.temperature_2m[idx]),
-      code: h.weather_code[idx],
-      rain: h.precipitation_probability?.[idx] ?? 0,
-      isDay: h.is_day?.[idx] === 1,
-    };
-  });
-
-  const data: Weather = {
-    temp: Math.round(j.current.temperature_2m),
-    feels: Math.round(j.current.apparent_temperature),
-    humidity: Math.round(j.current.relative_humidity_2m),
-    code: j.current.weather_code,
-    isDay: j.current.is_day === 1,
-    hi: daily[0]?.hi ?? Math.round(j.current.temperature_2m),
-    lo: daily[0]?.lo ?? Math.round(j.current.temperature_2m),
-    hourly,
-    daily,
-  };
-  cache = { at: Date.now(), data };
-  return data;
+  const w = (await res.json()) as Weather & { error?: string };
+  if (w.error) throw new Error(`weather ${w.error}`);
+  cache = { at: Date.now(), data: w };
+  return w;
 }
 
 // "Now", "2PM", "11AM" from an hourly ISO string (Asia/Seoul).
@@ -94,12 +57,17 @@ export function hourLabel(iso: string, index: number): string {
   return `${h12}${ampm}`;
 }
 
-// "Mon", "Tue" … from an ISO date (Asia/Seoul); today shown as "Today".
-export function dayLabel(iso: string, index: number): string {
-  if (index === 0) return 'Today';
-  // Parse as local calendar date without TZ shift.
+// "Today"/"Tomorrow"/weekday from an ISO date, by actual calendar date (the KMA
+// daily list may not start at today in the evening, so index isn't reliable).
+export function dayLabel(iso: string, _index: number): string {
   const [y, m, d] = iso.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short' });
+  const target = new Date(y, m - 1, d);
+  const today = new Date();
+  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diff = Math.round((target.getTime() - t0.getTime()) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  return target.toLocaleDateString('en-US', { weekday: 'short' });
 }
 
 // WMO code → a plain-English label + emoji (night-aware for clear/cloudy).

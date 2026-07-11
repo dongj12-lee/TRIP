@@ -9,7 +9,7 @@ import { fetchSeoulWeather, weatherDesc, weatherTip, Weather } from '@/lib/weath
 
 // Compact live-weather strip for the top of Explore — a traveler's first
 // question in a new city is "what's it like out there right now?". Self-fetches
-// from Open-Meteo (free, no key); hides itself on failure so it never breaks
+// from the KMA (기상청) proxy; hides itself on failure so it never breaks
 // the screen.
 export function SeoulWeather() {
   const { c, dark } = useTheme();
