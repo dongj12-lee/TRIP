@@ -6,6 +6,7 @@ import { useStore } from '@/lib/store';
 import { haptic } from '@/lib/haptics';
 import { useToast } from './Toast';
 import { FOREIGNER_TAGS, POST_TYPES, placeBySlug } from '@/data';
+import { intentLabel } from '@/data/intents';
 import { Place, Post, RouteDay } from '@/data/types';
 import { Icon } from './Icon';
 import { Photo, Chip, Rating, TagPill, Flag } from './ui';
@@ -49,7 +50,7 @@ export function PlaceCardCompact({ place }: { place: Place }) {
       <View style={{ padding: 11 }}>
         <T style={{ fontSize: 14, fontWeight: '700' }} numberOfLines={1}>{place.name}</T>
         <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600', marginTop: 2 }} numberOfLines={1}>
-          {place.category} · {guLabel(place.neighborhood)}
+          {intentLabel(place)} · {guLabel(place.neighborhood)}
         </T>
       </View>
     </Pressable>
@@ -100,7 +101,7 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
           {place.rating != null && <Rating value={place.rating} />}
         </View>
         <T style={{ marginTop: 4, fontSize: 12.5, color: c.inkSoft, fontWeight: '600' }}>
-          {place.category} · {guLabel(place.neighborhood)} · {place.priceRange}
+          {intentLabel(place)} · {guLabel(place.neighborhood)} · {place.priceRange}
         </T>
         {!compact && !!place.kContentNote && (
           <T style={{ marginTop: 9, fontSize: 12.5, lineHeight: 18, color: c.gold700, fontWeight: '600' }}>{place.kContentNote}</T>

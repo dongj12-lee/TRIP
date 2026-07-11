@@ -6,6 +6,7 @@ import { useRemoteContent } from '@/lib/remoteData';
 import { useStore } from '@/lib/store';
 import { recommendedPlaces } from '@/lib/recommend';
 import { ForeignerTagKey, Place } from '@/data/types';
+import { INTENTS, intentByKey, IntentKey } from '@/data/intents';
 import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
 import { ExploreMap } from '@/components/ExploreMap';
@@ -18,11 +19,6 @@ import { guLabel } from '@/lib/format';
 import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { DayPlanSheet } from '@/components/DayPlanSheet';
-
-const CATEGORY_EMOJI: Record<string, string> = {
-  Culture: '🎭', History: '🏯', Nature: '🌳', Shopping: '🛍️',
-  Cuisine: '🍽️', 'Experience Programs': '🎟️',
-};
 
 // Cap map pins so the Seoul map doesn't turn into an unreadable pin-cloud
 // once hundreds of places are loaded.
@@ -44,9 +40,8 @@ export default function ExploreScreen() {
   const [query, setQuery] = useState('');
   const [activeTags, setActiveTags] = useState<Set<ForeignerTagKey>>(new Set());
   const [selectedHoods, setSelectedHoods] = useState<Set<string>>(new Set());
-  const [category, setCategory] = useState<string | null>(null);
-  const [subcategory, setSubcategory] = useState<string | null>(null);
-  const [subsubcategory, setSubsubcategory] = useState<string | null>(null);
+  const [intent, setIntent] = useState<IntentKey | null>(null);
+  const [sub, setSub] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -54,60 +49,43 @@ export default function ExploreScreen() {
 
   const hoods = useMemo(() => Array.from(new Set(places.map((p) => p.neighborhood))).sort(), [places]);
 
-  // Distinct categories, most common first.
-  const categories = useMemo(() => {
-    const counts = new Map<string, number>();
-    places.forEach((p) => counts.set(p.category, (counts.get(p.category) ?? 0) + 1));
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([cat]) => cat);
-  }, [places]);
+  const activeIntent = intent ? intentByKey[intent] : null;
 
-  // Drill-down: sub-categories only make sense once a top category is picked,
-  // and only for places within it that actually have an L2 tag.
-  const subcategories = useMemo(() => {
-    if (!category) return [];
+  // Refinements within the picked intent (e.g. Eat → Korean / Western / …),
+  // most common first. Only intents that define `sub` get a row.
+  const subs = useMemo(() => {
+    if (!activeIntent?.sub) return [];
     const counts = new Map<string, number>();
     places.forEach((p) => {
-      if (p.category === category && p.categoryL2) counts.set(p.categoryL2, (counts.get(p.categoryL2) ?? 0) + 1);
+      if (!activeIntent.match(p)) return;
+      const s = activeIntent.sub!(p);
+      if (s) counts.set(s, (counts.get(s) ?? 0) + 1);
     });
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([s]) => s);
-  }, [places, category]);
+  }, [places, intent]);
 
-  const subsubcategories = useMemo(() => {
-    if (!category || !subcategory) return [];
-    const counts = new Map<string, number>();
-    places.forEach((p) => {
-      if (p.category === category && p.categoryL2 === subcategory && p.categoryL3) {
-        counts.set(p.categoryL3, (counts.get(p.categoryL3) ?? 0) + 1);
-      }
-    });
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([s]) => s);
-  }, [places, category, subcategory]);
-
-  const selectCategory = (cat: string | null) => {
-    setCategory(cat);
-    setSubcategory(null);
-    setSubsubcategory(null);
-  };
-  const selectSubcategory = (sub: string | null) => {
-    setSubcategory(sub);
-    setSubsubcategory(null);
+  const selectIntent = (k: IntentKey | null) => {
+    setIntent(k);
+    setSub(null);
   };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const ai = intent ? intentByKey[intent] : null;
     return places.filter((p) => {
       if (![...activeTags].every((t) => (p as any)[t])) return false;
       if (selectedHoods.size && !selectedHoods.has(p.neighborhood)) return false;
-      if (category && p.category !== category) return false;
-      if (subcategory && p.categoryL2 !== subcategory) return false;
-      if (subsubcategory && p.categoryL3 !== subsubcategory) return false;
+      if (ai) {
+        if (!ai.match(p)) return false;
+        if (sub && ai.sub?.(p) !== sub) return false;
+      }
       if (q) {
         const hay = `${p.name} ${p.nameKo} ${p.category} ${p.neighborhood} ${p.description}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [places, query, activeTags, selectedHoods, category, subcategory, subsubcategory]);
+  }, [places, query, activeTags, selectedHoods, intent, sub]);
 
   const activeFilterCount = activeTags.size + selectedHoods.size;
 
@@ -129,7 +107,7 @@ export default function ExploreScreen() {
   const mapPlaces = useMemo(() => filtered.slice(0, MAX_MAP_PINS), [filtered]);
 
   // "Recommended" only shows when the user hasn't narrowed the list themselves.
-  const noFilters = !query && selectedHoods.size === 0 && !category && activeTags.size === 0;
+  const noFilters = !query && selectedHoods.size === 0 && !intent && activeTags.size === 0;
   const recommended = useMemo(
     () => (noFilters ? recommendedPlaces(places, posts, 12) : []),
     [noFilters, places, posts],
@@ -153,7 +131,7 @@ export default function ExploreScreen() {
     setQuery('');
     setActiveTags(new Set());
     setSelectedHoods(new Set());
-    selectCategory(null);
+    selectIntent(null);
   };
 
   const header = (
@@ -252,35 +230,29 @@ export default function ExploreScreen() {
         </View>
       )}
 
-      {/* Category rail — the one filter kept always visible; icon-forward for quick scanning */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
-        <Chip label="All types" active={!category} onPress={() => selectCategory(null)} />
-        {categories.map((cat) => (
-          <Chip
-            key={cat}
-            label={CATEGORY_EMOJI[cat] ? `${CATEGORY_EMOJI[cat]} ${cat}` : cat}
-            active={category === cat}
-            onPress={() => selectCategory(category === cat ? null : cat)}
+      {/* Intent bar — traveler-first categories (Eat / Cafés / Sights / …),
+          icon-forward so the buckets are scannable at a glance. This is the
+          app's own taxonomy; Visit Seoul's raw L1/L2/L3 never reaches the UI. */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 6 }}>
+        <IntentItem emoji="✨" label="All" active={!intent} onPress={() => { haptic.tick(); selectIntent(null); }} />
+        {INTENTS.map((i) => (
+          <IntentItem
+            key={i.key}
+            emoji={i.emoji}
+            label={i.label}
+            active={intent === i.key}
+            onPress={() => { haptic.tick(); selectIntent(intent === i.key ? null : i.key); }}
           />
         ))}
       </ScrollView>
 
-      {/* Sub-category drill-down — only appears once a top category with real
-          sub-groups is picked, mirroring Visit Seoul's own L1 → L2 → L3 tree
-          instead of flattening everything into one giant list. */}
-      {subcategories.length > 1 && (
+      {/* One refinement row, only where it genuinely helps (Eat → cuisines,
+          Sights → historic/landmarks/…). Replaces the old L2+L3 double rail. */}
+      {activeIntent && subs.length > 1 && (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
-          <Chip label={`All ${category}`} active={!subcategory} onPress={() => selectSubcategory(null)} dark />
-          {subcategories.map((sub) => (
-            <Chip key={sub} label={sub} active={subcategory === sub} onPress={() => selectSubcategory(subcategory === sub ? null : sub)} dark />
-          ))}
-        </ScrollView>
-      )}
-      {subcategory && subsubcategories.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingBottom: 10 }}>
-          <Chip label={`All ${subcategory}`} active={!subsubcategory} onPress={() => setSubsubcategory(null)} />
-          {subsubcategories.map((s) => (
-            <Chip key={s} label={s} active={subsubcategory === s} onPress={() => setSubsubcategory(subsubcategory === s ? null : s)} />
+          <Chip label={`All ${activeIntent.label}`} active={!sub} onPress={() => { haptic.tick(); setSub(null); }} />
+          {subs.map((s) => (
+            <Chip key={s} label={s} active={sub === s} onPress={() => { haptic.tick(); setSub(sub === s ? null : s); }} />
           ))}
         </ScrollView>
       )}
@@ -318,7 +290,7 @@ export default function ExploreScreen() {
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {subsubcategory || subcategory || category || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
+          {sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
         </T>
         {!query && (
           <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -381,20 +353,43 @@ export default function ExploreScreen() {
   );
 }
 
+// Icon-forward category item (emoji tile + label), Airbnb-category-bar style —
+// far more scannable than a row of same-looking text pills.
+function IntentItem({ emoji, label, active, onPress }: { emoji: string; label: string; active: boolean; onPress: () => void }) {
+  const { c } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      style={({ pressed }) => [{ alignItems: 'center', width: 66, paddingVertical: 4, gap: 5 }, pressed && { opacity: 0.7 }]}
+    >
+      <View
+        style={{
+          width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
+          backgroundColor: active ? c.ink : c.surface,
+          borderWidth: 1.5, borderColor: active ? c.ink : c.line,
+        }}
+      >
+        <T style={{ fontSize: 22 }}>{emoji}</T>
+      </View>
+      <T numberOfLines={1} style={{ fontSize: 11, fontWeight: active ? '800' : '600', color: active ? c.ink : c.muted }}>
+        {label}
+      </T>
+    </Pressable>
+  );
+}
+
 function Chip({
   label,
   active,
   onPress,
-  dark,
 }: {
   label: string;
   active: boolean;
   onPress: () => void;
-  dark?: boolean;
 }) {
   const { c } = useTheme();
-  const activeBg = dark ? c.ink : c.accent;
-  const activeFg = dark ? c.paper : '#fff';
   return (
     <Pressable
       onPress={onPress}
@@ -402,11 +397,11 @@ function Chip({
       accessibilityState={{ selected: active }}
       style={{
         paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
-        backgroundColor: active ? activeBg : c.surface,
-        borderWidth: 1, borderColor: active ? activeBg : c.line,
+        backgroundColor: active ? c.accent : c.surface,
+        borderWidth: 1, borderColor: active ? c.accent : c.line,
       }}
     >
-      <T style={{ fontSize: 13, fontWeight: '700', color: active ? activeFg : c.inkSoft }}>{label}</T>
+      <T style={{ fontSize: 13, fontWeight: '700', color: active ? '#fff' : c.inkSoft }}>{label}</T>
     </Pressable>
   );
 }
