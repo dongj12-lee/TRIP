@@ -3,6 +3,31 @@
 How TRIP's data and environments are run in production. (Schema lives in
 `supabase/schema.sql` + `supabase/migration-*.sql`; app-side docs in README.)
 
+## Weather — KMA (기상청) via Edge Function
+
+Weather comes from the Korea Meteorological Administration open APIs on
+data.go.kr (KOGL Type-1 → commercial use OK **with "기상청" attribution**, which
+the weather sheet shows). Open-Meteo was dropped because its free tier forbids
+commercial use.
+
+- **Proxy**: the `seoul-weather` Supabase Edge Function
+  (`supabase/functions/seoul-weather/index.ts`) calls 초단기실황 + 단기예보 +
+  중기(기온/육상), merges to the app's `Weather` shape, and 20-min-caches. The
+  `KMA_SERVICE_KEY` (the data.go.kr key, **shared with TourAPI**) lives only as a
+  function secret — never in the app bundle.
+- **Client**: `lib/weather.ts` fetches the function via a plain GET (no headers →
+  no CORS preflight); deployed `--no-verify-jwt`.
+- **Redeploy** (after editing the function), per project ref
+  (dev `iqezjcmpsgawgkvjzcaa`, prod `dwajyyyimwpspdvxeflp`):
+  ```
+  npx supabase login
+  npx supabase functions deploy seoul-weather --no-verify-jwt --project-ref <REF>
+  npx supabase secrets set KMA_SERVICE_KEY=<data.go.kr key> --project-ref <REF>
+  ```
+- data.go.kr APIs needed (활용신청, auto-approved): 기상청_단기예보 조회서비스,
+  기상청_중기예보 조회서비스. Seoul grid nx=60 ny=127; mid-term regIds
+  11B10101 (기온) / 11B00000 (육상).
+
 ## Automated data pipeline (GitHub Actions)
 
 `.github/workflows/data-refresh.yml`, no server needed:
