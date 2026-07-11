@@ -14,6 +14,8 @@ import { T, H, Button } from './base';
 import { Photo } from './ui';
 import { Icon } from './Icon';
 import { RouteMap } from './RouteMap';
+import { ShareCardSheet } from './ShareCardSheet';
+import { ShareStop } from './ShareCard';
 import { useToast } from './Toast';
 
 // "Plan my day" — the one-tap bridge from browsing to a shareable route.
@@ -33,6 +35,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   const [area, setArea] = useState<string | null>(null);
   const [rainy, setRainy] = useState(false);
   const [exclude, setExclude] = useState<Set<string>>(new Set());
+  const [shareOpen, setShareOpen] = useState(false);
 
   // Today's forecast decides the indoor bias (silently skipped if offline).
   useEffect(() => {
@@ -86,7 +89,14 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   const v = VIBES[vibe];
   const accent = tone('terra');
 
+  const shareStops: ShareStop[] = plan
+    ? plan.stops.map((s) => ({ name: s.place.name, time: to12h(s.time), category: s.place.category, photoUrl: s.place.photoUrl, swatch: s.place.swatch }))
+    : [];
+  const shareTitle = `${v.emoji} ${v.label}${area ? ` · ${guLabel(area)}` : ''}`;
+  const shareSubtitle = plan ? `${plan.stops.length} stops · ~${plan.totalKm.toFixed(1)}km on foot` : undefined;
+
   return (
+    <>
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} accessibilityLabel="Close" />
       <View style={{ maxHeight: '88%', backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26 }}>
@@ -191,12 +201,23 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
         </ScrollView>
 
         {/* Actions */}
-        <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 20, paddingTop: 10, paddingBottom: insets.bottom + 14, borderTopWidth: 1, borderTopColor: c.line }}>
+        <View style={{ flexDirection: 'row', gap: 9, paddingHorizontal: 20, paddingTop: 10, paddingBottom: insets.bottom + 14, borderTopWidth: 1, borderTopColor: c.line }}>
           <Button label="Shuffle" icon="refresh" variant="soft" style={{ flex: 1 }} onPress={shuffle} disabled={!plan} />
-          <Button label="Add to my trip" style={{ flex: 1.6 }} onPress={addToTrip} disabled={!plan} />
+          <Button label="Share" icon="share" variant="soft" style={{ flex: 1 }} onPress={() => { haptic.tick(); setShareOpen(true); }} disabled={!plan} />
+          <Button label="Add to trip" style={{ flex: 1.3 }} onPress={addToTrip} disabled={!plan} />
         </View>
       </View>
     </Modal>
+
+    <ShareCardSheet
+      visible={shareOpen}
+      onClose={() => setShareOpen(false)}
+      title={shareTitle}
+      subtitle={shareSubtitle}
+      stops={shareStops}
+      handle={profile.handle}
+    />
+    </>
   );
 }
 

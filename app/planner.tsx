@@ -15,6 +15,8 @@ import { Icon } from '@/components/Icon';
 import { AddStopSheet } from '@/components/AddStopSheet';
 import { DayPlanSheet } from '@/components/DayPlanSheet';
 import { RouteMap } from '@/components/RouteMap';
+import { ShareCardSheet } from '@/components/ShareCardSheet';
+import { ShareStop } from '@/components/ShareCard';
 import { TimePickerSheet } from '@/components/TimePickerSheet';
 import { useToast } from '@/components/Toast';
 import { haptic } from '@/lib/haptics';
@@ -32,6 +34,7 @@ export default function TripPlanner() {
   const [sheetDay, setSheetDay] = useState<number | null>(null);
   const [timeTarget, setTimeTarget] = useState<{ di: number; si: number } | null>(null);
   const [genOpen, setGenOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const coOccurrence = useMemo(() => buildCoOccurrence(posts), [posts]);
   const suggestions = useMemo(
     () =>
@@ -77,9 +80,23 @@ export default function TripPlanner() {
     paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: c.ink, fontFamily: 'Jakarta',
   } as const;
 
+  // Flatten placed stops into the shareable card (skips empty/blank rows).
+  const shareStops: ShareStop[] = itinerary.days
+    .flatMap((d) => d.stops)
+    .filter((s) => s.name.trim())
+    .map((s) => ({ name: s.name, time: s.time ? to12h(s.time) : undefined, category: s.category, photoUrl: s.photoUrl, swatch: s.swatch }));
+  const canShare = shareStops.length >= 2;
+
   return (
     <Screen>
-      <DetailHeader title="Trip planner" />
+      <DetailHeader
+        title="Trip planner"
+        right={
+          canShare ? (
+            <IconButton name="share" label="Share as image" color={c.accent} onPress={() => { haptic.tick(); setShareOpen(true); }} />
+          ) : undefined
+        }
+      />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <Label>Trip title</Label>
@@ -194,6 +211,15 @@ export default function TripPlanner() {
       />
 
       <DayPlanSheet visible={genOpen} onClose={() => setGenOpen(false)} />
+
+      <ShareCardSheet
+        visible={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={itinerary.title || 'My Seoul trip'}
+        subtitle={[itinerary.dates, `${shareStops.length} stops`].filter(Boolean).join(' · ')}
+        stops={shareStops}
+        handle={profile.handle}
+      />
 
       <TimePickerSheet
         visible={timeTarget !== null}
