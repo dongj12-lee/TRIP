@@ -8,6 +8,14 @@ export type DayForecast = {
   rain: number; // max precipitation probability %
 };
 
+export type HourForecast = {
+  time: string; // ISO "yyyy-mm-ddTHH:00" (Asia/Seoul)
+  temp: number;
+  code: number;
+  rain: number; // precipitation probability %
+  isDay: boolean;
+};
+
 export type Weather = {
   temp: number;
   feels: number;
@@ -16,12 +24,14 @@ export type Weather = {
   isDay: boolean;
   hi: number;
   lo: number;
+  hourly: HourForecast[]; // next 24 hours from now
   daily: DayForecast[]; // 7-day forecast incl. today
 };
 
 const URL =
   'https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.978' +
   '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,is_day' +
+  '&hourly=temperature_2m,weather_code,precipitation_probability,is_day' +
   '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
   '&timezone=Asia%2FSeoul&forecast_days=7';
 
@@ -41,6 +51,25 @@ export async function fetchSeoulWeather(): Promise<Weather> {
     lo: Math.round(d.temperature_2m_min[i]),
     rain: d.precipitation_probability_max?.[i] ?? 0,
   }));
+
+  // Hourly: slice the next 24 hours starting at the current hour. All times are
+  // Asia/Seoul ISO strings (no offset), so a lexical compare avoids TZ pitfalls.
+  const h = j.hourly;
+  const nowHour = (j.current.time as string).slice(0, 13); // "yyyy-mm-ddTHH"
+  const times = (h?.time as string[]) ?? [];
+  let start = times.findIndex((t) => t.slice(0, 13) >= nowHour);
+  if (start < 0) start = 0;
+  const hourly: HourForecast[] = times.slice(start, start + 24).map((time, k) => {
+    const idx = start + k;
+    return {
+      time,
+      temp: Math.round(h.temperature_2m[idx]),
+      code: h.weather_code[idx],
+      rain: h.precipitation_probability?.[idx] ?? 0,
+      isDay: h.is_day?.[idx] === 1,
+    };
+  });
+
   const data: Weather = {
     temp: Math.round(j.current.temperature_2m),
     feels: Math.round(j.current.apparent_temperature),
@@ -49,10 +78,20 @@ export async function fetchSeoulWeather(): Promise<Weather> {
     isDay: j.current.is_day === 1,
     hi: daily[0]?.hi ?? Math.round(j.current.temperature_2m),
     lo: daily[0]?.lo ?? Math.round(j.current.temperature_2m),
+    hourly,
     daily,
   };
   cache = { at: Date.now(), data };
   return data;
+}
+
+// "Now", "2PM", "11AM" from an hourly ISO string (Asia/Seoul).
+export function hourLabel(iso: string, index: number): string {
+  if (index === 0) return 'Now';
+  const hh = Number(iso.slice(11, 13));
+  const ampm = hh < 12 ? 'AM' : 'PM';
+  const h12 = hh % 12 === 0 ? 12 : hh % 12;
+  return `${h12}${ampm}`;
 }
 
 // "Mon", "Tue" … from an ISO date (Asia/Seoul); today shown as "Today".
