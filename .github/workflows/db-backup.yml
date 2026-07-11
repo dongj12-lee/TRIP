@@ -2,11 +2,12 @@
 # backups, so we pg_dump the production DB ourselves and keep the compressed
 # dump as a GitHub artifact (90-day retention, free). Restores with `psql`.
 #
-# Setup (one time): add a repo Actions secret SUPABASE_DB_URL with the
-# production connection string from Supabase → Settings → Database →
-# "Connection string" → **Session pooler** (URI, includes the password;
-# IPv4-friendly, which the direct connection is not on GitHub runners).
-#   postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+# Setup (one time): add a repo Actions secret SUPABASE_DB_PASSWORD = the
+# production DB password only (raw, no encoding). Host/user below come from the
+# Session-pooler connection string (not secret — derived from the public project
+# ref). Passing the password via PGPASSWORD avoids URI-parsing breakage when the
+# password contains special characters.
+#   gh secret set SUPABASE_DB_PASSWORD -R dongj12-lee/TRIP
 name: DB backup
 
 on:
@@ -32,22 +33,25 @@ jobs:
 
       - name: pg_dump → gzip
         env:
-          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          # Session pooler host/user (public; from the connection string).
+          PGHOST: aws-1-ap-south-1.pooler.supabase.com
+          PGPORT: '5432'
+          PGUSER: postgres.dwajyyyimwpspdvxeflp
+          PGDATABASE: postgres
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           set -euo pipefail
-          if [ -z "$DB_URL" ]; then
-            echo "::error::SUPABASE_DB_URL secret is not set — see .github/workflows/db-backup.yml header."
+          if [ -z "${PGPASSWORD:-}" ]; then
+            echo "::error::SUPABASE_DB_PASSWORD secret is not set — see this file's header."
             exit 1
           fi
           STAMP=$(date -u +%Y%m%d-%H%M)
-          # Dump to a file first (not piped) so a pg_dump failure fails the step
-          # and its error is visible, instead of gzip silently wrapping nothing.
-          # --no-owner/--no-privileges: portable restore into a fresh project.
-          pg_dump "$DB_URL" --no-owner --no-privileges --clean --if-exists -f dump.sql
+          # Discrete PG* env vars (no URI) so a special-char password can't break
+          # connection-string parsing. Dump to a file so a failure fails the step.
+          pg_dump --no-owner --no-privileges --clean --if-exists -f dump.sql
           gzip -9 dump.sql
           mv dump.sql.gz "trip-backup-${STAMP}.sql.gz"
           ls -lh "trip-backup-${STAMP}.sql.gz"
-          echo "uncompressed lines were dumped; artifact ready."
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

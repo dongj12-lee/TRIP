@@ -52,13 +52,13 @@ Supabase's free tier has no automated backups, so `.github/workflows/db-backup.y
 GitHub **artifact** (90-day retention, free). Manual run: Actions → *DB backup* →
 *Run workflow*.
 
-- **One-time setup**: add a repo Actions secret **`SUPABASE_DB_URL`** =
-  production's connection string from Supabase → Settings → Database →
-  *Connection string* → **Session pooler** (URI form; it includes the password
-  and is IPv4-friendly, which the direct connection isn't on GitHub runners):
-  `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres`
-  Set it with `gh secret set SUPABASE_DB_URL -R dongj12-lee/TRIP` (paste when prompted).
-- **Restore** into a fresh/empty project: `gunzip -c trip-backup-*.sql.gz | psql "<target DB_URL>"`
+- **One-time setup**: add a repo Actions secret **`SUPABASE_DB_PASSWORD`** = the
+  production DB password only (raw). The host/user (`aws-1-ap-south-1.pooler.supabase.com`,
+  `postgres.<ref>`, port 5432, Session pooler — IPv4-friendly) are non-secret and
+  hardcoded in the workflow; the password goes via `PGPASSWORD` so special
+  characters can't break connection-string parsing (an earlier URI attempt hit
+  exactly that). Set it with `gh secret set SUPABASE_DB_PASSWORD -R dongj12-lee/TRIP`.
+- **Restore** into a fresh/empty project: `gunzip -c trip-backup-*.sql.gz | psql "<target conn string>"`
   (the dump uses `--clean --if-exists --no-owner --no-privileges`, so it's portable).
 
 ## Environments
