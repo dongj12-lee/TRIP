@@ -91,6 +91,65 @@ export async function fetchMyRank(): Promise<{ rank: number; total: number } | n
   return { rank: (rank as number) ?? 0, total: (total as number) ?? 0 };
 }
 
+// ─────────────────────────── Friends (migration-020) ───────────────────────────
+const mapLeaderRow = (r: Record<string, unknown>): LeaderRow => ({
+  id: r.id as string,
+  name: (r.display_name as string) || (r.handle ? `@${r.handle}` : 'Traveler'),
+  country: (r.country as string) ?? null,
+  stamps: (r.stamp_count as number) ?? 0,
+  districts: (r.district_count as number) ?? 0,
+});
+
+// Look up a traveler by their exact @handle (public profile) so they can be added.
+export async function findProfileByHandle(handle: string): Promise<LeaderRow | null> {
+  const clean = handle.trim().replace(/^@/, '');
+  if (!clean) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, display_name, handle, country, stamp_count, district_count')
+    .eq('handle', clean)
+    .maybeSingle();
+  if (error || !data) return null;
+  return mapLeaderRow(data);
+}
+
+export async function addFriend(friendId: string) {
+  const userId = await currentUserId();
+  const { error } = await supabase.from('friend_links').upsert({ user_id: userId, friend_id: friendId });
+  if (error) throw error;
+}
+
+export async function removeFriend(friendId: string) {
+  const userId = await currentUserId();
+  await supabase.from('friend_links').delete().eq('user_id', userId).eq('friend_id', friendId);
+}
+
+// The current user's friends (their public passport counts), for the Friends board.
+export async function fetchFriends(): Promise<LeaderRow[]> {
+  const userId = await currentUserId();
+  const { data: links, error } = await supabase.from('friend_links').select('friend_id').eq('user_id', userId);
+  if (error || !links?.length) return [];
+  const ids = links.map((l: { friend_id: string }) => l.friend_id);
+  const { data, error: e2 } = await supabase
+    .from('profiles')
+    .select('id, display_name, handle, country, stamp_count, district_count')
+    .in('id', ids);
+  if (e2 || !data) return [];
+  return data.map(mapLeaderRow);
+}
+
+// The current user's own leaderboard row (to include "you" in the friends board).
+export async function fetchMyLeaderRow(): Promise<LeaderRow | null> {
+  const userId = await currentUserId();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, display_name, handle, country, stamp_count, district_count')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return mapLeaderRow(data);
+}
+
 // Uploads a local image URI to a public bucket under the user's own uid prefix
 // and returns its public URL. Bucket RLS (migrations 017/018) enforces that a
 // user can only write under <bucket>/<their-uid>/. Shared by avatar + post
