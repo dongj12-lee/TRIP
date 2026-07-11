@@ -45,6 +45,22 @@ commercial use.
 - If a run fails, GitHub emails the repo owner; data just stays one day stale,
   nothing breaks.
 
+## Backups (self-managed)
+
+Supabase's free tier has no automated backups, so `.github/workflows/db-backup.yml`
+`pg_dump`s production weekly (Mon 04:00 KST) and keeps the gzipped dump as a
+GitHub **artifact** (90-day retention, free). Manual run: Actions → *DB backup* →
+*Run workflow*.
+
+- **One-time setup**: add a repo Actions secret **`SUPABASE_DB_URL`** =
+  production's connection string from Supabase → Settings → Database →
+  *Connection string* → **Session pooler** (URI form; it includes the password
+  and is IPv4-friendly, which the direct connection isn't on GitHub runners):
+  `postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres`
+  Set it with `gh secret set SUPABASE_DB_URL -R dongj12-lee/TRIP` (paste when prompted).
+- **Restore** into a fresh/empty project: `gunzip -c trip-backup-*.sql.gz | psql "<target DB_URL>"`
+  (the dump uses `--clean --if-exists --no-owner --no-privileges`, so it's portable).
+
 ## Environments
 
 | File | Points at | Used by |

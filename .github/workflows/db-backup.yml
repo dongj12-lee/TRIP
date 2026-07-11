@@ -1,0 +1,52 @@
+# Weekly self-managed Postgres backup. Supabase's free tier has no automated
+# backups, so we pg_dump the production DB ourselves and keep the compressed
+# dump as a GitHub artifact (90-day retention, free). Restores with `psql`.
+#
+# Setup (one time): add a repo Actions secret SUPABASE_DB_URL with the
+# production connection string from Supabase → Settings → Database →
+# "Connection string" → **Session pooler** (URI, includes the password;
+# IPv4-friendly, which the direct connection is not on GitHub runners).
+#   postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+name: DB backup
+
+on:
+  schedule:
+    - cron: '0 19 * * 0' # Sun 19:00 UTC = Mon 04:00 KST
+  workflow_dispatch:
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Install postgresql-client 17
+        run: |
+          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+
+      - name: pg_dump → gzip
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL secret is not set — see .github/workflows/db-backup.yml header."
+            exit 1
+          fi
+          STAMP=$(date -u +%Y%m%d-%H%M)
+          # --no-owner/--no-privileges: portable restore into a fresh project.
+          pg_dump "$DB_URL" --no-owner --no-privileges --clean --if-exists \
+            | gzip > "trip-backup-${STAMP}.sql.gz"
+          ls -lh trip-backup-*.sql.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: trip-backup-*.sql.gz
+          retention-days: 90
