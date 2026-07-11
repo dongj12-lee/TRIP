@@ -3,8 +3,9 @@ import { View, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { useAuth } from '@/lib/auth';
-import { fetchLeaderboard, fetchMyRank, fetchFriends, fetchMyLeaderRow, removeFriend, LeaderRow } from '@/data/remote';
-import { passportRank } from '@/lib/stamps';
+import { useStore } from '@/lib/store';
+import { fetchLeaderboard, fetchMyRank, fetchFriends, fetchMyLeaderRow, fetchAddedMe, addFriend, removeFriend, LeaderRow } from '@/data/remote';
+import { passportRank, milestoneStamps } from '@/lib/stamps';
 import { T, H, Screen, DetailHeader, IconButton } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { AddFriendSheet } from '@/components/AddFriendSheet';
@@ -20,9 +21,26 @@ export default function Leaderboard() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const { stamps, saved, itinerary, sharedPost, joined, myPostCount } = useStore();
   const [tab, setTab] = useState<Tab>('everyone');
+
+  // The current user's LIVE counts (server sync is async, so the board can lag).
+  // We override "you" everywhere with these so it always matches the passport.
+  const liveEarned = new Set<string>([
+    ...stamps,
+    ...milestoneStamps({
+      savedCount: saved.size,
+      hasPlan: itinerary.days.some((d) => d.stops.some((s) => s.name.trim())),
+      hasShared: !!sharedPost || myPostCount > 0,
+      buddyCount: joined.size,
+    }),
+  ]);
+  let liveDistricts = 0;
+  liveEarned.forEach((k) => { if (k.startsWith('district:')) liveDistricts++; });
+  const withLive = (r: LeaderRow): LeaderRow => (r.id === user?.id ? { ...r, stamps: liveEarned.size, districts: liveDistricts } : r);
   const [rows, setRows] = useState<LeaderRow[]>([]);
   const [friends, setFriends] = useState<LeaderRow[]>([]);
+  const [addedMe, setAddedMe] = useState<LeaderRow[]>([]);
   const [meRow, setMeRow] = useState<LeaderRow | null>(null);
   const [me, setMe] = useState<{ rank: number; total: number } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -30,11 +48,14 @@ export default function Leaderboard() {
 
   const load = async () => {
     try {
-      const [board, rank, fr, mine] = await Promise.all([fetchLeaderboard(50), fetchMyRank(), fetchFriends(), fetchMyLeaderRow()]);
+      const [board, rank, fr, mine, incoming] = await Promise.all([
+        fetchLeaderboard(50), fetchMyRank(), fetchFriends(), fetchMyLeaderRow(), fetchAddedMe(),
+      ]);
       setRows(board);
       setMe(rank);
       setFriends(fr);
       setMeRow(mine);
+      setAddedMe(incoming);
     } catch {
       // empty state covers it
     } finally {
@@ -43,8 +64,16 @@ export default function Leaderboard() {
   };
   useEffect(() => { load(); }, []);
 
+  const addBack = async (r: LeaderRow) => {
+    haptic.success();
+    setAddedMe((prev) => prev.filter((x) => x.id !== r.id));
+    setFriends((prev) => (prev.some((f) => f.id === r.id) ? prev : [...prev, r]));
+    try { await addFriend(r.id); } catch { load(); }
+  };
+
   // Friends board = you + your friends, ranked. (Sorted client-side; small set.)
   const friendsRanked: LeaderRow[] = [...friends, ...(meRow ? [meRow] : [])]
+    .map(withLive)
     .filter((v, i, a) => a.findIndex((x) => x.id === v.id) === i)
     .sort((a, b) => b.stamps - a.stamps || b.districts - a.districts);
 
@@ -54,7 +83,9 @@ export default function Leaderboard() {
     try { await removeFriend(id); } catch { load(); }
   };
 
-  const list = tab === 'everyone' ? rows : friendsRanked;
+  const list = (tab === 'everyone' ? rows : friendsRanked)
+    .map(withLive)
+    .sort((a, b) => b.stamps - a.stamps || b.districts - a.districts);
 
   return (
     <Screen>
@@ -103,8 +134,33 @@ export default function Leaderboard() {
           })}
         </View>
 
+        {/* Added-you prompts (Friends tab) — mutual growth */}
+        {tab === 'friends' && addedMe.length > 0 && (
+          <View style={{ marginTop: 16 }}>
+            <T style={{ fontSize: 12, fontWeight: '800', color: c.muted, letterSpacing: 0.6, marginBottom: 8 }}>
+              👋 ADDED YOU · {addedMe.length}
+            </T>
+            <View style={{ gap: 8 }}>
+              {addedMe.map((r) => (
+                <View key={r.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: c.accent50, borderRadius: 14, borderWidth: 1, borderColor: c.accent, padding: 12 }}>
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <T style={{ fontSize: 14.5, fontWeight: '800', color: c.ink }} numberOfLines={1}>{r.name}</T>
+                      {!!r.country && <T style={{ fontSize: 13 }}>{r.country}</T>}
+                    </View>
+                    <T style={{ fontSize: 11.5, color: c.inkSoft, fontWeight: '600', marginTop: 1 }}>{r.stamps} stamps · {r.districts}/25 gu</T>
+                  </View>
+                  <Pressable onPress={() => addBack(r)} accessibilityRole="button" accessibilityLabel={`Add ${r.name} back`} style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 999, backgroundColor: c.accent }}>
+                    <T style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>Add back</T>
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* List */}
-        {list.length === 0 && !loading ? (
+        {list.length === 0 && !loading && !(tab === 'friends' && addedMe.length > 0) ? (
           <View style={{ alignItems: 'center', paddingVertical: 46 }}>
             <T style={{ fontSize: 30 }}>{tab === 'friends' ? '👥' : '🗺️'}</T>
             <T style={{ fontSize: 15, fontWeight: '700', marginTop: 10 }}>{tab === 'friends' ? 'No friends yet' : 'No explorers yet'}</T>

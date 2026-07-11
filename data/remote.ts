@@ -138,6 +138,14 @@ export async function fetchFriends(): Promise<LeaderRow[]> {
   return data.map(mapLeaderRow);
 }
 
+// People who added the current user as a friend but haven't been added back
+// (migration-021), for the "added you" prompts.
+export async function fetchAddedMe(): Promise<LeaderRow[]> {
+  const { data, error } = await supabase.rpc('friends_added_me');
+  if (error || !data) return [];
+  return (data as Record<string, unknown>[]).map(mapLeaderRow);
+}
+
 // The current user's own leaderboard row (to include "you" in the friends board).
 export async function fetchMyLeaderRow(): Promise<LeaderRow | null> {
   const userId = await currentUserId();

@@ -94,3 +94,26 @@ export function passportRank(earned: number): { title: string; emoji: string } {
   if (earned >= 5) return { title: 'Getting Around', emoji: '🚇' };
   return { title: 'Just Landed', emoji: '🛬' };
 }
+
+// ─── Seoul Conquest — district milestones with a reward moment ─────────────
+// A rewards track keyed to how many of Seoul's 25 districts you've stamped.
+// Crossing one triggers a celebration overlay (see CelebrationOverlay).
+export type ConquestTier = { districts: number; title: string; emoji: string; blurb: string };
+export const CONQUEST_TIERS: ConquestTier[] = [
+  { districts: 5, title: 'Neighborhood Nomad', emoji: '🏘️', blurb: '5 districts stamped' },
+  { districts: 10, title: 'City Explorer', emoji: '🧭', blurb: '10 districts — you know your way around' },
+  { districts: 15, title: 'Seoul Regular', emoji: '🚇', blurb: '15 districts — practically a local' },
+  { districts: 20, title: 'Almost Local', emoji: '🌟', blurb: '20 districts — Seoul is your city' },
+  { districts: 25, title: 'Seoul Conqueror', emoji: '👑', blurb: 'All 25 districts — you conquered Seoul!' },
+];
+
+// The highest tier reached at a given district count (or null below the first).
+export function highestConquest(districts: number): ConquestTier | null {
+  let hit: ConquestTier | null = null;
+  for (const t of CONQUEST_TIERS) if (districts >= t.districts) hit = t;
+  return hit;
+}
+// The next tier to chase (or null once complete).
+export function nextConquest(districts: number): ConquestTier | null {
+  return CONQUEST_TIERS.find((t) => districts < t.districts) ?? null;
+}

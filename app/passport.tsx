@@ -7,20 +7,22 @@ import { useStore } from '@/lib/store';
 import { fetchMyRank } from '@/data/remote';
 import { Icon } from '@/components/Icon';
 import {
-  DISTRICT_STAMPS, EXPERIENCE_STAMPS, MILESTONE_STAMPS,
-  milestoneStamps, progressFor, passportRank, StampDef,
+  DISTRICT_STAMPS, EXPERIENCE_STAMPS, MILESTONE_STAMPS, CONQUEST_TIERS,
+  milestoneStamps, progressFor, passportRank, highestConquest, StampDef, ConquestTier,
 } from '@/lib/stamps';
 import { T, H, Screen, DetailHeader, IconButton } from '@/components/base';
 import { CollectionMap, DistrictLegend } from '@/components/CollectionMap';
 import { ShareCardSheet } from '@/components/ShareCardSheet';
+import { CelebrationOverlay } from '@/components/CelebrationOverlay';
 import { haptic } from '@/lib/haptics';
 
 export default function Passport() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { stamps, saved, itinerary, sharedPost, joined, myPostCount, profile } = useStore();
+  const { stamps, saved, itinerary, sharedPost, joined, myPostCount, profile, seenConquest, markConquestSeen } = useStore();
   const router = useRouter();
   const [shareOpen, setShareOpen] = useState(false);
+  const [celebrate, setCelebrate] = useState<ConquestTier | null>(null);
   const [myRank, setMyRank] = useState<{ rank: number; total: number } | null>(null);
   useEffect(() => { fetchMyRank().then(setMyRank).catch(() => {}); }, []);
 
@@ -44,6 +46,15 @@ export default function Passport() {
   const prog = progressFor(earned);
   const rank = passportRank(earned.size);
   const pct = Math.round((earned.size / prog.total) * 100);
+
+  // Celebrate a newly-crossed district conquest tier (once).
+  useEffect(() => {
+    const tier = highestConquest(prog.districts);
+    if (tier && tier.districts > seenConquest) {
+      setCelebrate(tier);
+      markConquestSeen(tier.districts);
+    }
+  }, [prog.districts, seenConquest]);
 
   return (
     <Screen>
@@ -113,6 +124,31 @@ export default function Passport() {
           </View>
         </View>
 
+        {/* Seoul Conquest — district-milestone reward track */}
+        <View style={{ paddingHorizontal: 18, paddingTop: 24 }}>
+          <H style={{ fontSize: 18 }}>Seoul Conquest</H>
+          <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12, marginTop: 3 }}>Rewards for stamping more districts</T>
+          <View style={{ gap: 8 }}>
+            {CONQUEST_TIERS.map((t) => {
+              const got = prog.districts >= t.districts;
+              return (
+                <View key={t.districts} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: got ? c.accent50 : c.surface, borderRadius: 14, borderWidth: 1, borderColor: got ? c.accent : c.line, padding: 12 }}>
+                  <T style={{ fontSize: 26, opacity: got ? 1 : 0.35 }}>{t.emoji}</T>
+                  <View style={{ flex: 1 }}>
+                    <T style={{ fontSize: 14.5, fontWeight: '800', color: got ? c.ink : c.muted }}>{t.title}</T>
+                    <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600', marginTop: 1 }}>{t.blurb}</T>
+                  </View>
+                  {got ? (
+                    <T style={{ fontSize: 12, fontWeight: '800', color: c.accent }}>DONE</T>
+                  ) : (
+                    <T style={{ fontSize: 12, fontWeight: '700', color: c.muted }}>{t.districts} gu</T>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
         {/* Experience badges */}
         <StampSection title="Experiences" subtitle="Earned by saving different kinds of places" stamps={EXPERIENCE_STAMPS} earned={earned} />
 
@@ -137,6 +173,8 @@ export default function Passport() {
         }}
         handle={profile.handle}
       />
+
+      <CelebrationOverlay tier={celebrate} onClose={() => setCelebrate(null)} onShare={() => setShareOpen(true)} />
     </Screen>
   );
 }

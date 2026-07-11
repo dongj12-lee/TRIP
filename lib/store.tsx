@@ -23,6 +23,7 @@ type PersistShape = {
   itinerary: Itinerary;
   sharedPost: Post | null;
   stamps: string[];
+  seenConquest: number;
 };
 
 type StoreValue = {
@@ -36,6 +37,8 @@ type StoreValue = {
   itinerary: Itinerary;
   sharedPost: Post | null;
   stamps: Set<string>;
+  seenConquest: number; // highest district-milestone already celebrated
+  markConquestSeen: (districts: number) => void;
   completeOnboarding: (profile: Profile) => void;
   toggleSave: (slug: string) => void;
   toggleVote: (post: Post) => void;
@@ -77,6 +80,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [placeReactions, setPlaceReactions] = useState<Record<string, 'like' | 'dislike'>>({});
   const [tagVotes, setTagVotes] = useState<Record<string, 'yes' | 'no'>>({});
   const [stamps, setStamps] = useState<Set<string>>(new Set());
+  const [seenConquest, setSeenConquest] = useState(0);
 
   // Grow-only stamp collection: award a place's district/experience stamps.
   const awardPlaceStamps = (slug: string) => {
@@ -101,6 +105,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           if (s.itinerary) setItineraryState(s.itinerary);
           if (s.sharedPost) setSharedPost(s.sharedPost);
           if (s.stamps) setStamps(new Set(s.stamps));
+          if (typeof s.seenConquest === 'number') setSeenConquest(s.seenConquest);
         }
       })
       .catch(() => {})
@@ -161,9 +166,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       itinerary,
       sharedPost,
       stamps: [...stamps],
+      seenConquest,
     };
     AsyncStorage.setItem(STORE_KEY, JSON.stringify(data)).catch(() => {});
-  }, [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, stamps]);
+  }, [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, stamps, seenConquest]);
 
   // Backfill stamps from places already saved/liked (e.g. before the passport
   // existed, or after the server relations load). Runs once place data + the
@@ -210,6 +216,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       itinerary,
       sharedPost,
       stamps,
+      seenConquest,
+      markConquestSeen: (districts) => setSeenConquest((prev) => Math.max(prev, districts)),
       completeOnboarding: (p) => {
         setProfile(p);
         setOnboarded(true);
@@ -315,9 +323,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setPlaceReactions({});
         setTagVotes({});
         setStamps(new Set());
+        setSeenConquest(0);
       },
     }),
-    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, stamps, myPostCount, placeReactions, tagVotes, canWrite, user, addLocalPost, placeBySlug],
+    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, stamps, seenConquest, myPostCount, placeReactions, tagVotes, canWrite, user, addLocalPost, placeBySlug],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
