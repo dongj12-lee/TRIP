@@ -9,8 +9,8 @@ import { haptic } from '@/lib/haptics';
 import { T, H, Button } from './base';
 import { Icon } from './Icon';
 import {
-  ShareCard, PlaceShareCard, FourCutsCard, TicketCard, MagazineCard, PolaroidCard,
-  ShareStop, PlaceShareData, BgKey, SHARE_BGS,
+  ShareCard, PlaceShareCard, FourCutsCard, TicketCard, MagazineCard, PolaroidCard, PassportShareCard,
+  ShareStop, PlaceShareData, PassportShareData, BgKey, SHARE_BGS,
   DayTemplate, PlaceTemplate, DAY_TEMPLATES, PLACE_TEMPLATES,
   SHARE_W, SHARE_H,
 } from './ShareCard';
@@ -31,6 +31,7 @@ export function ShareCardSheet({
   subtitle,
   stops,
   place,
+  passport,
   handle,
 }: {
   visible: boolean;
@@ -39,6 +40,7 @@ export function ShareCardSheet({
   subtitle?: string;
   stops?: ShareStop[];
   place?: PlaceShareData;
+  passport?: PassportShareData;
   handle?: string;
 }) {
   const { c } = useTheme();
@@ -74,10 +76,13 @@ export function ShareCardSheet({
     }
   };
 
+  const isPassport = !!passport;
   const previewScale = 0.78;
-  const showBgRow = (isPlace ? placeTpl : dayTpl) === 'classic';
+  const showBgRow = !isPassport && (isPlace ? placeTpl : dayTpl) === 'classic';
+  const showTemplateRow = !isPassport; // passport has a single signature look
 
   const renderCard = () => {
+    if (isPassport && passport) return <PassportShareCard ref={cardRef} data={passport} handle={handle} />;
     if (isPlace && place) {
       if (placeTpl === 'magazine') return <MagazineCard ref={cardRef} place={place} handle={handle} />;
       if (placeTpl === 'polaroid') return <PolaroidCard ref={cardRef} place={place} handle={handle} />;
@@ -102,7 +107,7 @@ export function ShareCardSheet({
         <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingBottom: insets.bottom + 16 }}>
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 8 }}>
-            <H style={{ fontSize: 20 }}>{isPlace ? 'Share this spot' : 'Share your day'}</H>
+            <H style={{ fontSize: 20 }}>{isPassport ? 'Share your passport' : isPlace ? 'Share this spot' : 'Share your day'}</H>
             <Pressable onPress={onClose} hitSlop={8} accessibilityRole="button" accessibilityLabel="Close">
               <Icon name="close" size={22} stroke={c.inkSoft} sw={2} />
             </Pressable>
@@ -118,6 +123,7 @@ export function ShareCardSheet({
           </View>
 
           {/* Template picker */}
+          {showTemplateRow && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 20, paddingTop: 12, flexGrow: 1, justifyContent: 'center' }}>
             {templates.map(([k, v]) => {
               const on = activeTpl === k;
@@ -140,6 +146,7 @@ export function ShareCardSheet({
               );
             })}
           </ScrollView>
+          )}
 
           {/* Background moods — Classic template only */}
           {showBgRow && (

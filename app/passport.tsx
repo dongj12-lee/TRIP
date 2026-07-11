@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
@@ -7,13 +7,16 @@ import {
   DISTRICT_STAMPS, EXPERIENCE_STAMPS, MILESTONE_STAMPS,
   milestoneStamps, progressFor, passportRank, StampDef,
 } from '@/lib/stamps';
-import { T, H, Screen, DetailHeader } from '@/components/base';
+import { T, H, Screen, DetailHeader, IconButton } from '@/components/base';
 import { CollectionMap, DistrictLegend } from '@/components/CollectionMap';
+import { ShareCardSheet } from '@/components/ShareCardSheet';
+import { haptic } from '@/lib/haptics';
 
 export default function Passport() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const { stamps, saved, itinerary, sharedPost, joined, myPostCount } = useStore();
+  const { stamps, saved, itinerary, sharedPost, joined, myPostCount, profile } = useStore();
+  const [shareOpen, setShareOpen] = useState(false);
 
   // Earned = grow-only place stamps ∪ live milestones.
   const earned = useMemo(() => {
@@ -38,7 +41,14 @@ export default function Passport() {
 
   return (
     <Screen>
-      <DetailHeader title="Seoul Passport" />
+      <DetailHeader
+        title="Seoul Passport"
+        right={
+          earned.size > 0 ? (
+            <IconButton name="share" label="Share passport" color={c.accent} onPress={() => { haptic.tick(); setShareOpen(true); }} />
+          ) : undefined
+        }
+      />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
         {/* Rank + progress */}
         <View style={{ paddingHorizontal: 18, paddingTop: 4 }}>
@@ -85,6 +95,20 @@ export default function Passport() {
           Save or ♥ places as you explore — your passport fills up automatically.
         </T>
       </ScrollView>
+
+      <ShareCardSheet
+        visible={shareOpen}
+        onClose={() => setShareOpen(false)}
+        passport={{
+          earnedDistricts: [...earnedDistricts],
+          rankTitle: rank.title,
+          rankEmoji: rank.emoji,
+          earned: earned.size,
+          total: prog.total,
+          districts: prog.districts,
+        }}
+        handle={profile.handle}
+      />
     </Screen>
   );
 }

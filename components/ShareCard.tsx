@@ -1,7 +1,8 @@
 import React, { forwardRef } from 'react';
 import { View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Svg, Rect } from 'react-native-svg';
+import { Svg, Rect, Path, G } from 'react-native-svg';
+import { SEOUL_DISTRICTS, SEOUL_MAP_W, SEOUL_MAP_H } from '@/data/seoulDistricts';
 import { Photo } from './ui';
 import { T, H } from './base';
 
@@ -27,6 +28,15 @@ export type PlaceShareData = {
   swatch?: [string, string] | string[];
   tags?: string[];
   rating?: number;
+};
+
+export type PassportShareData = {
+  earnedDistricts: string[]; // bare gu names
+  rankTitle: string;
+  rankEmoji: string;
+  earned: number;
+  total: number;
+  districts: number;
 };
 
 export type DayTemplate = 'fourcuts' | 'ticket' | 'classic';
@@ -380,6 +390,66 @@ export const PlaceShareCard = forwardRef<View, { place: PlaceShareData; handle?:
           </View>
           <View style={{ marginTop: 16 }}>
             <BrandFooter handle={handle} />
+          </View>
+        </LinearGradient>
+      </View>
+    );
+  },
+);
+
+// ─── 🎫 PASSPORT — "% of Seoul conquered" flex ────────────────────────────
+// A dark "passport" card whose Seoul map glows gold with the districts you've
+// collected. Built to make progress braggable ("I've stamped 14/25 districts").
+const bareGu = (n: string) => n.replace(/-gu$/, '');
+export const PassportShareCard = forwardRef<View, { data: PassportShareData; handle?: string }>(
+  function PassportShareCard({ data, handle }, ref) {
+    const earned = new Set(data.earnedDistricts);
+    const pct = Math.round((data.earned / Math.max(1, data.total)) * 100);
+    const GOLD = '#f2a24d';
+    return (
+      <View ref={ref} collapsable={false} style={{ width: SHARE_W, height: SHARE_H, backgroundColor: '#141021' }}>
+        <LinearGradient colors={['#2a2140', '#120e1d']} start={{ x: 0, y: 0 }} end={{ x: 0.5, y: 1 }} style={{ flex: 1, paddingHorizontal: 22, paddingTop: 30, paddingBottom: 22 }}>
+          <T style={{ fontSize: 12, fontWeight: '800', letterSpacing: 2, color: 'rgba(253,243,231,0.6)' }}>🇰🇷  MY SEOUL PASSPORT</T>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10, marginTop: 10 }}>
+            <H style={{ fontSize: 64, lineHeight: 64, color: GOLD }}>{pct}%</H>
+            <T style={{ fontSize: 14, fontWeight: '800', color: CREAM, marginBottom: 10 }}>OF SEOUL{'\n'}CONQUERED</T>
+          </View>
+          <View style={{ alignSelf: 'flex-start', marginTop: 12, backgroundColor: 'rgba(242,162,77,0.16)', borderWidth: 1, borderColor: 'rgba(242,162,77,0.5)', paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999 }}>
+            <T style={{ fontSize: 13, fontWeight: '800', color: GOLD }}>{data.rankEmoji} {data.rankTitle}</T>
+          </View>
+
+          {/* Glowing map */}
+          <View style={{ flex: 1, justifyContent: 'center', paddingVertical: 8 }}>
+            <Svg width="100%" height="100%" viewBox={`0 0 ${SEOUL_MAP_W} ${SEOUL_MAP_H}`} preserveAspectRatio="xMidYMid meet">
+              <G>
+                {SEOUL_DISTRICTS.map((d) => {
+                  const on = earned.has(bareGu(d.name));
+                  return (
+                    <Path
+                      key={d.name}
+                      d={d.path}
+                      fill={on ? GOLD : 'rgba(255,255,255,0.07)'}
+                      stroke={on ? '#120e1d' : 'rgba(255,255,255,0.10)'}
+                      strokeWidth={0.5}
+                    />
+                  );
+                })}
+              </G>
+            </Svg>
+          </View>
+
+          <T style={{ fontSize: 13, fontWeight: '700', color: CREAM_DIM, textAlign: 'center', marginBottom: 14 }}>
+            {data.districts}/25 districts · {data.earned}/{data.total} stamps collected
+          </T>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View>
+              <H style={{ fontSize: 24, color: CREAM, letterSpacing: 0.5 }}>TRIP</H>
+              <T style={{ fontSize: 11, fontWeight: '700', color: CREAM_DIM }}>{handle ? `@${handle} · ` : ''}collect yours on TRIP</T>
+            </View>
+            <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(242,162,77,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+              <T style={{ fontSize: 22 }}>🎫</T>
+            </View>
           </View>
         </LinearGradient>
       </View>
