@@ -5,6 +5,7 @@ import { ForeignerTagKey, Itinerary, Post, Profile } from '@/data/types';
 import { isSupabaseConfigured } from './supabase';
 import { useAuth } from './auth';
 import { useRemoteContent } from './remoteData';
+import { stampsForPlace } from './stamps';
 import * as remote from '@/data/remote';
 
 // Local persistence (AsyncStorage) doubles as: (a) the entire data store when
@@ -21,6 +22,7 @@ type PersistShape = {
   following: string[];
   itinerary: Itinerary;
   sharedPost: Post | null;
+  stamps: string[];
 };
 
 type StoreValue = {
@@ -33,6 +35,7 @@ type StoreValue = {
   following: Set<string>;
   itinerary: Itinerary;
   sharedPost: Post | null;
+  stamps: Set<string>;
   completeOnboarding: (profile: Profile) => void;
   toggleSave: (slug: string) => void;
   toggleVote: (post: Post) => void;
@@ -59,7 +62,7 @@ const toggleInSet = (prev: Set<string>, key: string) => {
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  const { addLocalPost } = useRemoteContent();
+  const { addLocalPost, placeBySlug } = useRemoteContent();
 
   const [hydrated, setHydrated] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
@@ -73,6 +76,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [myPostCount, setMyPostCount] = useState(0);
   const [placeReactions, setPlaceReactions] = useState<Record<string, 'like' | 'dislike'>>({});
   const [tagVotes, setTagVotes] = useState<Record<string, 'yes' | 'no'>>({});
+  const [stamps, setStamps] = useState<Set<string>>(new Set());
+
+  // Grow-only stamp collection: award a place's district/experience stamps.
+  const awardPlaceStamps = (slug: string) => {
+    const place = placeBySlug[slug];
+    if (!place) return;
+    const keys = stampsForPlace(place);
+    if (keys.length) setStamps((prev) => (keys.every((k) => prev.has(k)) ? prev : new Set([...prev, ...keys])));
+  };
 
   // hydrate from local cache first (instant paint, and the whole story when offline)
   useEffect(() => {
@@ -88,6 +100,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           if (s.following) setFollowing(new Set(s.following));
           if (s.itinerary) setItineraryState(s.itinerary);
           if (s.sharedPost) setSharedPost(s.sharedPost);
+          if (s.stamps) setStamps(new Set(s.stamps));
         }
       })
       .catch(() => {})
@@ -147,9 +160,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       following: [...following],
       itinerary,
       sharedPost,
+      stamps: [...stamps],
     };
     AsyncStorage.setItem(STORE_KEY, JSON.stringify(data)).catch(() => {});
-  }, [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost]);
+  }, [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, stamps]);
+
+  // Backfill stamps from places already saved/liked (e.g. before the passport
+  // existed, or after the server relations load). Runs once place data + the
+  // saved/liked sets are available; grow-only so it never removes anything.
+  useEffect(() => {
+    if (!hydrated || Object.keys(placeBySlug).length === 0) return;
+    const keys: string[] = [];
+    saved.forEach((slug) => { const p = placeBySlug[slug]; if (p) keys.push(...stampsForPlace(p)); });
+    Object.entries(placeReactions).forEach(([slug, r]) => { if (r === 'like') { const p = placeBySlug[slug]; if (p) keys.push(...stampsForPlace(p)); } });
+    if (keys.length) setStamps((prev) => (keys.every((k) => prev.has(k)) ? prev : new Set([...prev, ...keys])));
+  }, [hydrated, placeBySlug, saved, placeReactions]);
 
   // debounced-ish remote itinerary sync (fires on every edit; fine at MVP scale)
   useEffect(() => {
@@ -170,6 +195,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       following,
       itinerary,
       sharedPost,
+      stamps,
       completeOnboarding: (p) => {
         setProfile(p);
         setOnboarded(true);
@@ -178,6 +204,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSaved((prev) => {
           const willSave = !prev.has(slug);
           if (canWrite) remote.setSaved(slug, willSave).catch((e) => console.warn('setSaved failed', e));
+          if (willSave) awardPlaceStamps(slug); // stamps are grow-only; keep on unsave
           return toggleInSet(prev, slug);
         });
       },
@@ -244,6 +271,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           const cleared = prev[slug] === reaction; // tapping the active one clears it
           if (cleared) delete next[slug];
           else next[slug] = reaction;
+          if (!cleared && reaction === 'like') awardPlaceStamps(slug);
           if (canWrite) remote.setPlaceReaction(slug, cleared ? null : reaction).catch((e) => console.warn('setPlaceReaction failed', e));
           return next;
         });
@@ -272,9 +300,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setMyPostCount(0);
         setPlaceReactions({});
         setTagVotes({});
+        setStamps(new Set());
       },
     }),
-    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, myPostCount, placeReactions, tagVotes, canWrite, user, addLocalPost],
+    [hydrated, onboarded, profile, saved, votes, joined, following, itinerary, sharedPost, stamps, myPostCount, placeReactions, tagVotes, canWrite, user, addLocalPost, placeBySlug],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

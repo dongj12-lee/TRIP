@@ -18,6 +18,7 @@ import { ShareCardSheet } from '@/components/ShareCardSheet';
 import { PlaceShareData } from '@/components/ShareCard';
 import { useToast } from '@/components/Toast';
 import { guLabel } from '@/lib/format';
+import { normalizeDistrict } from '@/lib/stamps';
 import { haptic } from '@/lib/haptics';
 
 const PHRASES = [
@@ -39,7 +40,7 @@ export default function PlaceDetail() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote, itinerary, setItinerary, profile } = useStore();
+  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote, itinerary, setItinerary, profile, stamps } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
@@ -80,7 +81,13 @@ export default function PlaceDetail() {
   const isSaved = saved.has(place.slug);
   const onSave = () => {
     haptic.tick();
-    if (!isSaved) showToast('Saved to your spots', '🔖');
+    if (!isSaved) {
+      // Celebrate a newly-stamped district (passport dopamine).
+      const gu = normalizeDistrict(place.neighborhood);
+      const newDistrict = gu && !stamps.has(`district:${gu}`);
+      if (newDistrict) showToast(`${gu}-gu stamped! 🎫`, '🎉');
+      else showToast('Saved to your spots', '🔖');
+    }
     toggleSave(place.slug);
   };
   const myReaction = placeReactions[place.slug];

@@ -12,7 +12,8 @@ import { Creator, Place } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
 import { PlaceCardCompact, PostCardMini } from '@/components/cards';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
-import { ExploreMap } from '@/components/ExploreMap';
+import { CollectionMap } from '@/components/CollectionMap';
+import { milestoneStamps, progressFor, passportRank } from '@/lib/stamps';
 import { useToast } from '@/components/Toast';
 import { Icon } from '@/components/Icon';
 import { Photo } from '@/components/ui';
@@ -23,7 +24,7 @@ export default function MyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount, placeReactions } = useStore();
+  const { saved, toggleSave, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount, placeReactions, stamps, joined } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { user } = useAuth();
   const { showToast } = useToast();
@@ -45,8 +46,21 @@ export default function MyScreen() {
     .filter(([, r]) => r === 'like')
     .map(([slug]) => placeBySlug[slug])
     .filter(Boolean);
-  // Every place the user has marked in some way — their personal Seoul.
-  const mySpots: Place[] = [...new Map([...savedPlaces, ...likedPlaces].map((p) => [p.slug, p])).values()];
+  // Passport progress (place stamps ∪ live milestones).
+  const earnedStamps = new Set<string>([
+    ...stamps,
+    ...milestoneStamps({
+      savedCount: saved.size,
+      hasPlan: itinerary.days.some((d) => d.stops.some((s) => s.name.trim())),
+      hasShared: !!sharedPost || myPostCount > 0,
+      buddyCount: joined.size,
+    }),
+  ]);
+  const earnedDistricts = new Set<string>();
+  earnedStamps.forEach((k) => { if (k.startsWith('district:')) earnedDistricts.add(k.slice('district:'.length)); });
+  const passportProg = progressFor(earnedStamps);
+  const passportRankInfo = passportRank(earnedStamps.size);
+  const passportPct = Math.round((earnedStamps.size / passportProg.total) * 100);
   const followingList = CREATORS.filter((cr) => following.has(cr.id));
   const suggestions = CREATORS.filter((cr) => !following.has(cr.id));
   // The user's own posts — real, not the seeded mock contributions.
@@ -108,22 +122,35 @@ export default function MyScreen() {
           <Stat n={following.size} label="Following" />
         </View>
 
-        {/* Your Seoul — every saved & liked spot on one map */}
-        {mySpots.length > 0 && (
-          <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
-            <View style={{ borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
-              <ExploreMap
-                places={mySpots.slice(0, 40)}
-                selectedSlug={null}
-                onSelect={(slug) => slug && router.push(`/place/${slug}`)}
-                height={170}
-              />
+        {/* Seoul Passport — the district-fill collection, taps into /passport */}
+        <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
+          <Pressable
+            onPress={() => { haptic.tick(); router.push('/passport'); }}
+            accessibilityRole="button"
+            accessibilityLabel="Open Seoul Passport"
+            style={({ pressed }) => [
+              { backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.line, overflow: 'hidden' },
+              pressed && { opacity: 0.92 },
+            ]}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 15, paddingTop: 13 }}>
+              <T style={{ fontSize: 11, fontWeight: '800', color: c.accent, letterSpacing: 1 }}>🎫 SEOUL PASSPORT</T>
+              <View style={{ flex: 1 }} />
+              <T style={{ fontSize: 12, fontWeight: '700', color: c.inkSoft }}>{passportRankInfo.emoji} {passportRankInfo.title}</T>
+              <Icon name="chevron" size={16} stroke={c.muted} sw={2} />
             </View>
-            <T style={{ fontSize: 11.5, color: c.muted, marginTop: 6, textAlign: 'center' }}>
-              Your Seoul — {plural(mySpots.length, 'spot')} you've saved or liked
-            </T>
-          </View>
-        )}
+            <CollectionMap earned={earnedDistricts} height={158} />
+            <View style={{ paddingHorizontal: 15, paddingBottom: 14 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
+                <T style={{ fontSize: 12.5, fontWeight: '700', color: c.ink }}>{passportProg.districts}/25 districts · {earnedStamps.size}/{passportProg.total} stamps</T>
+                <T style={{ fontSize: 12.5, fontWeight: '800', color: c.accent }}>{passportPct}%</T>
+              </View>
+              <View style={{ height: 7, borderRadius: 999, backgroundColor: c.surface2, overflow: 'hidden' }}>
+                <View style={{ height: 7, borderRadius: 999, backgroundColor: c.accent, width: `${Math.max(3, passportPct)}%` }} />
+              </View>
+            </View>
+          </Pressable>
+        </View>
 
         {/* Itinerary card */}
         <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
