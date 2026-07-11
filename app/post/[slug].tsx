@@ -14,6 +14,7 @@ import { T, H, Screen, DetailHeader } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Avatar } from '@/components/Avatar';
 import { PostTypeBadge, PlaceCard } from '@/components/cards';
+import { Photo } from '@/components/ui';
 import { ReportSheet } from '@/components/ReportSheet';
 import { RouteFeedbackBar } from '@/components/RouteFeedbackBar';
 import { RouteMap } from '@/components/RouteMap';
@@ -122,6 +123,7 @@ export default function PostDetail() {
           {/* Content */}
           {!isThought && <H style={{ fontSize: 23, lineHeight: 29, marginTop: 16 }}>{post.title}</H>}
           {!!post.body && <T style={{ fontSize: 16, lineHeight: 25, color: c.ink, marginTop: isThought ? 14 : 10 }}>{post.body}</T>}
+          {!!post.imageUrl && <Photo uri={post.imageUrl} height={240} radius={16} style={{ marginTop: 14 }} />}
 
           {place && (
             <View style={{ marginTop: 18 }}>

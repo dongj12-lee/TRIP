@@ -174,6 +174,9 @@ export function PostCard({ post }: { post: Post }) {
           {!!post.body && <T numberOfLines={2} style={{ marginTop: 5, fontSize: 13.5, lineHeight: 20, color: c.inkSoft }}>{post.body}</T>}
         </>
       )}
+      {!!post.imageUrl && (
+        <Photo uri={post.imageUrl} height={190} radius={14} style={{ marginTop: 11 }} />
+      )}
       {post.routeDays && <RoutePreview days={post.routeDays} />}
 
       {/* Action row */}

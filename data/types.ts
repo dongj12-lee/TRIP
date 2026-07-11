@@ -134,6 +134,7 @@ export type Post = {
   votes: number;
   comments: number;
   routeDays?: RouteDay[];
+  imageUrl?: string; // optional photo attached to the post (Storage, migration-018)
   commentList: Comment[];
   fromItinerary?: boolean;
   // Tally of one-click route-feedback prompts, keyed by prompt id (route posts).

@@ -47,10 +47,11 @@ export async function updateProfile(fields: { displayName?: string; handle?: str
   if (error) throw error;
 }
 
-// Uploads an avatar image (from a local file URI) to the avatars bucket under
-// the user's own uid prefix, and returns its public URL. RLS (migration-017)
-// enforces that a user can only write under avatars/<their-uid>/.
-export async function uploadAvatar(localUri: string): Promise<string> {
+// Uploads a local image URI to a public bucket under the user's own uid prefix
+// and returns its public URL. Bucket RLS (migrations 017/018) enforces that a
+// user can only write under <bucket>/<their-uid>/. Shared by avatar + post
+// photo uploads.
+async function uploadImageTo(bucket: string, localUri: string): Promise<string> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -60,14 +61,17 @@ export async function uploadAvatar(localUri: string): Promise<string> {
   const blob = await res.blob();
   const contentType = blob.type || 'image/jpeg';
   const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
-  // Timestamped filename busts CDN/Image caches so a new avatar shows instantly.
+  // Timestamped filename busts CDN/Image caches so a new upload shows instantly.
   const path = `${user.id}/${Date.now()}.${ext}`;
 
-  const { error } = await supabase.storage.from('avatars').upload(path, blob, { contentType, upsert: true });
+  const { error } = await supabase.storage.from(bucket).upload(path, blob, { contentType, upsert: true });
   if (error) throw error;
-  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }
+
+export const uploadAvatar = (localUri: string) => uploadImageTo('avatars', localUri);
+export const uploadPostImage = (localUri: string) => uploadImageTo('post-images', localUri);
 
 // Count of a user's own non-removed posts (for the profile "Posts" stat).
 export async function fetchMyPostCount(userId: string): Promise<number> {
@@ -208,6 +212,7 @@ function mapPost(row: any): Post {
     votes: row.vote_count,
     comments: row.comment_count,
     routeDays: row.route_days ?? undefined,
+    imageUrl: row.image_url ?? undefined,
     commentList: [],
     feedbackCounts: row.feedback_counts ?? {},
   };
@@ -326,6 +331,7 @@ export async function createPost(input: {
   neighborhood?: string;
   placeSlug?: string;
   routeDays?: Post['routeDays'];
+  imageUrl?: string;
   authorName: string;
   authorCountry: string | null;
 }): Promise<Post> {
@@ -345,6 +351,7 @@ export async function createPost(input: {
       neighborhood: input.neighborhood ?? null,
       place_slug: input.placeSlug ?? null,
       route_days: input.routeDays ?? null,
+      image_url: input.imageUrl ?? null,
       author_id: user.id,
       author_name: input.authorName,
       author_country: input.authorCountry,

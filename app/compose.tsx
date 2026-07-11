@@ -11,6 +11,7 @@ import { createBuddy, createPost, friendlyError } from '@/data/remote';
 import { POST_TYPES } from '@/data';
 import { PostType } from '@/data/types';
 import { T, H, Screen, DetailHeader, Button } from '@/components/base';
+import { PhotoAttach } from '@/components/PhotoAttach';
 import { useToast } from '@/components/Toast';
 import { haptic } from '@/lib/haptics';
 
@@ -31,6 +32,7 @@ export default function Compose() {
   const [when, setWhen] = useState('');
   const [groupSize, setGroupSize] = useState('4');
   const [emoji, setEmoji] = useState('🧭');
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [busy, setBusy] = useState(false);
 
   const canSubmit = isSupabaseConfigured && !!session;
@@ -67,6 +69,7 @@ export default function Compose() {
           type,
           title: title.trim(),
           body: body.trim(),
+          imageUrl,
           authorName: profile.displayName || 'You',
           authorCountry: profile.country,
         });
@@ -108,6 +111,13 @@ export default function Compose() {
 
           <T style={{ fontSize: 12, fontWeight: '700', color: c.muted, marginBottom: 6, marginTop: 14 }}>{isBuddy ? 'DETAILS' : 'BODY'}</T>
           <TextInput value={body} onChangeText={setBody} placeholder="Share the details…" multiline style={[field, { minHeight: 140, textAlignVertical: 'top' }]} placeholderTextColor={c.muted} />
+
+          {!isBuddy && (
+            <>
+              <T style={{ fontSize: 12, fontWeight: '700', color: c.muted, marginBottom: 6, marginTop: 14 }}>PHOTO</T>
+              <PhotoAttach value={imageUrl} onChange={setImageUrl} canUpload={canSubmit} />
+            </>
+          )}
 
           {isBuddy && (
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>

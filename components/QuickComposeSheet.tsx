@@ -10,6 +10,7 @@ import { createPost, friendlyError } from '@/data/remote';
 import { PostType } from '@/data/types';
 import { T, H } from './base';
 import { Avatar } from './Avatar';
+import { PhotoAttach } from './PhotoAttach';
 import { useToast } from './Toast';
 import { haptic } from '@/lib/haptics';
 
@@ -34,15 +35,16 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
   const [body, setBody] = useState('');
   const [title, setTitle] = useState('');
   const [showTitle, setShowTitle] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (visible) {
-      setType('thought'); setBody(''); setTitle(''); setShowTitle(false); setBusy(false);
+      setType('thought'); setBody(''); setTitle(''); setShowTitle(false); setImageUrl(undefined); setBusy(false);
     }
   }, [visible]);
 
-  const canPost = body.trim().length > 0 && !busy;
+  const canPost = (body.trim().length > 0 || !!imageUrl) && !busy;
   const canWrite = isSupabaseConfigured && !!session;
 
   const post = async () => {
@@ -54,6 +56,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
         type,
         title: title.trim(),
         body: body.trim(),
+        imageUrl,
         authorName: profile.displayName || 'You',
         authorCountry: profile.country,
       });
@@ -111,8 +114,13 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
               placeholderTextColor={c.muted}
               autoFocus
               multiline
-              style={{ fontSize: 16.5, lineHeight: 24, color: c.ink, fontFamily: 'Jakarta', paddingTop: 6, paddingBottom: 12, minHeight: 120, textAlignVertical: 'top' }}
+              style={{ fontSize: 16.5, lineHeight: 24, color: c.ink, fontFamily: 'Jakarta', paddingTop: 6, paddingBottom: 12, minHeight: imageUrl ? 60 : 120, textAlignVertical: 'top' }}
             />
+            {!!imageUrl && (
+              <View style={{ paddingBottom: 12 }}>
+                <PhotoAttach value={imageUrl} onChange={setImageUrl} canUpload={canWrite} />
+              </View>
+            )}
           </ScrollView>
 
           {/* Footer: type pills + add-title toggle */}
@@ -137,6 +145,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
               >
                 <T style={{ fontSize: 12.5, fontWeight: '700', color: showTitle ? c.accent : c.inkSoft }}>{showTitle ? '– Title' : '+ Title'}</T>
               </Pressable>
+              {!imageUrl && <PhotoAttach value={imageUrl} onChange={setImageUrl} canUpload={canWrite} compact />}
             </ScrollView>
           </View>
         </View>
