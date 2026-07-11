@@ -14,7 +14,10 @@ import { T, H, Button } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Photo, Chip, Rating } from '@/components/ui';
 import { PostCardMini } from '@/components/cards';
+import { ShareCardSheet } from '@/components/ShareCardSheet';
+import { PlaceShareData } from '@/components/ShareCard';
 import { useToast } from '@/components/Toast';
+import { guLabel } from '@/lib/format';
 import { haptic } from '@/lib/haptics';
 
 const PHRASES = [
@@ -36,10 +39,11 @@ export default function PlaceDetail() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote, itinerary, setItinerary } = useStore();
+  const { saved, toggleSave, placeReactions, togglePlaceReaction, tagVotes, toggleTagVote, itinerary, setItinerary, profile } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const place = placeBySlug[slug!];
   // Optimistic like/dislike counts — seed from the server counts and re-sync
@@ -145,9 +149,14 @@ export default function PlaceDetail() {
             <Pressable onPress={() => router.back()} hitSlop={8} accessibilityRole="button" accessibilityLabel="Go back" style={heroBtn}>
               <Icon name="back" size={22} stroke="#fff" sw={2.2} />
             </Pressable>
-            <Pressable onPress={onSave} hitSlop={8} accessibilityRole="button" accessibilityLabel={isSaved ? 'Remove from saved' : 'Save this place'} style={heroBtn}>
-              <Icon name="heart" size={22} fill={isSaved ? c.rose : 'none'} stroke={isSaved ? c.rose : '#fff'} sw={2.2} />
-            </Pressable>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Pressable onPress={() => { haptic.tick(); setShareOpen(true); }} hitSlop={8} accessibilityRole="button" accessibilityLabel="Share this place" style={heroBtn}>
+                <Icon name="share" size={20} stroke="#fff" sw={2.2} />
+              </Pressable>
+              <Pressable onPress={onSave} hitSlop={8} accessibilityRole="button" accessibilityLabel={isSaved ? 'Remove from saved' : 'Save this place'} style={heroBtn}>
+                <Icon name="heart" size={22} fill={isSaved ? c.rose : 'none'} stroke={isSaved ? c.rose : '#fff'} sw={2.2} />
+              </Pressable>
+            </View>
           </View>
           <View style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>
             {!!place.kContentTitle && (
@@ -301,6 +310,30 @@ export default function PlaceDetail() {
           </View>
         )}
       </ScrollView>
+
+      <ShareCardSheet
+        visible={shareOpen}
+        onClose={() => setShareOpen(false)}
+        place={{
+          name: place.name,
+          nameKo: place.nameKo,
+          category: place.category,
+          neighborhood: guLabel(place.neighborhood),
+          photoUrl: place.photoUrl,
+          swatch: place.swatch,
+          rating: place.rating,
+          tags: ([
+            ['soloOk', 'Solo OK'],
+            ['englishMenu', 'English menu'],
+            ['englishSpoken', 'English spoken'],
+            ['cardOk', 'Card OK'],
+            ['priceTransparent', 'Fair price'],
+          ] as const)
+            .filter(([k]) => (place as any)[k])
+            .map(([, label]) => label),
+        }}
+        handle={profile.handle}
+      />
 
       {/* Translate sheet */}
       <Modal visible={sheet} transparent animationType="slide" onRequestClose={() => setSheet(false)}>
