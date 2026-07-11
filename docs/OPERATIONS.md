@@ -36,8 +36,11 @@ The service role key bypasses RLS and must only ever live in `.env`,
 ### Creating the dev project (one-time, ~10 min)
 
 1. supabase.com → New project (free tier is fine).
-2. `npm run db:setup-sql > /tmp/setup.sql`, paste into the new project's
-   SQL editor, run. This is the base schema + all 14 migrations in order.
+2. `node scripts/print-setup-sql.mjs > /tmp/setup.sql`, paste into the new
+   project's SQL editor, run. This is the base schema + all migrations in
+   order. (Use `node …` directly, or `npm run -s db:setup-sql` — a bare
+   `npm run` prepends its script banner into the redirected file, which the
+   SQL editor then rejects.)
 3. Put the new project's URL / anon key / service-role key into `.env`
    (current prod values are already preserved in `.env.production`).
 4. Optional seed content: `npm run import:visitseoul` (uses `.env` = dev),

@@ -33,3 +33,4 @@ create policy "avatars owner update" on storage.objects for update
 drop policy if exists "avatars owner delete" on storage.objects;
 create policy "avatars owner delete" on storage.objects for delete
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+

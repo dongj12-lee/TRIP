@@ -44,3 +44,6 @@ yarn-error.*
 .env
 .env.development
 .env.production
+
+# generated dev-DB setup (schema + migrations combined)
+supabase/_dev-setup.generated.sql
