@@ -34,15 +34,20 @@ jobs:
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
+          set -euo pipefail
           if [ -z "$DB_URL" ]; then
             echo "::error::SUPABASE_DB_URL secret is not set — see .github/workflows/db-backup.yml header."
             exit 1
           fi
           STAMP=$(date -u +%Y%m%d-%H%M)
+          # Dump to a file first (not piped) so a pg_dump failure fails the step
+          # and its error is visible, instead of gzip silently wrapping nothing.
           # --no-owner/--no-privileges: portable restore into a fresh project.
-          pg_dump "$DB_URL" --no-owner --no-privileges --clean --if-exists \
-            | gzip > "trip-backup-${STAMP}.sql.gz"
-          ls -lh trip-backup-*.sql.gz
+          pg_dump "$DB_URL" --no-owner --no-privileges --clean --if-exists -f dump.sql
+          gzip -9 dump.sql
+          mv dump.sql.gz "trip-backup-${STAMP}.sql.gz"
+          ls -lh "trip-backup-${STAMP}.sql.gz"
+          echo "uncompressed lines were dumped; artifact ready."
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
