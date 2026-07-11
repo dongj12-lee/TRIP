@@ -47,6 +47,50 @@ export async function updateProfile(fields: { displayName?: string; handle?: str
   if (error) throw error;
 }
 
+// ─────────────────────────── Passport leaderboard ───────────────────────────
+export type LeaderRow = {
+  id: string;
+  name: string;
+  country: string | null;
+  stamps: number;
+  districts: number;
+};
+
+// Mirror the passport totals onto the user's public profile (migration-019).
+export async function syncPassport(stampCount: number, districtCount: number) {
+  const userId = await currentUserId();
+  await supabase.from('profiles').update({ stamp_count: stampCount, district_count: districtCount }).eq('id', userId);
+}
+
+export async function fetchLeaderboard(limit = 50): Promise<LeaderRow[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, display_name, handle, country, stamp_count, district_count')
+    .eq('banned', false)
+    .gt('stamp_count', 0)
+    .order('stamp_count', { ascending: false })
+    .order('district_count', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []).map((r: Record<string, unknown>) => ({
+    id: r.id as string,
+    name: (r.display_name as string) || (r.handle ? `@${r.handle}` : 'Traveler'),
+    country: (r.country as string) ?? null,
+    stamps: (r.stamp_count as number) ?? 0,
+    districts: (r.district_count as number) ?? 0,
+  }));
+}
+
+// The signed-in user's rank + the total number of ranked travelers.
+export async function fetchMyRank(): Promise<{ rank: number; total: number } | null> {
+  const [{ data: rank, error: e1 }, { data: total, error: e2 }] = await Promise.all([
+    supabase.rpc('my_passport_rank'),
+    supabase.rpc('passport_player_count'),
+  ]);
+  if (e1 || e2) return null;
+  return { rank: (rank as number) ?? 0, total: (total as number) ?? 0 };
+}
+
 // Uploads a local image URI to a public bucket under the user's own uid prefix
 // and returns its public URL. Bucket RLS (migrations 017/018) enforces that a
 // user can only write under <bucket>/<their-uid>/. Shared by avatar + post

@@ -1,8 +1,11 @@
-import React, { useMemo, useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
+import { fetchMyRank } from '@/data/remote';
+import { Icon } from '@/components/Icon';
 import {
   DISTRICT_STAMPS, EXPERIENCE_STAMPS, MILESTONE_STAMPS,
   milestoneStamps, progressFor, passportRank, StampDef,
@@ -16,7 +19,10 @@ export default function Passport() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { stamps, saved, itinerary, sharedPost, joined, myPostCount, profile } = useStore();
+  const router = useRouter();
   const [shareOpen, setShareOpen] = useState(false);
+  const [myRank, setMyRank] = useState<{ rank: number; total: number } | null>(null);
+  useEffect(() => { fetchMyRank().then(setMyRank).catch(() => {}); }, []);
 
   // Earned = grow-only place stamps ∪ live milestones.
   const earned = useMemo(() => {
@@ -68,6 +74,28 @@ export default function Passport() {
             <View style={{ height: 8, borderRadius: 999, backgroundColor: c.accent, width: `${Math.max(3, pct)}%` }} />
           </View>
         </View>
+
+        {/* Leaderboard entry — the competitive hook */}
+        {earned.size > 0 && (
+          <Pressable
+            onPress={() => { haptic.tick(); router.push('/leaderboard'); }}
+            accessibilityRole="button"
+            accessibilityLabel="Open Seoul Explorers leaderboard"
+            style={({ pressed }) => [
+              { marginHorizontal: 18, marginTop: 16, backgroundColor: c.ink, borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+              pressed && { opacity: 0.92 },
+            ]}
+          >
+            <T style={{ fontSize: 24 }}>🏆</T>
+            <View style={{ flex: 1 }}>
+              <T style={{ fontSize: 14.5, fontWeight: '800', color: c.paper }}>
+                {myRank && myRank.rank > 0 ? `You're #${myRank.rank} of ${myRank.total.toLocaleString()} explorers` : 'Seoul Explorers'}
+              </T>
+              <T style={{ fontSize: 12, color: c.paper, opacity: 0.7, marginTop: 1, fontWeight: '600' }}>See how you rank against other travelers</T>
+            </View>
+            <Icon name="chevron" size={18} stroke={c.paper} sw={2} />
+          </Pressable>
+        )}
 
         {/* The map fills in */}
         <View style={{ marginHorizontal: 18, marginTop: 18, backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.line, paddingVertical: 14 }}>

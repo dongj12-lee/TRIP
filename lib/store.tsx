@@ -5,7 +5,7 @@ import { ForeignerTagKey, Itinerary, Post, Profile } from '@/data/types';
 import { isSupabaseConfigured } from './supabase';
 import { useAuth } from './auth';
 import { useRemoteContent } from './remoteData';
-import { stampsForPlace } from './stamps';
+import { stampsForPlace, milestoneStamps } from './stamps';
 import * as remote from '@/data/remote';
 
 // Local persistence (AsyncStorage) doubles as: (a) the entire data store when
@@ -181,6 +181,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!isSupabaseConfigured || !user || !hydrated) return;
     remote.saveItinerary(user.id, itinerary).catch((e) => console.warn('saveItinerary failed', e));
   }, [itinerary, user?.id, hydrated]);
+
+  // Mirror passport totals (stamps + milestones) to the profile for the
+  // Explorers leaderboard. Fires whenever the earned set could have changed.
+  const hasPlan = itinerary.days.some((d) => d.stops.some((s) => s.name.trim()));
+  useEffect(() => {
+    if (!isSupabaseConfigured || !user || !hydrated) return;
+    const earned = new Set<string>([
+      ...stamps,
+      ...milestoneStamps({ savedCount: saved.size, hasPlan, hasShared: !!sharedPost || myPostCount > 0, buddyCount: joined.size }),
+    ]);
+    let districts = 0;
+    earned.forEach((k) => { if (k.startsWith('district:')) districts++; });
+    remote.syncPassport(earned.size, districts).catch((e) => console.warn('syncPassport failed', e));
+  }, [stamps, saved.size, hasPlan, sharedPost, myPostCount, joined.size, user?.id, hydrated]);
 
   const canWrite = isSupabaseConfigured && !!user;
 
