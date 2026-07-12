@@ -45,6 +45,14 @@ commercial use.
 - If a run fails, GitHub emails the repo owner; data just stays one day stale,
   nothing breaks.
 
+## Web deploy (gh-pages)
+
+Deploy the **web export only**: `npx expo export --platform web` then force-push
+`dist/` to the `gh-pages` branch. Do NOT include the iOS export in that commit —
+GitHub push protection false-positives on byte patterns inside the Hermes
+bundle (`*.hbc` once matched a "PostHog key" regex) and blocks the push. Build
+iOS separately when needed for verification.
+
 ## Backups (self-managed)
 
 Supabase's free tier has no automated backups, so `.github/workflows/db-backup.yml`
