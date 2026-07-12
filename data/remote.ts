@@ -267,7 +267,9 @@ const BROWSE_COLS =
   'slug,lat,lng,name,name_ko,category,category_l2,category_l3,neighborhood,city,address,hours,' +
   'price_range,rating,reviews,solo_ok,english_menu,price_transparent,card_ok,english_spoken,votes,' +
   'warn_tip,k_content_title,k_content_type,k_content_note,swatch,photo_url,subway,free_entry,' +
-  'english_site,wheelchair,like_count,dislike_count';
+  // description is included so the natural-language screener (lib/screener.ts)
+  // can match on it — descriptions are its richest signal.
+  'english_site,wheelchair,like_count,dislike_count,description';
 
 export async function fetchPlaces(): Promise<Place[]> {
   // PostgREST caps a single response at 1000 rows, so page through the whole
@@ -285,7 +287,7 @@ export async function fetchPlaces(): Promise<Place[]> {
     all.push(...(data ?? []));
     if (!data || data.length < PAGE) break;
   }
-  return all.map((row) => ({ ...mapPlace(row), description: '' }));
+  return all.map((row) => mapPlace(row));
 }
 
 // Full single place incl. description — for the detail screen, which loads it

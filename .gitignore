@@ -47,3 +47,6 @@ yarn-error.*
 
 # generated dev-DB setup (schema + migrations combined)
 supabase/_dev-setup.generated.sql
+
+# supabase CLI temp
+supabase/.temp/

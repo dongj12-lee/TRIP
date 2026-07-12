@@ -57,7 +57,7 @@ export function PlaceCardCompact({ place }: { place: Place }) {
   );
 }
 
-export function PlaceCard({ place, compact = false }: { place: Place; compact?: boolean }) {
+export function PlaceCard({ place, compact = false, reasons }: { place: Place; compact?: boolean; reasons?: string[] }) {
   const { c } = useTheme();
   const router = useRouter();
   const { saved, toggleSave } = useStore();
@@ -105,6 +105,16 @@ export function PlaceCard({ place, compact = false }: { place: Place; compact?: 
         </T>
         {!compact && !!place.kContentNote && (
           <T style={{ marginTop: 9, fontSize: 12.5, lineHeight: 18, color: c.gold700, fontWeight: '600' }}>{place.kContentNote}</T>
+        )}
+        {/* Screener "why it matches" chips (accent-tinted, distinct from fit tags) */}
+        {!!reasons?.length && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 11 }}>
+            {reasons.map((r) => (
+              <View key={r} style={{ backgroundColor: c.accent50, paddingVertical: 4, paddingHorizontal: 9, borderRadius: 999 }}>
+                <T style={{ fontSize: 11.5, fontWeight: '700', color: c.accent }}>{r}</T>
+              </View>
+            ))}
+          </View>
         )}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 11 }}>
           {tags.map((t) => (

@@ -7,6 +7,7 @@ import { useStore } from '@/lib/store';
 import { recommendedPlaces } from '@/lib/recommend';
 import { ForeignerTagKey, Place } from '@/data/types';
 import { INTENTS, intentByKey, IntentKey } from '@/data/intents';
+import { screen, SCREENER_EXAMPLES } from '@/lib/screener';
 import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
 import { ExploreMap } from '@/components/ExploreMap';
@@ -69,8 +70,9 @@ export default function ExploreScreen() {
     setSub(null);
   };
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+  // Places narrowed by the structured filters (intent / sub / tags / hoods),
+  // BEFORE the search query — the screener ranks within this set.
+  const baseFiltered = useMemo(() => {
     const ai = intent ? intentByKey[intent] : null;
     return places.filter((p) => {
       if (![...activeTags].every((t) => (p as any)[t])) return false;
@@ -79,13 +81,22 @@ export default function ExploreScreen() {
         if (!ai.match(p)) return false;
         if (sub && ai.sub?.(p) !== sub) return false;
       }
-      if (q) {
-        const hay = `${p.name} ${p.nameKo} ${p.category} ${p.neighborhood} ${p.description}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
       return true;
     });
-  }, [places, query, activeTags, selectedHoods, intent, sub]);
+  }, [places, activeTags, selectedHoods, intent, sub]);
+
+  // The search bar is a natural-language screener: "quiet café with an english
+  // menu" ranks by intent + Foreigner-Fit/facts + description, with a "why it
+  // matches" note. A plain word ("gyeongbokgung") still works as a lookup.
+  const q = query.trim();
+  const hits = useMemo(() => (q ? screen(q, baseFiltered) : []), [q, baseFiltered]);
+  const reasonsBySlug = useMemo(() => {
+    const m: Record<string, string[]> = {};
+    for (const h of hits) if (h.reasons.length) m[h.place.slug] = h.reasons;
+    return m;
+  }, [hits]);
+  const screenerActive = !!q && hits.some((h) => h.reasons.length > 0);
+  const filtered = q ? hits.map((h) => h.place) : baseFiltered;
 
   const activeFilterCount = activeTags.size + selectedHoods.size;
 
@@ -171,6 +182,21 @@ export default function ExploreScreen() {
             </Pressable>
           )}
         </View>
+        {/* Example prompts teach the natural-language screener */}
+        {noFilters && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 7, paddingTop: 9 }}>
+            <T style={{ fontSize: 12, color: c.muted, fontWeight: '700', alignSelf: 'center', marginRight: 1 }}>✨ Try</T>
+            {SCREENER_EXAMPLES.map((ex) => (
+              <Pressable
+                key={ex}
+                onPress={() => { haptic.tick(); setQuery(ex); }}
+                style={{ paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
+              >
+                <T style={{ fontSize: 12, color: c.inkSoft, fontWeight: '600' }}>{ex}</T>
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
       </View>
 
       {/* Live Seoul weather — shown at the top of the default Explore view */}
@@ -290,7 +316,7 @@ export default function ExploreScreen() {
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
+          {screenerActive ? `✨ Best matches` : sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
         </T>
         {!query && (
           <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -309,7 +335,7 @@ export default function ExploreScreen() {
         keyExtractor={(p) => p.slug}
         renderItem={({ item }: { item: Place }) => (
           <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
-            <PlaceCard place={item} />
+            <PlaceCard place={item} reasons={reasonsBySlug[item.slug]} />
           </View>
         )}
         ListHeaderComponent={header}
