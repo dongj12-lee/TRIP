@@ -48,7 +48,14 @@ export default function ThemeDetail() {
         {/* Title + description below the photo, in dark text for readability */}
         <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
           <H style={{ fontSize: 26, color: c.ink, lineHeight: 31 }}>{theme.title}</H>
-          <T style={{ fontSize: 14, color: c.accent, fontWeight: '700', marginTop: 3 }}>{theme.subtitle}</T>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 }}>
+            <T style={{ fontSize: 14, color: c.accent, fontWeight: '700', flexShrink: 1 }}>{theme.subtitle}</T>
+            {!!theme.updated && (
+              <View style={{ backgroundColor: c.sage50, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999 }}>
+                <T style={{ fontSize: 10.5, fontWeight: '800', color: c.sage700 }}>UPDATED {theme.updated.toUpperCase()}</T>
+              </View>
+            )}
+          </View>
           <T style={{ fontSize: 14.5, lineHeight: 22, color: c.inkSoft, marginTop: 12 }}>{theme.description}</T>
         </View>
 
@@ -115,6 +122,19 @@ export default function ThemeDetail() {
           </View>
         )}
 
+        {/* Deep guide: titled sections (bestsellers by category, sale calendar…) */}
+        {!isWalk && theme.sections?.map((sec, si) => (
+          <View key={si} style={{ paddingHorizontal: 18, paddingTop: 24 }}>
+            <H style={{ fontSize: 18 }}>{sec.title}</H>
+            {!!sec.subtitle && <T style={{ fontSize: 12.5, color: c.muted, marginTop: 2 }}>{sec.subtitle}</T>}
+            <View style={{ gap: 12, marginTop: 12 }}>
+              {sec.items.map((it, i) => (
+                <GuideItemCard key={i} item={it} />
+              ))}
+            </View>
+          </View>
+        ))}
+
         {/* Guide: streets */}
         {!isWalk && theme.streets && (
           <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
@@ -153,7 +173,14 @@ function GuideItemCard({ item }: { item: GuideItem }) {
           <T style={{ fontSize: 14.5, fontWeight: '700', flex: 1 }}>{item.name}</T>
           <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>{item.price}</T>
         </View>
-        {!!item.nameKo && <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{item.nameKo}</T>}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          {!!item.tag && (
+            <View style={{ backgroundColor: c.gold50, paddingVertical: 1.5, paddingHorizontal: 7, borderRadius: 999, marginTop: 2 }}>
+              <T style={{ fontSize: 10.5, fontWeight: '800', color: c.gold700 }}>{item.tag}</T>
+            </View>
+          )}
+          {!!item.nameKo && <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{item.nameKo}</T>}
+        </View>
         <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 4, lineHeight: 18 }}>{item.note}</T>
         {!!item.where && <T style={{ fontSize: 12, color: c.muted, marginTop: 4, fontWeight: '600' }}>📍 {item.where}</T>}
         {!!item.caution && (

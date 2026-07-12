@@ -100,6 +100,10 @@ export type Theme = {
   items?: GuideItem[];
   streetsTitle?: string;
   streets?: Street[];
+  // Deep guides: multiple titled item groups (bestsellers by category, a sale
+  // calendar, hacks…) so one theme can hold a real handbook, not 6 picks.
+  sections?: { title: string; subtitle?: string; items: GuideItem[] }[];
+  updated?: string; // freshness stamp shown on the card, e.g. 'Jul 2026'
 };
 
 export type Author = { name: string; country: string };

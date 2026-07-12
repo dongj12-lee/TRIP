@@ -115,21 +115,86 @@ export const THEMES: Theme[] = [
   },
   {
     slug: 'olive-young-must-buys', kind: 'guide', category: 'Shopping', photoUrl: COVER.starfield,
-    title: 'Olive Young Haul', subtitle: 'K-beauty everyone flies home with', badge: '💄 Shopping',
-    description: "Korea's beauty mega-store, open late on every major street. Tourists get tax-free on purchases over ₩30,000 — bring your passport to the counter. These are the items that actually earn their suitcase space.",
-    meta: [{ icon: 'sparkle', label: '12 picks' }, { icon: 'won', label: 'Tax-free ₩30k+' }],
+    title: 'Olive Young Haul', subtitle: 'The complete K-beauty playbook', badge: '💄 Shopping', updated: 'Jul 2026',
+    description: "Korea's beauty mega-chain — 1,300+ stores, open till 10–11pm on every major street. This is the deep guide: what actually sells, when the big sales hit, and every hack the locals use. Prices below are regular shelf prices; during Olive Young Sale weeks most of these drop 30–50%.",
+    meta: [{ icon: 'sparkle', label: '25 picks' }, { icon: 'won', label: 'Tax refund ₩15k+' }, { icon: 'clock', label: 'Sales: Mar·Jun·Sep·Dec' }],
     tips: [
-      'Show your passport at checkout for instant tax-free over ₩30,000.',
-      'Download the Olive Young app — members get extra discounts + samples.',
-      'Flagship stores (Myeongdong, Gangnam) have testers and English signage.',
+      'Instant tax refund at checkout on ₩15,000+ per receipt — just show your passport. No airport paperwork.',
+      'Olive Young SALE runs ~10 days each quarter (early Mar / Jun / Sep / Dec) — up to 50% off bestsellers. Plan your haul around it if you can.',
+      'Download the Olive Young Global app: membership QR gets member prices, and you can check English ingredient lists + reviews by scanning barcodes.',
+      "Myeongdong Town flagship (3 floors) has a Global Lounge with English-speaking staff, luggage storage, and every tester imaginable.",
+      'In Seoul, stores offer same-day delivery to hotels (오늘드림) — buy heavy hauls early, travel light all day.',
+      'The December Olive Young Awards list = the definitive bestseller bible. Awards-sticker items are safe blind buys.',
+      'Myeongdong branches are packed 7–10pm; mornings are calm and testers are clean.',
     ],
-    items: [
-      { name: 'Beauty of Joseon — Relief Sun', nameKo: '조선미녀 선크림', tag: 'Bestseller', price: '₩12,000', note: 'Lightweight rice + probiotic sunscreen. The viral one.', swatch: ['#caa05a', '#e3c25f'] },
-      { name: 'COSRX Snail Mucin Essence', nameKo: '코스알엑스 스네일 96', tag: 'Cult favorite', price: '₩18,000', note: '96% snail secretion essence for glass skin.', swatch: ['#5f6d53', '#a9bf94'] },
-      { name: 'Medicube Zero Pore Pads', nameKo: '메디큐브 제로모공패드', price: '₩25,000', note: 'Exfoliating toner pads — great for travel.', swatch: ['#5b6f9c', '#8fb0c0'] },
-      { name: 'Anua Heartleaf Toner', nameKo: '아누아 어성초 토너', tag: 'TikTok viral', price: '₩19,000', note: 'Soothing toner for sensitive, irritated skin.', swatch: ['#7a4a2a', '#e0a05a'] },
-      { name: 'Laneige Lip Sleeping Mask', nameKo: '라네즈 립 슬리핑 마스크', price: '₩22,000', note: "Overnight lip mask — easy gift, doesn't spill.", swatch: ['#c75c54', '#e3a9a0'] },
-      { name: 'Mediheal sheet masks', nameKo: '메디힐 마스크팩', tag: 'Buy in bulk', price: '₩900–1,500 ea', note: "Grab a box — they're cheaper here than anywhere.", swatch: ['#3a2c22', '#caa05a'] },
+    sections: [
+      {
+        title: '☀️ Suncare — the #1 haul category',
+        subtitle: 'Korean sunscreens are why people fly here',
+        items: [
+          { name: 'Beauty of Joseon — Relief Sun', nameKo: '조선미녀 맑은쌀 선크림', tag: 'All-time bestseller', price: '₩18,000', note: 'Rice + probiotics, zero white cast, dewy finish. THE viral one — often purchase-limited during sales.', swatch: ['#caa05a', '#e3c25f'] },
+          { name: 'skin1004 Hyalu-Cica Water-Fit Sun Serum', nameKo: '스킨1004 히알루시카 선세럼', tag: 'Awards winner', price: '₩19,000', note: 'Serum-texture SPF50+ that layers under makeup without pilling.', swatch: ['#5f6d53', '#a9bf94'] },
+          { name: 'Round Lab Birch Juice Moisturizing Sun Cream', nameKo: '라운드랩 자작나무 선크림', price: '₩17,000', note: 'Hydrating daily SPF for dry/sensitive skin — dermatologist favorite.', swatch: ['#8fb0c0', '#dbe7ee'] },
+          { name: 'Isntree Hyaluronic Acid Airy Sun Stick', nameKo: '이즈앤트리 에어리 선스틱', price: '₩16,000', note: 'Stick format for reapplying over makeup — perfect for a walking-heavy trip.', swatch: ['#c8b88a', '#efe2c0'] },
+        ],
+      },
+      {
+        title: '💧 Skincare icons',
+        subtitle: 'The essences and serums with global cult followings',
+        items: [
+          { name: 'COSRX Advanced Snail 96 Mucin Essence', nameKo: '코스알엑스 스네일 96', tag: 'Cult classic', price: '₩18,000', note: '96% snail secretion for the glass-skin look. Cheaper here than anywhere on earth.', swatch: ['#5f6d53', '#a9bf94'] },
+          { name: 'Anua Heartleaf 77% Soothing Toner', nameKo: '아누아 어성초 77 토너', tag: 'TikTok viral', price: '₩19,000', note: 'Calms redness and irritated skin — the gateway Anua product.', swatch: ['#7a4a2a', '#e0a05a'] },
+          { name: 'Torriden DIVE-IN Serum', nameKo: '토리든 다이브인 세럼', tag: 'Awards winner', price: '₩16,000', note: '5-molecule hyaluronic hydration bomb. Korea\'s #1 serum multiple years running.', swatch: ['#5b6f9c', '#8fb0c0'] },
+          { name: 'Mixsoon Bean Essence', nameKo: '믹순 콩에센스', price: '₩22,000', note: 'Fermented soybean essence — the “skin flooding” trend hero.', swatch: ['#caa05a', '#e3c25f'] },
+          { name: 'Medicube Zero Pore Pads 2.0', nameKo: '메디큐브 제로모공패드', price: '₩25,000', note: 'Exfoliating toner pads; travel-friendly jar. Pairs with their viral booster devices.', swatch: ['#c75c54', '#e3a9a0'] },
+        ],
+      },
+      {
+        title: '🎭 Masks & overnight care',
+        items: [
+          { name: 'Biodance Bio-Collagen Real Deep Mask', nameKo: '바이오던스 콜라겐 마스크', tag: 'Sold-out famous', price: '₩4,000 ea', note: 'Overnight hydrogel that turns transparent when done. The current it-mask — grab multipacks.', swatch: ['#dbe7ee', '#8fb0c0'] },
+          { name: 'Mediheal sheet masks', nameKo: '메디힐 마스크팩', tag: 'Buy in bulk', price: '₩900–1,500 ea', note: 'Box of 10 costs less than 3 masks abroad. Tea tree + collagen are the safe picks.', swatch: ['#3a2c22', '#caa05a'] },
+          { name: 'Abib Gummy Sheet Mask', nameKo: '아비브 껌딱지 마스크', price: '₩3,500 ea', note: 'Sticks like gum so you can walk around while it works. Heartleaf for calming.', swatch: ['#a9bf94', '#5f6d53'] },
+          { name: 'Laneige Lip Sleeping Mask', nameKo: '라네즈 립 슬리핑 마스크', tag: 'Gift favorite', price: '₩22,000', note: "Berry overnight lip mask — the easiest gift in the store, doesn't spill.", swatch: ['#c75c54', '#e3a9a0'] },
+        ],
+      },
+      {
+        title: '💄 Makeup that flies home',
+        items: [
+          { name: "rom&nd Juicy Lasting Tint", nameKo: '롬앤 쥬시 래스팅 틴트', tag: 'Bestseller', price: '₩9,900', note: 'Glassy water-tint in 20+ shades. #06 Figfig is the eternal top seller.', swatch: ['#c75c54', '#e3a9a0'] },
+          { name: 'Peripera Ink the Velvet', nameKo: '페리페라 잉크더벨벳', price: '₩9,000', note: 'Weightless matte lip stain — K-drama lips in one swipe.', swatch: ['#b0466a', '#e084a0'] },
+          { name: 'CLIO Kill Cover Mesh Glow Cushion', nameKo: '클리오 킬커버 쿠션', price: '₩32,000', note: 'The cushion foundation to try if you\'ve never used one. Testers at every counter.', swatch: ['#c8b88a', '#efe2c0'] },
+          { name: 'MUZIGAE MANSION Objet Liquid', nameKo: '무지개맨션 오브제 리퀴드', tag: 'Trendy', price: '₩17,000', note: 'Matte liquid lip in gallery-worthy packaging — Gen-Z Seoul in a bottle.', swatch: ['#5b6f9c', '#8fb0c0'] },
+        ],
+      },
+      {
+        title: '🧴 Hair, body & cleansing',
+        items: [
+          { name: "Ma:nyo Pure Cleansing Oil", nameKo: '마녀공장 클렌징 오일', tag: 'Awards winner', price: '₩15,000', note: 'Korea\'s #1 first-cleanser. Dissolves sunscreen without stripping.', swatch: ['#caa05a', '#e3c25f'] },
+          { name: 'mise-en-scène Perfect Serum', nameKo: '미쟝센 퍼펙트세럼', price: '₩9,000', note: 'Argan hair serum — salon gloss for convenience-store money.', swatch: ['#7a4a2a', '#e0a05a'] },
+          { name: 'KUNDAL Honey & Macadamia Shampoo', nameKo: '쿤달 샴푸', price: '₩9,900', note: 'Cult perfumed shampoo; cherry blossom scent sells out first.', swatch: ['#a9bf94', '#5f6d53'] },
+          { name: 'ILLIYOON Ceramide Ato Lotion', nameKo: '일리윤 세라마이드 로션', price: '₩13,000', note: 'Family-size body lotion for eczema-prone skin — pharmacist recommended.', swatch: ['#dbe7ee', '#8fb0c0'] },
+        ],
+      },
+      {
+        title: '📅 Sale calendar & events',
+        subtitle: 'Time your haul — the discounts are real',
+        items: [
+          { name: 'Olive Young SALE (quarterly)', nameKo: '올영세일', tag: 'Up to 50%', price: 'Mar · Jun · Sep · Dec', note: '~10 days at the start of each quarter-month. Suncare and masks hit their yearly lows; popular items sell out by evening.', emoji: '🏷️' },
+          { name: 'Olive Young Awards', nameKo: '올리브영 어워즈', price: 'December', note: "Year-end bestseller rankings across every category — look for the Awards shelf tags. It doubles as next year's shopping list.", emoji: '🏆' },
+          { name: 'Brand Days & app coupons', price: 'Monthly', note: 'Rotating single-brand deals (20–30%) announced in the Global app. Check the app the morning you shop.', emoji: '📱' },
+          { name: 'Global Lounge events (Myeongdong Town)', price: 'Ongoing', note: 'Tourist-only samples, mini-classes and photo events at the flagship — bring your passport.', emoji: '🎁' },
+        ],
+      },
+      {
+        title: '🧠 Checkout hacks',
+        items: [
+          { name: 'Instant tax refund', price: '₩15,000+ / receipt', note: 'Passport at the till = VAT knocked off on the spot (foreign tourists). Works at every branch, purchase caps apply.', emoji: '🛂' },
+          { name: 'Today Delivery (오늘드림)', price: '~₩2,500–5,000', note: 'Same-day delivery to your Seoul hotel. Buy at 11am, it beats you home. Staff can set it up at checkout.', emoji: '📦' },
+          { name: 'Barcode-scan reviews', price: 'Free', note: 'Scan any product in the Global app for English ingredients + real Korean review scores before you commit.', emoji: '🔎' },
+          { name: 'Ask for samples', price: 'Free', note: 'Bigger baskets earn handfuls of sachets — just ask "샘플 주세요" (sample juseyo) at checkout.', emoji: '🫙' },
+        ],
+      },
     ],
     swatch: ['#c75c54', '#e3a9a0'],
   },
@@ -500,6 +565,51 @@ export const THEMES: Theme[] = [
       { name: 'Incheon Chinatown', nameKo: '인천 차이나타운', emoji: '🥟', price: 'Subway Line 1', where: '~1 hr west', note: 'Jjajangmyeon\'s birthplace + the colourful Songwol-dong fairy-tale village.' },
     ],
     swatch: ['#2f4858', '#5b7a99'],
+  },
+  {
+    slug: 'kpop-fan-guide', kind: 'guide', category: 'K-Content', photoUrl: COVER.ddp,
+    title: 'K-pop Fan Pilgrimage', subtitle: 'Music shows, birthday cafés & photocards', badge: '🎤 K-Content', updated: 'Jul 2026',
+    description: "Seoul is the pilgrimage: watch a live music show taping, hunt photocards in Myeongdong basements, and drink your bias's birthday latte in Seongsu. Here's how fans actually do it — the systems, the neighborhoods, and the etiquette.",
+    meta: [{ icon: 'sparkle', label: '13 entries' }, { icon: 'clock', label: 'Shows: Tue–Sun' }],
+    tips: [
+      'Music-show tapings are FREE but competitive — most require pre-registration with the fan community (or luck at standby lines). Bring your passport and the physical album if required.',
+      "Birthday cafés (생일카페) are pop-up events fans throw for idols' birthdays — order a drink, get free photocard 'freebies'. Find them on X by searching '아이돌이름 생일카페'.",
+      'Photocard etiquette: prices are set by rarity, sleeves are sacred, and trading happens openly — bring a toploader.',
+      'HYBE/SM/JYP buildings are offices, not attractions — the fan spots are their official stores, not the lobbies.',
+      'Album prices in Korea (₩15–25k) beat overseas prices, and many stores bundle exclusive photocards or lucky draws.',
+    ],
+    sections: [
+      {
+        title: '📺 Music show tapings',
+        subtitle: 'One show almost every day of the week',
+        items: [
+          { name: 'M Countdown (Mnet)', nameKo: '엠카운트다운', price: 'Thu · free', where: 'CJ ENM Center, Sangam', note: 'The flagship. Pre-recording queues form before dawn; global fans enter via Mnet Plus app events.', emoji: '🎬' },
+          { name: 'Music Bank (KBS)', nameKo: '뮤직뱅크', price: 'Fri · free', where: 'KBS Hall, Yeouido', note: 'Longest-running. KBS runs a foreigner standby line — passport required, arrive by ~6am for big lineups.', emoji: '📡' },
+          { name: 'Inkigayo (SBS)', nameKo: '인기가요', price: 'Sun · free', where: 'SBS Prism Tower, Sangam', note: 'Sunday closer. Fan-club pre-registration dominates seats; standby is a long shot but happens.', emoji: '🌟' },
+          { name: 'The Show / Show Champion', price: 'Tue / Wed · free', where: 'Sangam · Ilsan', note: "Smaller shows = best odds of getting in. Check each show's X account for foreigner applications.", emoji: '🎫' },
+        ],
+      },
+      {
+        title: '🛍️ Where fans shop',
+        items: [
+          { name: 'Myeongdong Underground Shopping Center', nameKo: '명동지하쇼핑센터', price: '₩1,000+', where: 'Myeongdong Stn', note: 'The classic photocard/merch basement maze — light haggling is fine here.', emoji: '🃏' },
+          { name: 'Ktown4u COEX', nameKo: '케이타운포유', price: 'Albums ₩15–25k', where: 'COEX, Samseong', note: 'Giant official store: albums, lucky draws, fan-sign entry events, tax refund counter.', emoji: '💿' },
+          { name: 'WithMuu / Everline stores', price: 'Albums + benefits', where: 'Hongdae · Myeongdong', note: 'Chain music stores with exclusive photocard benefits per version — compare before buying.', emoji: '🎁' },
+          { name: 'Label flagship pop-ups', nameKo: '광야서울 등', price: 'Varies', where: 'Seongsu · Yongsan', note: 'SM/HYBE-affiliated stores rotate artist pop-ups constantly — check what opened the week you land.', emoji: '🏢' },
+          { name: 'Photoism idol frames', nameKo: '포토이즘', price: '₩4,000–5,000', where: 'Everywhere', note: 'Photo-booth chains run rotating idol collab frames — the fan souvenir that costs pocket change.', emoji: '📸' },
+        ],
+      },
+      {
+        title: '☕ Fan neighborhoods',
+        items: [
+          { name: 'Seongsu-dong birthday café crawl', nameKo: '성수 생일카페', price: 'One drink per café', where: 'Seongsu', note: "Seoul's birthday-café capital — on a big idol birthday, whole blocks turn into shrines with freebies.", emoji: '🎂' },
+          { name: 'Hapjeong / Hongdae fan cafés', price: '₩6–8k drinks', where: 'Mapo', note: "Agency-adjacent cafés where comeback cup-sleeve events cluster — check X for this week's events.", emoji: '🧋' },
+          { name: 'K-Star Road', nameKo: '케이스타로드', price: 'Free', where: 'Apgujeong Rodeo', note: "GangnamDol bear statues for major groups along the old agencies' block.", emoji: '🐻' },
+          { name: 'Idol billboard spotting', price: 'Free', where: 'Subway stations', note: 'Fan-funded birthday billboards fill stations like Seongsu, Hapjeong, Hongdae — part of the streetscape.', emoji: '🖼️' },
+        ],
+      },
+    ],
+    swatch: ['#5b6f9c', '#8fb0c0'],
   },
 ];
 
