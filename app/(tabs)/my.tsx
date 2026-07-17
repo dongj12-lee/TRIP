@@ -7,8 +7,8 @@ import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { useRemoteContent } from '@/lib/remoteData';
 import { plural, guLabel } from '@/lib/format';
-import { CREATORS, creatorById, tierFor, TIERS } from '@/data';
-import { Creator, Place } from '@/data/types';
+import { tierFor, TIERS } from '@/data';
+import { Place } from '@/data/types';
 import { T, H, Card, Button, IconButton } from '@/components/base';
 import { PlaceCardCompact, PostCardMini } from '@/components/cards';
 import { EditProfileSheet } from '@/components/EditProfileSheet';
@@ -24,17 +24,12 @@ export default function MyScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { saved, toggleSave, following, toggleFollow, itinerary, sharedPost, shareTrip, profile, myPostCount, placeReactions, stamps, joined } = useStore();
+  const { saved, toggleSave, itinerary, sharedPost, shareTrip, profile, myPostCount, placeReactions, stamps, joined } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
 
-  const onFollowToggle = (cr: Creator) => {
-    const wasFollowing = following.has(cr.id);
-    toggleFollow(cr.id);
-    showToast(wasFollowing ? `Unfollowed ${cr.name}` : `Following ${cr.name}`, wasFollowing ? undefined : '✓');
-  };
 
   const name = profile.displayName || 'You';
   const handle = profile.handle || 'traveler';
@@ -61,8 +56,6 @@ export default function MyScreen() {
   const passportProg = progressFor(earnedStamps);
   const passportRankInfo = passportRank(earnedStamps.size);
   const passportPct = Math.round((earnedStamps.size / passportProg.total) * 100);
-  const followingList = CREATORS.filter((cr) => following.has(cr.id));
-  const suggestions = CREATORS.filter((cr) => !following.has(cr.id));
   // The user's own posts — real, not the seeded mock contributions.
   const myPosts = user ? posts.filter((p) => p.authorId === user.id) : [];
 
@@ -119,7 +112,7 @@ export default function MyScreen() {
         <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 14 }}>
           <Stat n={myPostCount} label="Posts" />
           <Stat n={saved.size} label="Saved" />
-          <Stat n={following.size} label="Following" />
+          <Stat n={likedPlaces.length} label="Liked" />
         </View>
 
         {/* Seoul Passport — the district-fill collection, taps into /passport */}
@@ -195,24 +188,6 @@ export default function MyScreen() {
             </View>
           </Card>
         </View>
-
-        {/* Following */}
-        {followingList.length > 0 && (
-          <Section title="Following">
-            {followingList.map((cr) => (
-              <CreatorRow key={cr.id} creator={cr} following onToggle={() => onFollowToggle(cr)} />
-            ))}
-          </Section>
-        )}
-
-        {/* Creators to follow */}
-        <Section title="Creators to follow">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 18 }}>
-            {suggestions.map((cr) => (
-              <CreatorCard key={cr.id} creator={cr} onToggle={() => onFollowToggle(cr)} />
-            ))}
-          </ScrollView>
-        </Section>
 
         {/* My contributions — the user's own posts, or an empty state */}
         <Section title="My contributions">
@@ -316,53 +291,3 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function CreatorRow({ creator, following, onToggle }: { creator: Creator; following: boolean; onToggle: () => void }) {
-  const { c } = useTheme();
-  const router = useRouter();
-  return (
-    <Pressable
-      onPress={() => router.push(`/creator/${creator.id}`)}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 12 }}
-    >
-      <View style={{ width: 44, height: 44, borderRadius: 999, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
-        <T style={{ fontSize: 22 }}>{creator.avatar}</T>
-      </View>
-      <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <T style={{ fontSize: 14.5, fontWeight: '700' }}>{creator.name}</T>
-          {creator.verified && <Icon name="check" size={13} stroke={c.accent} sw={2.6} />}
-        </View>
-        <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{creator.expertise} · {creator.followers}</T>
-      </View>
-      <Pressable
-        onPress={onToggle}
-        style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: c.line, backgroundColor: following ? 'transparent' : c.accent }}
-      >
-        <T style={{ fontSize: 12.5, fontWeight: '700', color: following ? c.inkSoft : '#fff' }}>{following ? 'Following' : 'Follow'}</T>
-      </Pressable>
-    </Pressable>
-  );
-}
-
-function CreatorCard({ creator, onToggle }: { creator: Creator; onToggle: () => void }) {
-  const { c } = useTheme();
-  const router = useRouter();
-  return (
-    <Pressable
-      onPress={() => router.push(`/creator/${creator.id}`)}
-      style={{ width: 170, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: c.line, backgroundColor: c.surface }}
-    >
-      <Photo swatch={creator.swatch} height={80} />
-      <View style={{ padding: 12, marginTop: -22 }}>
-        <View style={{ width: 44, height: 44, borderRadius: 999, backgroundColor: c.surface, borderWidth: 2, borderColor: c.surface, alignItems: 'center', justifyContent: 'center' }}>
-          <T style={{ fontSize: 22 }}>{creator.avatar}</T>
-        </View>
-        <T style={{ fontSize: 14.5, fontWeight: '700', marginTop: 6 }} numberOfLines={1}>{creator.name}</T>
-        <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600' }} numberOfLines={1}>{creator.expertise}</T>
-        <Pressable onPress={onToggle} style={{ marginTop: 10, paddingVertical: 7, borderRadius: 999, backgroundColor: c.accent, alignItems: 'center' }}>
-          <T style={{ fontSize: 12.5, fontWeight: '700', color: '#fff' }}>Follow</T>
-        </Pressable>
-      </View>
-    </Pressable>
-  );
-}
