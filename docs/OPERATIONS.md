@@ -3,6 +3,74 @@
 How TRIP's data and environments are run in production. (Schema lives in
 `supabase/schema.sql` + `supabase/migration-*.sql`; app-side docs in README.)
 
+## Maps — Naver Maps JS SDK (native WebView + web static page)
+
+`components/WebMap.tsx` (native) / `WebMap.web.tsx` (web) render real maps
+(Explore browse map, day-route lines) using the **Naver Maps JavaScript SDK
+v3**, not a native map SDK. Deliberate: the only maintained "native Kakao
+map" package turned out to be a mislabeled navigation-launcher (not an
+embeddable map view), and Naver's *Mobile* Dynamic Map SDK has no free
+quota, while the *Web* Dynamic Map JS SDK gets 6M free requests/month on the
+representative NCP account — same product used on map.naver.com. Net effect:
+a real interactive map, zero native modules, **the app stays on Expo Go**.
+
+- **Setup**: NCP Console → Menu (☰) → search "Maps" (it's under a top-level
+  **Maps** product, not nested in "AI·NAVER API") → Application → register
+  with API **Dynamic Map only** (Directions/Geocoding aren't needed — TRIP
+  already has coordinates from Visit Seoul, and an unused API on a
+  client-exposed key is needless surface area). Add Service URLs:
+  `http://127.0.0.1:8081` (exact host **and port** — `localhost` without a
+  port, or the wrong port, both 401), and the real deploy domain (e.g.
+  `https://dongj12-lee.github.io`) for the gh-pages build. Put the Client ID
+  in `EXPO_PUBLIC_NAVER_MAP_CLIENT_ID` (`.env` / `.env.production`) — meant
+  to be public, secured by Service-URL whitelisting not secrecy.
+- **Why two different implementations**: `react-native-webview` has no web
+  target at all (native only). On web, loading the map HTML via a `srcDoc`
+  (or `blob:`) iframe seems natural but **always 401s** — the Naver SDK
+  reads `window.location` itself for its domain check, and a srcDoc/blob
+  iframe reports `about:srcdoc` (or a `blob:` URL), which can never match a
+  registered Service URL, no matter what you register. Native WebViews don't
+  have this problem — `loadDataWithBaseURL`/`loadHTMLString(baseURL:)`
+  genuinely let `window.location` report the given `baseUrl`, which is why
+  `WebMap.tsx` can safely inline HTML with `source={{ html, baseUrl }}`.
+  The web fix: **`public/naver-map.html`** is a real, same-origin static
+  file (Expo Router copies `public/` into `dist/` on export, and serves it
+  in local dev too) that `WebMap.web.tsx` points an `<iframe src=...>` at,
+  then feeds pins/polyline to via `postMessage` once loaded — genuinely
+  same-origin, so the domain check passes for real.
+- **Graceful fallback**: `ExploreMap.tsx` and `RouteMap.tsx` render the
+  original stylized SVG map (no key needed) whenever
+  `EXPO_PUBLIC_NAVER_MAP_CLIENT_ID` is unset — the app never breaks for a
+  contributor without the key configured.
+- **Shared runtime**: all rendering (grid clustering that re-clusters on
+  zoom, category-colored pins, numbered route stops, cluster tap → zoom in)
+  lives in `MAP_RUNTIME_JS` in `components/webMapHtml.ts`, injected into both
+  the native WebView and the web iframe so the two platforms stay identical.
+  `ExploreMap` passes `cluster` (dense browse map); `RouteMap` leaves it off
+  (few numbered stops + a dashed polyline).
+
+## Per-leg transit estimates (trip planner)
+
+`lib/transit.ts` renders "how to get there" info between consecutive planner
+stops in two tiers:
+
+- **Heuristic (always on, no API)**: straight-line distance from the coords we
+  already have → suggested mode (walk ≤1km / subway-bus ≤6km / taxi beyond)
+  + rough minutes, displayed as "~14 min" to signal it's an estimate. Tapping
+  a leg opens real turn-by-turn: Naver Map app via its documented
+  `nmap://route/{walk|public|car}` URL scheme, falling back to a Google Maps
+  directions URL (no key needed for either).
+- **Seoul transit upgrade (dormant until enabled)**: `lib/transitSeoul.ts`
+  swaps a transit-mode leg's estimate for a real route (exact minutes,
+  line names, transfers) from the 서울시 대중교통환승경로 API (data.go.kr,
+  permanently free government data — chosen over ODsay, whose free tier
+  expires after 6 months). Requires: (1) 활용신청 for
+  data.go.kr/data/15000414 on the existing data.go.kr account, (2) a
+  `seoul-transit` Edge Function proxy (keeps the key server-side; NOT built
+  yet), (3) set `EXPO_PUBLIC_SEOUL_TRANSIT_ENABLED=1`. Until then the hook
+  no-ops and everything stays on the heuristic — outside-Seoul legs and API
+  failures also fall back, so leg info never disappears.
+
 ## Weather — KMA (기상청) via Edge Function
 
 Weather comes from the Korea Meteorological Administration open APIs on
@@ -102,3 +170,24 @@ The service role key bypasses RLS and must only ever live in `.env`,
 Write `supabase/migration-0NN-name.sql` (idempotent: `if not exists` /
 `drop ... if exists`), run it against **dev first**, then prod, then commit.
 `db:setup-sql` picks it up automatically for future fresh environments.
+
+## Foreigner-Fit: crowd votes vs "verified by TRIP"
+
+The Foreigner-Fit checklist (migration-007) is a pure crowd layer — imported
+places start honestly blank, no pre-fills. `migration-022-verified-tags.sql`
+adds a separate `places.verified_tags` column for facts the team can state
+with real confidence (never a per-place guess): either a mechanical promotion
+of an existing objective Visit Seoul field (`english_site`, `wheelchair`), or
+a well-established category-level fact (department stores/malls take cards
+everywhere in Korea). It never touches `votes` or the vote-backed boolean
+columns, so it can't clobber a real traveler vote — the UI shows both, with
+a distinct "✓ TRIP verified" badge, plus a "be the first to confirm" nudge
+when a place has neither.
+
+Re-run after a fresh Visit Seoul import so newly-added places get covered:
+```
+npm run backfill:verified-tags            # dev (.env)
+node -r dotenv/config ./node_modules/.bin/tsx scripts/backfill-verified-tags.ts dotenv_config_path=.env.production   # prod
+```
+Add `-- --dry-run` to preview counts without writing. The rules live in
+`scripts/backfill-verified-tags.ts` — idempotent, safe to re-run anytime.

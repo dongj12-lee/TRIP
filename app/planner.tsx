@@ -6,6 +6,8 @@ import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { analyzeTrip } from '@/lib/routeHealth';
+import { heuristicLeg, formatLegMinutes, MODE_META, Leg, openDirections, dayTravelMinutes } from '@/lib/transit';
+import { useSeoulLeg } from '@/lib/transitSeoul';
 import { buildCoOccurrence, suggestPlacesForDay } from '@/lib/routeSuggest';
 import { Itinerary, ItineraryDay, ItineraryStop, Place } from '@/data/types';
 import { to12h, partOfDay } from '@/lib/timeUtils';
@@ -136,20 +138,31 @@ export default function TripPlanner() {
                   </View>
                 )}
 
+                {(() => {
+                  const mins = dayTravelMinutes(day.stops);
+                  return mins != null ? (
+                    <T style={{ marginTop: 8, fontSize: 11.5, color: c.muted, fontWeight: '600', textAlign: 'right' }}>
+                      🧭 ≈ {mins} min getting between stops
+                    </T>
+                  ) : null;
+                })()}
+
                 {day.stops.map((stop, si) => (
-                  <StopCard
-                    key={si}
-                    stop={stop}
-                    field={field}
-                    first={si === 0}
-                    last={si === day.stops.length - 1}
-                    onTimePress={() => setTimeTarget({ di, si })}
-                    onName={(v) => setStop(di, si, 'name', v)}
-                    onNote={(v) => setStop(di, si, 'note', v)}
-                    onRemove={() => removeStop(di, si)}
-                    onUp={() => moveStop(di, si, -1)}
-                    onDown={() => moveStop(di, si, 1)}
-                  />
+                  <React.Fragment key={si}>
+                    {si > 0 && <LegConnector from={day.stops[si - 1]} to={stop} />}
+                    <StopCard
+                      stop={stop}
+                      field={field}
+                      first={si === 0}
+                      last={si === day.stops.length - 1}
+                      onTimePress={() => setTimeTarget({ di, si })}
+                      onName={(v) => setStop(di, si, 'name', v)}
+                      onNote={(v) => setStop(di, si, 'note', v)}
+                      onRemove={() => removeStop(di, si)}
+                      onUp={() => moveStop(di, si, -1)}
+                      onDown={() => moveStop(di, si, 1)}
+                    />
+                  </React.Fragment>
                 ))}
 
                 {dh.longHop && (
@@ -229,6 +242,61 @@ export default function TripPlanner() {
         onClose={() => setTimeTarget(null)}
       />
     </Screen>
+  );
+}
+
+// "How to get there" connector between two consecutive stops — suggested mode
+// + rough time from the coordinates we already have, upgraded to a real Seoul
+// transit route when that layer is live. Tapping opens real turn-by-turn
+// directions (Naver Map app → Google Maps fallback). Silent when either stop
+// lacks coordinates (e.g. a free-text "KTX to Busan" custom stop).
+function LegConnector({ from, to }: { from: ItineraryStop; to: ItineraryStop }) {
+  const { c } = useTheme();
+  const a = from.lat != null && from.lng != null ? { lat: from.lat, lng: from.lng } : null;
+  const b = to.lat != null && to.lng != null ? { lat: to.lat, lng: to.lng } : null;
+  const base: Leg | null = a && b ? heuristicLeg(a, b) : null;
+  const seoul = useSeoulLeg(a, b, base?.mode === 'transit');
+  const leg = seoul ?? base;
+  if (!leg || !a || !b) return null;
+  const meta = MODE_META[leg.mode];
+  // Per-mode tint so the three modes read at a glance (walk=sage,
+  // transit=accent, taxi=gold) — same tones the app uses elsewhere.
+  const tone =
+    leg.mode === 'walk'
+      ? { bg: c.sage50, fg: c.sage700 }
+      : leg.mode === 'taxi'
+        ? { bg: c.gold50, fg: c.gold700 }
+        : { bg: c.accent50, fg: c.accent };
+  return (
+    <View style={{ flexDirection: 'row', marginTop: 10, marginBottom: -2 }}>
+      {/* rail segment aligned with the stop cards' timeline border */}
+      <View style={{ width: 2, backgroundColor: c.accent50, opacity: 0.6 }} />
+      <Pressable
+        onPress={() => {
+          haptic.tick();
+          openDirections(a, b, leg.mode, from.name, to.name);
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={`Directions from ${from.name} to ${to.name}`}
+        style={({ pressed }) => ({
+          flex: 1, marginLeft: 12, flexDirection: 'row', alignItems: 'center', gap: 8,
+          opacity: pressed ? 0.65 : 1,
+        })}
+      >
+        <View style={{ width: 26, height: 26, borderRadius: 999, backgroundColor: tone.bg, alignItems: 'center', justifyContent: 'center' }}>
+          <T style={{ fontSize: 12.5 }}>{meta.emoji}</T>
+        </View>
+        <T style={{ fontSize: 12.5, fontWeight: '800', color: c.ink }}>
+          {formatLegMinutes(leg)}
+          <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>  {leg.detail || meta.label}</T>
+        </T>
+        <View style={{ flex: 1 }} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: tone.bg, paddingVertical: 3.5, paddingHorizontal: 8, borderRadius: 999 }}>
+          <T style={{ fontSize: 10.5, fontWeight: '800', color: tone.fg }}>ROUTE</T>
+          <Icon name="chevron" size={11} stroke={tone.fg} sw={2.4} />
+        </View>
+      </Pressable>
+    </View>
   );
 }
 
