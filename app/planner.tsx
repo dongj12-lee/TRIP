@@ -79,7 +79,7 @@ export default function TripPlanner() {
 
   const field = {
     backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
-    paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: c.ink, fontFamily: 'Jakarta',
+    paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 
   // Flatten placed stops into the shareable card (skips empty/blank rows).

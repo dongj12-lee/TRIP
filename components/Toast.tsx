@@ -62,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             }}
           >
             {toast.emoji ? <Text style={{ fontSize: 15 }}>{toast.emoji}</Text> : null}
-            <Text style={{ color: dark ? '#2e2a24' : '#fffdfa', fontSize: 14, fontWeight: '700', fontFamily: 'Jakarta-Bold' }} numberOfLines={2}>
+            <Text style={{ color: dark ? '#2e2a24' : '#fffdfa', fontSize: 14, fontWeight: '700', fontFamily: 'Pretendard-Bold' }} numberOfLines={2}>
               {toast.message}
             </Text>
           </Animated.View>

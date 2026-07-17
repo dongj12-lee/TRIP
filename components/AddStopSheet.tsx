@@ -95,7 +95,7 @@ export function AddStopSheet({
               onChangeText={setQuery}
               placeholder="Search a place to add…"
               placeholderTextColor={c.muted}
-              style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Jakarta' }}
+              style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Pretendard' }}
               autoCapitalize="none"
             />
             {query.length > 0 && (

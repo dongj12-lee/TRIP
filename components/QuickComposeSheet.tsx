@@ -103,7 +103,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
                 onChangeText={setTitle}
                 placeholder="Add a title (optional)"
                 placeholderTextColor={c.muted}
-                style={{ fontSize: 17, fontWeight: '700', color: c.ink, fontFamily: 'Jakarta-Bold', paddingVertical: 8 }}
+                style={{ fontSize: 17, fontWeight: '700', color: c.ink, fontFamily: 'Pretendard-Bold', paddingVertical: 8 }}
                 maxLength={100}
               />
             )}
@@ -114,7 +114,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
               placeholderTextColor={c.muted}
               autoFocus
               multiline
-              style={{ fontSize: 16.5, lineHeight: 24, color: c.ink, fontFamily: 'Jakarta', paddingTop: 6, paddingBottom: 12, minHeight: imageUrl ? 60 : 120, textAlignVertical: 'top' }}
+              style={{ fontSize: 16.5, lineHeight: 24, color: c.ink, fontFamily: 'Pretendard', paddingTop: 6, paddingBottom: 12, minHeight: imageUrl ? 60 : 120, textAlignVertical: 'top' }}
             />
             {!!imageUrl && (
               <View style={{ paddingBottom: 12 }}>

@@ -171,7 +171,7 @@ export default function ExploreScreen() {
             onChangeText={setQuery}
             placeholder="Search places, food, areas…"
             placeholderTextColor={c.muted}
-            style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Jakarta' }}
+            style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Pretendard' }}
             autoCapitalize="none"
             returnKeyType="search"
           />

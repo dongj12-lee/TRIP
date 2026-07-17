@@ -39,7 +39,7 @@ export default function Compose() {
 
   const field = {
     backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
-    paddingHorizontal: 12, paddingVertical: 11, fontSize: 15, color: c.ink, fontFamily: 'Jakarta',
+    paddingHorizontal: 12, paddingVertical: 11, fontSize: 15, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 
   const submit = async () => {

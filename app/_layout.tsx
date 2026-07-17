@@ -13,13 +13,6 @@ import {
   Fraunces_600SemiBold_Italic,
   Fraunces_400Regular,
 } from '@expo-google-fonts/fraunces';
-import {
-  PlusJakartaSans_400Regular,
-  PlusJakartaSans_500Medium,
-  PlusJakartaSans_600SemiBold,
-  PlusJakartaSans_700Bold,
-  PlusJakartaSans_800ExtraBold,
-} from '@expo-google-fonts/plus-jakarta-sans';
 import { ThemeProvider, useTheme } from '@/theme/theme';
 import { StoreProvider, useStore } from '@/lib/store';
 import { AuthProvider, useAuth } from '@/lib/auth';
@@ -97,11 +90,14 @@ export default function RootLayout() {
     Fraunces: Fraunces_600SemiBold,
     'Fraunces-Italic': Fraunces_600SemiBold_Italic,
     'Fraunces-Regular': Fraunces_400Regular,
-    Jakarta: PlusJakartaSans_400Regular,
-    'Jakarta-Medium': PlusJakartaSans_500Medium,
-    'Jakarta-SemiBold': PlusJakartaSans_600SemiBold,
-    'Jakarta-Bold': PlusJakartaSans_700Bold,
-    'Jakarta-ExtraBold': PlusJakartaSans_800ExtraBold,
+    // Body/UI: Pretendard — one family covering Latin + Hangul, so Korean
+    // place names render intentionally instead of falling back to a system
+    // font (Jakarta was Latin-only). Local static TTFs in assets/fonts.
+    Pretendard: require('../assets/fonts/Pretendard-Regular.ttf'),
+    'Pretendard-Medium': require('../assets/fonts/Pretendard-Medium.ttf'),
+    'Pretendard-SemiBold': require('../assets/fonts/Pretendard-SemiBold.ttf'),
+    'Pretendard-Bold': require('../assets/fonts/Pretendard-Bold.ttf'),
+    'Pretendard-ExtraBold': require('../assets/fonts/Pretendard-ExtraBold.ttf'),
   });
 
   if (!loaded) return null;

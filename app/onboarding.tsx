@@ -110,7 +110,7 @@ function PickName({ name, setName }: { name: string; setName: (v: string) => voi
         returnKeyType="done"
         style={{
           marginTop: 22, backgroundColor: c.surface, borderWidth: 1.5, borderColor: name ? c.accent : c.line,
-          borderRadius: 14, paddingHorizontal: 16, paddingVertical: 15, fontSize: 18, color: c.ink, fontFamily: 'Jakarta-SemiBold',
+          borderRadius: 14, paddingHorizontal: 16, paddingVertical: 15, fontSize: 18, color: c.ink, fontFamily: 'Pretendard-SemiBold',
         }}
       />
     </View>

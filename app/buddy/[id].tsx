@@ -260,7 +260,7 @@ function RequestSheet({ visible, onClose, onSend, hostName }: { visible: boolean
             style={{
               marginTop: 14, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 14,
               paddingHorizontal: 14, paddingVertical: 12, minHeight: 74, fontSize: 14.5, color: c.ink,
-              fontFamily: 'Jakarta', textAlignVertical: 'top',
+              fontFamily: 'Pretendard', textAlignVertical: 'top',
             }}
           />
           <Button label="Send request 🙋" onPress={() => onSend(message.trim())} style={{ marginTop: 16 }} />

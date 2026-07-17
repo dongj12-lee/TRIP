@@ -153,7 +153,7 @@ export default function BuddyChat() {
             onChangeText={setDraft}
             placeholder="Message the group…"
             placeholderTextColor={c.muted}
-            style={{ flex: 1, maxHeight: 110, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 18, paddingHorizontal: 14, paddingTop: 9, paddingBottom: 9, fontSize: 14.5, color: c.ink, fontFamily: 'Jakarta' }}
+            style={{ flex: 1, maxHeight: 110, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 18, paddingHorizontal: 14, paddingTop: 9, paddingBottom: 9, fontSize: 14.5, color: c.ink, fontFamily: 'Pretendard' }}
             multiline
           />
           <Pressable

@@ -62,7 +62,7 @@ export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClo
 
   const field = {
     backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
-    paddingHorizontal: 13, paddingVertical: 12, fontSize: 15, color: c.ink, fontFamily: 'Jakarta',
+    paddingHorizontal: 13, paddingVertical: 12, fontSize: 15, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 
   const save = async () => {

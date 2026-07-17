@@ -25,7 +25,7 @@ export function Avatar({ name, uri, size = 40 }: { name: string; uri?: string; s
         borderWidth: 1, borderColor: `${hue}55`, alignItems: 'center', justifyContent: 'center',
       }}
     >
-      <T style={{ fontSize: size * 0.42, fontWeight: '800', color: hue, fontFamily: 'Jakarta-ExtraBold' }}>{initial}</T>
+      <T style={{ fontSize: size * 0.42, fontWeight: '800', color: hue, fontFamily: 'Pretendard-ExtraBold' }}>{initial}</T>
     </View>
   );
 }

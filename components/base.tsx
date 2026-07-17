@@ -8,26 +8,28 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { Icon, IconName } from './Icon';
 
-// Weight → Jakarta family map (RN needs a distinct family per weight).
-const JAKARTA: Record<string, string> = {
-  '400': 'Jakarta',
-  '500': 'Jakarta-Medium',
-  '600': 'Jakarta-SemiBold',
-  '700': 'Jakarta-Bold',
-  '800': 'Jakarta-ExtraBold',
+// Weight → Pretendard family map (RN needs a distinct family per weight).
+// Pretendard covers Latin + Hangul in one family, so mixed EN/KO text sets
+// consistently (Jakarta, the old body face, was Latin-only).
+const UI_FONT: Record<string, string> = {
+  '400': 'Pretendard',
+  '500': 'Pretendard-Medium',
+  '600': 'Pretendard-SemiBold',
+  '700': 'Pretendard-Bold',
+  '800': 'Pretendard-ExtraBold',
 };
-function jakartaFamily(weight?: TextStyle['fontWeight']) {
+function uiFamily(weight?: TextStyle['fontWeight']) {
   const w = String(weight ?? '400');
-  if (w === '650' || w === '750') return JAKARTA['700'];
-  if (w === 'bold') return JAKARTA['700'];
-  return JAKARTA[w] ?? 'Jakarta';
+  if (w === '650' || w === '750') return UI_FONT['700'];
+  if (w === 'bold') return UI_FONT['700'];
+  return UI_FONT[w] ?? 'Pretendard';
 }
 
-// Body text — defaults to Plus Jakarta Sans, resolves weight → family.
+// Body text — Pretendard (Latin + Hangul), resolves weight → family.
 export function T({ style, ...props }: TextProps) {
   const { c } = useTheme();
   const flat = Array.isArray(style) ? Object.assign({}, ...style.filter(Boolean)) : (style as TextStyle) || {};
-  const family = flat.fontFamily || jakartaFamily(flat.fontWeight);
+  const family = flat.fontFamily || uiFamily(flat.fontWeight);
   return <Text {...props} style={[{ color: c.ink, fontFamily: family }, style, { fontFamily: family }]} />;
 }
 

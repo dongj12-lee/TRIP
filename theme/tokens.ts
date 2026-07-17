@@ -24,7 +24,7 @@ export const DEFAULT_ACCENT: AccentKey = '#c26b4a';
 export const FONTS = {
   display: 'Fraunces',
   displayItalic: 'Fraunces-Italic',
-  ui: 'Jakarta',
+  ui: 'Pretendard',
 } as const;
 
 const LIGHT = {
