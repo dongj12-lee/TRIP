@@ -80,6 +80,14 @@ export default function PlaceDetail() {
 
   const fitKeys = fitTagsFor(place.category, place.categoryL2);
   const isSaved = saved.has(place.slug);
+  // Split the description into an editorial lead (first sentence, set large)
+  // and the rest (supporting body). Only break at a real sentence boundary —
+  // ≥40 chars, ending in .!?, followed by whitespace + an uppercase/quote —
+  // so dates like "War (6. 25. 1950)" don't fool it. Hermes-safe (no
+  // lookbehind; lookahead/capture only).
+  const descMatch = description.match(/^([\s\S]{40,}?[.!?])\s+([A-Z"'“][\s\S]*)$/);
+  const descLead = descMatch ? descMatch[1] : description;
+  const descRest = descMatch ? descMatch[2] : '';
   const onSave = () => {
     haptic.tick();
     if (!isSaved) {
@@ -149,10 +157,11 @@ export default function PlaceDetail() {
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
-        {/* Hero */}
-        <View style={{ height: 280 }}>
-          <Photo uri={place.photoUrl} swatch={place.swatch} height={280} />
-          <LinearGradient colors={['rgba(0,0,0,0.35)', 'transparent', 'rgba(0,0,0,0.5)']} style={{ position: 'absolute', inset: 0 }} />
+        {/* Hero photo — a clean band. The headline lives below on paper,
+            editorial-style, instead of trapped over a busy image. */}
+        <View style={{ height: 240 }}>
+          <Photo uri={place.photoUrl} swatch={place.swatch} height={240} />
+          <LinearGradient colors={['rgba(0,0,0,0.4)', 'transparent']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 120 }} />
           <View style={{ position: 'absolute', top: insets.top, left: 8, right: 8, flexDirection: 'row', justifyContent: 'space-between' }}>
             <Pressable onPress={() => router.back()} hitSlop={8} accessibilityRole="button" accessibilityLabel="Go back" style={heroBtn}>
               <Icon name="back" size={22} stroke="#fff" sw={2.2} />
@@ -166,18 +175,30 @@ export default function PlaceDetail() {
               </Pressable>
             </View>
           </View>
-          <View style={{ position: 'absolute', bottom: 16, left: 18, right: 18 }}>
-            {!!place.kContentTitle && (
-              <Chip tone="gold" style={{ alignSelf: 'flex-start', marginBottom: 8 }}>{`🎬 ${place.kContentTitle}`}</Chip>
-            )}
-            <H style={{ fontSize: 27, color: '#fff', lineHeight: 31 }}>{place.name}</H>
-          </View>
+        </View>
+
+        {/* Editorial header */}
+        <View style={{ paddingHorizontal: 18, paddingTop: 20 }}>
+          {!!place.kContentTitle && (
+            <Chip tone="gold" style={{ alignSelf: 'flex-start', marginBottom: 12 }}>{`🎬 ${place.kContentTitle}`}</Chip>
+          )}
+          <T style={{ fontSize: 12.5, fontWeight: '800', color: c.accent, letterSpacing: 0.2 }}>
+            {place.category}{place.neighborhood ? `   ·   ${guLabel(place.neighborhood)}` : ''}
+          </T>
+          <H style={{ fontSize: 31, color: c.ink, lineHeight: 37, marginTop: 7 }}>{place.name}</H>
+          {(place.rating != null || !!place.priceRange) && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 }}>
+              {place.rating != null && <Rating value={place.rating} count={place.reviews} size={15} />}
+              {place.rating != null && !!place.priceRange && <T style={{ color: c.muted }}>·</T>}
+              {!!place.priceRange && <T style={{ fontSize: 13.5, color: c.inkSoft, fontWeight: '700' }}>{place.priceRange}</T>}
+            </View>
+          )}
         </View>
 
         {/* Show-to-staff card */}
         <Pressable
           onPress={() => setSheet(true)}
-          style={{ marginHorizontal: 18, marginTop: 16, padding: 15, borderRadius: 16, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, flexDirection: 'row', alignItems: 'center', gap: 12 }}
+          style={{ marginHorizontal: 18, marginTop: 20, padding: 15, borderRadius: 16, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, flexDirection: 'row', alignItems: 'center', gap: 12 }}
         >
           <Icon name="translate" size={24} stroke={c.accent} sw={1.9} />
           <View style={{ flex: 1 }}>
@@ -186,19 +207,6 @@ export default function PlaceDetail() {
           </View>
           <Icon name="chevron" size={18} stroke={c.muted} sw={2} />
         </Pressable>
-
-        {/* Rating row */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 18, paddingTop: 16 }}>
-          {place.rating != null && <Rating value={place.rating} count={place.reviews} size={15} />}
-          {place.rating != null && <T style={{ color: c.muted }}>·</T>}
-          <T style={{ fontSize: 13, color: c.inkSoft, fontWeight: '600' }}>{place.category}</T>
-          {!!place.priceRange && (
-            <>
-              <T style={{ color: c.muted }}>·</T>
-              <T style={{ fontSize: 13, color: c.inkSoft, fontWeight: '600' }}>{place.priceRange}</T>
-            </>
-          )}
-        </View>
 
         {/* Like / dislike — the community satisfaction signal */}
         <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 16 }}>
@@ -228,10 +236,25 @@ export default function PlaceDetail() {
           />
         </View>
 
+        {/* About — the place's editorial "read", surfaced up top (was buried
+            at the very bottom) with the opening line set large as a lead. */}
+        {!!description && (
+          <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
+            <H style={{ fontSize: 19, marginBottom: 12 }}>About</H>
+            <T style={{ fontSize: 16.5, lineHeight: 27, color: c.ink }}>{descLead}</T>
+            {!!descRest && <T style={{ fontSize: 14.5, lineHeight: 23, color: c.inkSoft, marginTop: 11 }}>{descRest}</T>}
+            {/* price already sits in the header, so it's not repeated here */}
+            <View style={{ marginTop: 20, gap: 10 }}>
+              {!!place.hours && <InfoRow icon="clock" text={place.hours} />}
+              {!!place.address && <InfoRow icon="pin" text={place.address} />}
+            </View>
+          </View>
+        )}
+
         {/* Good to know — objective facts from Visit Seoul (distinct from the
             community-voted Foreigner Fit below) */}
         {hasFacts && (
-          <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
+          <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
             <H style={{ fontSize: 19, marginBottom: 10 }}>Good to know</H>
             <View style={{ gap: 8 }}>
               {!!place.subway && <FactRow emoji="🚇" text={place.subway} />}
@@ -251,7 +274,7 @@ export default function PlaceDetail() {
         )}
 
         {/* Foreigner Fit — tags tailored to this place's category */}
-        <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
+        <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
           <H style={{ fontSize: 19, marginBottom: 4 }}>Foreigner Fit</H>
           <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
           {fitKeys.every((key) => !place.verifiedTags?.includes(key) && (tagCounts[key]?.yes ?? 0) === 0 && (tagCounts[key]?.no ?? 0) === 0) && (
@@ -310,19 +333,9 @@ export default function PlaceDetail() {
           )}
         </View>
 
-        {/* Description + info */}
-        <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
-          <T style={{ fontSize: 14, lineHeight: 22, color: c.inkSoft }}>{description}</T>
-          <View style={{ marginTop: 16, gap: 10 }}>
-            <InfoRow icon="clock" text={place.hours} />
-            <InfoRow icon="pin" text={place.address} />
-            <InfoRow icon="won" text={place.priceRange} />
-          </View>
-        </View>
-
         {/* From the community */}
         {relatedPosts.length > 0 && (
-          <View style={{ paddingHorizontal: 18, paddingTop: 24 }}>
+          <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
             <H style={{ fontSize: 18, marginBottom: 12 }}>From the community</H>
             <View style={{ gap: 10 }}>
               {relatedPosts.map((p) => (
