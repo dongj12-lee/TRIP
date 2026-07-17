@@ -117,7 +117,7 @@ export const THEMES: Theme[] = [
     slug: 'olive-young-must-buys', kind: 'guide', category: 'Shopping', photoUrl: COVER.starfield,
     title: 'Olive Young Haul', subtitle: 'The complete K-beauty playbook', badge: '💄 Shopping', updated: 'Jul 2026',
     description: "Korea's beauty mega-chain — 1,300+ stores, open till 10–11pm on every major street. This is the deep guide: what actually sells, when the big sales hit, and every hack the locals use. Prices below are regular shelf prices; during Olive Young Sale weeks most of these drop 30–50%.",
-    meta: [{ icon: 'sparkle', label: '25 picks' }, { icon: 'won', label: 'Tax refund ₩15k+' }, { icon: 'clock', label: 'Sales: Mar·Jun·Sep·Dec' }],
+    meta: [{ icon: 'sparkle', label: '30 picks' }, { icon: 'won', label: 'Tax refund ₩15k+' }, { icon: 'clock', label: 'Sales: Mar·Jun·Sep·Dec' }],
     tips: [
       'Instant tax refund at checkout on ₩15,000+ per receipt — just show your passport. No airport paperwork.',
       'Olive Young SALE runs ~10 days each quarter (early Mar / Jun / Sep / Dec) — up to 50% off bestsellers. Plan your haul around it if you can.',
@@ -128,6 +128,17 @@ export const THEMES: Theme[] = [
       'Myeongdong branches are packed 7–10pm; mornings are calm and testers are clean.',
     ],
     sections: [
+      {
+        title: '🔥 Trending right now',
+        subtitle: 'Currently topping Olive Young\'s own ranking + Glowpick — reflects Jul 2026, rotates a few times a year',
+        items: [
+          { name: 'Anua PDRN Hyaluronic Capsule 100 Serum', nameKo: '아누아 PDRN 히알루론산 캡슐 100 세럼', tag: '#1 serum', price: '₩39,000 (often ~₩22,500 on promo)', note: 'The single best-selling serum on both Olive Young\'s own ranking and the Hwahae app right now. Salmon-DNA-derived PDRN + 11 types of hyaluronic acid — the ingredient of the moment for uneven tone and post-blemish marks.', swatch: ['#5b6f9c', '#8fb0c0'] },
+          { name: 'Goodal Houttuynia Cordata Calming Sun Cream', nameKo: '구달 맑은 어성초 진정 수분 선크림', tag: 'Top 3 sunscreen', price: '₩17,000', note: 'A long-running Glowpick top-3 pick, not a flash trend — calming, lightweight, layers cleanly under makeup.', swatch: ['#a9bf94', '#5f6d53'] },
+          { name: 'Mediheal Madecassoside Sun Serum', nameKo: '메디힐 마데카소사이드 수분 선세럼 흔적리페어', tag: 'Glowpick #1 sunscreen', price: '₩18,000', note: 'Currently the #1-voted sunscreen on Glowpick — serum texture, marketed on scar/mark repair alongside SPF.', swatch: ['#dbe7ee', '#8fb0c0'] },
+          { name: 'TIRTIR Mask Fit Red Cushion', nameKo: '티르티르 마스크 핏 레드 쿠션', tag: 'Global viral hit', price: '₩24,000 (18g)', note: '20 shades, buildable full coverage — the cushion that blew up internationally on social media and now sits on Olive Young\'s own bestseller shelf.', swatch: ['#c75c54', '#e3a9a0'] },
+          { name: 'HERA Black Cushion', nameKo: '헤라 블랙 쿠션', tag: 'Premium #1', price: '₩62,000 (main + refill, 9 shades)', note: 'The current #1 in the premium cushion tier — glow finish, the one Korean office workers actually splurge on.', swatch: ['#3a2c22', '#caa05a'] },
+        ],
+      },
       {
         title: '☀️ Suncare — the #1 haul category',
         subtitle: 'Korean sunscreens are why people fly here',
@@ -199,23 +210,106 @@ export const THEMES: Theme[] = [
     swatch: ['#c75c54', '#e3a9a0'],
   },
   {
-    slug: 'daiso-finds', kind: 'guide', category: 'Shopping', photoUrl: COVER.timesSquare,
+    slug: 'daiso-finds', kind: 'guide', category: 'Shopping', photoUrl: COVER.timesSquare, updated: 'Jul 2026',
     title: 'Daiso ₩1,000 Finds', subtitle: 'Cheap souvenirs & travel hacks', badge: '🛍️ Shopping',
-    description: "Korea's everything-store, where almost nothing tops ₩5,000. Equal parts souvenir goldmine and traveler's lifesaver. Fixed price tiers (₩1,000 / 2,000 / 3,000 / 5,000) — no haggling, cards accepted.",
-    meta: [{ icon: 'sparkle', label: '8 picks' }, { icon: 'won', label: '₩1,000–5,000' }],
+    description: "Korea's everything-store, where almost nothing tops ₩5,000. Equal parts souvenir goldmine and traveler's lifesaver — the trip-saving item you didn't pack is almost always a few thousand won away here. Fixed price tiers (₩1,000 / 2,000 / 3,000 / 5,000) — no haggling, cards accepted.",
+    meta: [{ icon: 'sparkle', label: '20 picks' }, { icon: 'won', label: '₩1,000–5,000' }],
     tips: [
       'Price tiers are color-coded on the shelf label — check before the till.',
-      'Biggest branches: Myeongdong (multi-floor) and Hongdae.',
-      'Great for last-minute gifts: socks, masks, snacks, stationery.',
+      'Biggest branches: Myeongdong (multi-floor, tourist-stocked) and Hongdae; the Myeongdong flagship near Euljiro is the largest in the city.',
+      'Great for last-minute gifts: socks, masks, snacks, stationery — buy in bulk, it barely dents the wallet.',
+      'No tax refund here — prices are already rock-bottom, so Daiso is excluded from most Tax Free schemes.',
+      "Daiso's beauty boom is real, not hype: many lines are made by Korea's own top contract manufacturers (Kolmar, Cosmax — the same factories behind Olive Young and department-store brands), just repackaged without the marketing markup. That's why the formulas hold up.",
+      'Keep the receipt if you buy anything electronic (chargers, adapters) — exchanges need it within 7 days.',
     ],
-    items: [
-      { name: 'Korean character socks', nameKo: '캐릭터 양말', tag: 'Souvenir', price: '₩1,000–2,000', note: 'Cheapest, lightest gift to bring home in bulk.', swatch: ['#5b6f9c', '#8fb0c0'] },
-      { name: 'Hanji & traditional stationery', nameKo: '한지 문구', price: '₩2,000–5,000', note: 'Pretty notebooks, bookmarks, postcards.', swatch: ['#7a4a2a', '#e0a05a'] },
-      { name: 'Travel toiletry bottles', nameKo: '여행용 공병', tag: 'Lifesaver', price: '₩1,000–3,000', note: 'Refill your Olive Young finds for carry-on.', swatch: ['#5f6d53', '#a9bf94'] },
-      { name: 'Korean snacks & candy', nameKo: '과자 · 사탕', price: '₩1,000–3,000', note: 'A whole aisle of giftable snacks.', swatch: ['#caa05a', '#e3c25f'] },
-      { name: 'Phone & cable accessories', nameKo: '휴대폰 액세서리', price: '₩2,000–5,000', note: 'Adapters, cables, grips — handy mid-trip.', swatch: ['#3a2c22', '#caa05a'] },
+    sections: [
+      {
+        title: '🔥 Beauty sellouts right now',
+        subtitle: 'The lines actually causing the "품절 대란" (sellout frenzy) headlines — Jul 2026, rotates a few times a year',
+        items: [
+          { name: 'ZOOM by Jung Saem Mool', nameKo: '줌 바이 정샘물', tag: 'Sells out fastest', price: 'Toner pads ₩1,000 · cushion/foundation/fixer ₩5,000', note: "A real collab with makeup artist Jung Saem Mool's own brand, priced at a fraction of her department-store line. Word-of-mouth has been calling it \"the next Needleshot\" (the last Olive Young item to sell out this hard) — check more than one branch, city-center stores restock fastest.", emoji: '💄' },
+          { name: 'AHC Eye Cream (Daiso line)', nameKo: 'AHC 아이크림', tag: '~1/6 the price', price: '₩5,000', note: 'Three variants (elasticity / hydration / wrinkle-care) from the actual AHC brand, whose full-size originals run ₩30,000+ at Olive Young — same name, stripped-down packaging.', emoji: '👁️' },
+          { name: 'TS Scalp & Hair line', nameKo: 'TS 헤어', tag: 'Hair-loss care', price: 'Shampoo/treatment/tonic, ~₩3,000–5,000 ea', note: "Cooling, anti-dandruff shampoo and scalp tonic aimed at 20–30-somethings worried about hair thinning — dermatologist-style claims (hypoallergenic tested) at Daiso pricing.", emoji: '🧴' },
+        ],
+      },
+      {
+        title: '🧳 Travel lifesavers',
+        subtitle: 'The stuff you forgot to pack',
+        items: [
+          { name: 'Travel toiletry bottles', nameKo: '여행용 공병', tag: 'Lifesaver', price: '₩1,000–3,000', note: 'Refill your Olive Young finds for carry-on-safe sizes.', emoji: '🧴' },
+          { name: 'Packing cubes & pouches', nameKo: '압축 파우치', price: '₩2,000–5,000', note: 'Compress a half-empty suitcase before the flight home.', emoji: '🎒' },
+          { name: 'Phone & cable accessories', nameKo: '휴대폰 액세서리', price: '₩2,000–5,000', note: 'Adapters, cables, grips, phone stands — handy mid-trip, cheaper than a convenience store.', emoji: '🔌' },
+          { name: 'Portable mini fan / umbrella', nameKo: '휴대용 선풍기·우산', price: '₩3,000–5,000', note: 'Summer humidity and jangma (monsoon) rain both hit fast — grab one the day you need it.', emoji: '🌂' },
+          { name: 'Foldable shopping bag', nameKo: '접이식 장바구니', price: '₩1,000–2,000', note: 'Korea charges for plastic bags almost everywhere — bring your own.', emoji: '🛍️' },
+        ],
+      },
+      {
+        title: '🎁 Souvenirs & gifts',
+        items: [
+          { name: 'Korean character socks', nameKo: '캐릭터 양말', tag: 'Souvenir', price: '₩1,000–2,000', note: 'Cheapest, lightest gift to bring home in bulk.', emoji: '🧦' },
+          { name: 'Hanji & traditional stationery', nameKo: '한지 문구', price: '₩2,000–5,000', note: 'Pretty notebooks, bookmarks, postcards — nicer than they look at this price.', emoji: '📝' },
+          { name: 'Korean snacks & candy', nameKo: '과자 · 사탕', price: '₩1,000–3,000', note: 'A whole aisle of giftable snacks — cheaper than the airport or a convenience store.', emoji: '🍬' },
+          { name: 'Mini cosmetics tools', nameKo: '뷰티 소품', price: '₩1,000–3,000', note: 'Makeup sponges, brushes, tweezers, cotton pads — solid basics, no need for a name brand.', emoji: '💄' },
+        ],
+      },
+      {
+        title: '🏠 If you\'re staying a while',
+        subtitle: 'For longer stays, an Airbnb, or a dorm room',
+        items: [
+          { name: 'Basic kitchenware', nameKo: '주방용품', price: '₩1,000–5,000', note: 'Bowls, chopsticks, a small pan — enough to self-cater an extended stay cheaply.', emoji: '🍳' },
+          { name: 'Hangers & storage boxes', nameKo: '옷걸이·수납함', price: '₩1,000–3,000', note: 'Airbnbs are notoriously short on hangers and closet space.', emoji: '🧺' },
+          { name: 'Slippers & bath items', nameKo: '슬리퍼·목욕용품', price: '₩1,000–3,000', note: 'Indoor slippers are a real Korean-home habit — worth adopting even short-term.', emoji: '🩴' },
+        ],
+      },
     ],
     swatch: ['#5b6f9c', '#8fb0c0'],
+  },
+  {
+    slug: 'korea-souvenirs', kind: 'guide', category: 'Shopping', updated: 'Jul 2026',
+    title: 'What to Bring Home', subtitle: 'Beyond beauty — the classic Korea gifts', badge: '🎁 Shopping',
+    description: "If Olive Young and Daiso cover the beauty run and the cheap-and-cheerful gifts, this is the other half: the food, drink and craft items Koreans themselves give as gifts — ginseng, seaweed, traditional sweets, and where each one is actually worth buying.",
+    meta: [{ icon: 'sparkle', label: '12 picks' }, { icon: 'won', label: '₩3,000–80,000' }],
+    tips: [
+      'Ginseng and red ginseng (홍삼) products are Korea\'s single most classic gift — look for a KGC (정관장) label for the real, regulated stuff.',
+      'Instant/ready meal-kits (라면, 즉석밥, 김치) travel surprisingly well and read as a "real Korea" gift, not a tourist trinket.',
+      'Alcohol: 1 bottle of spirits is duty-free per adult — a nice bottle of premium soju or takju (rice wine) is a better gift than the convenience-store green bottle.',
+      'Skip fresh/perishable food gifts (rice cakes, fresh kimchi) unless you\'re flying home within a day or two.',
+    ],
+    sections: [
+      {
+        title: '🍵 Food & drink gifts',
+        items: [
+          { name: 'Red ginseng products', nameKo: '홍삼', price: '₩15,000–80,000', note: 'Extract sticks, candy, or tea — KGC Jung Kwan Jang is the trusted, government-regulated brand.', tag: 'Classic', emoji: '🌿' },
+          { name: 'Roasted seaweed (gim)', nameKo: '조미김', price: '₩3,000–10,000', note: 'Individually wrapped snack packs travel perfectly and everyone likes them.', emoji: '🌊' },
+          { name: 'Yuja (citron) tea', nameKo: '유자차', price: '₩8,000–15,000', note: 'A jar of citron-honey marmalade — just add hot water. Great cold-season gift.', emoji: '🍯' },
+          { name: 'Premium instant noodles', nameKo: '고급 라면 세트', price: '₩10,000–20,000', note: 'Gift-boxed ramyeon sets (Shin Ramyeon, Jjapaguri) — a fun, real gift for foodie friends.', emoji: '🍜' },
+          { name: 'Hangwa (traditional sweets)', nameKo: '한과', price: '₩10,000–25,000', note: 'Honey cookies and rice-puff candy in a nice box — sold at markets and department stores.', emoji: '🍡' },
+          { name: 'Premium soju / takju gift set', nameKo: '전통주 선물세트', price: '₩15,000–40,000', note: 'A boxed bottle of a craft or premium label reads far better than the everyday green bottle.', tag: 'Duty-free eligible', emoji: '🍶' },
+        ],
+      },
+      {
+        title: '🪡 Craft & keepsake gifts',
+        items: [
+          { name: 'Norigae / hanbok tassels', nameKo: '노리개', price: '₩5,000–20,000', note: 'Traditional silk knot ornaments — small, light, genuinely pretty.', emoji: '🎗️' },
+          { name: 'Celadon pottery (small)', nameKo: '고려청자 소품', price: '₩10,000–40,000', note: 'Small jade-green celadon dishes or cups — Insadong has the best selection.', emoji: '🏺' },
+          { name: 'Mother-of-pearl (najeon) items', nameKo: '자개', price: '₩10,000–50,000', note: 'Inlaid lacquerware boxes, mirrors and jewelry — a genuinely distinctive craft souvenir.', emoji: '✨' },
+          { name: 'Dancheong-pattern items', nameKo: '단청무늬 소품', price: '₩5,000–15,000', note: 'Palace-roof color patterns on fans, pouches, and phone cases — very "Seoul" as a keepsake.', emoji: '🎨' },
+        ],
+      },
+    ],
+    blocks: [
+      {
+        type: 'compare', title: 'Where to actually buy them', subtitle: 'Trade-offs by venue',
+        columns: ['Airport Duty-Free', 'Supermarket (Emart/Homeplus)', 'Traditional Market'],
+        rows: [
+          { label: 'Price', values: ['Higher, but tax-free on alcohol', 'Cheapest for packaged food gifts', 'Good for crafts; haggling rare but ask'] },
+          { label: 'Selection', values: ['Curated, gift-boxed', 'Widest packaged-food range', 'Best for one-of-a-kind craft items'] },
+          { label: 'Best for', values: ['Last-minute, alcohol, ginseng sets', 'Seaweed, ramyeon, tea, hangwa', 'Norigae, celadon, najeon, dancheong'] },
+        ],
+        note: 'A good split: buy food gifts at a supermarket mid-trip (so you\'re not carrying them the whole time), crafts at Insadong, and save alcohol for the duty-free counter after security.',
+      },
+    ],
+    swatch: ['#7a4a2a', '#e0a05a'],
   },
   {
     slug: 'street-food-bucket-list', kind: 'guide', category: 'Food & Drink', photoUrl: COVER.gwangjang,
@@ -274,15 +368,16 @@ export const THEMES: Theme[] = [
     swatch: ['#2f4858', '#5b7a99'],
   },
   {
-    slug: 'airport-to-seoul', kind: 'guide', category: 'Getting Around', photoUrl: COVER.nseoul,
+    slug: 'airport-to-seoul', kind: 'guide', category: 'Getting Around', photoUrl: COVER.nseoul, updated: 'Jul 2026',
     title: 'Airport to Seoul', subtitle: 'From Incheon & Gimpo into the city', badge: '✈️ Arrival',
-    description: 'Five ways to get from the airport into central Seoul — what each costs, how long it takes, and which to choose with heavy luggage or after a late-night landing.',
+    description: 'Five ways to get from the airport into central Seoul — what each costs, how long it takes, and which to choose with heavy luggage or after a late-night landing. Built to answer one question fast: which one should I actually take?',
     meta: [{ icon: 'clock', label: '30–90 min' }, { icon: 'won', label: '₩1,500–95,000' }],
     tips: [
-      'Pick up a T-money card and a SIM/eSIM right on the arrivals floor before you leave the airport.',
-      'AREX express and the limousine buses are the easiest options with big luggage.',
-      'Landing after midnight? Most trains and buses have stopped — plan for a taxi or an airport-area hotel.',
-      'Keep a little cash for the bus even though most accept T-money.',
+      'Pick up a T-money card and a SIM/eSIM right on the arrivals floor before you leave the airport — both counters are past customs, before the exit.',
+      'AREX express and the limousine buses are the easiest options with big luggage; the all-stop train gets crowded at the door.',
+      'Landing after midnight (00:30–05:00)? Every train and most buses have stopped for the night — budget for a taxi (~₩75,000–95,000) or an airport-area hotel instead of waiting it out.',
+      'Airport limousine buses take T-money and cards, but keep ₩20,000 cash as backup — card readers occasionally glitch.',
+      'Incheon has two terminals (T1 and T2) linked by a free shuttle train — check which one your airline uses before you plan your exit.',
     ],
     itemsTitle: 'Ways into the city',
     items: [
@@ -292,7 +387,55 @@ export const THEMES: Theme[] = [
       { name: 'Taxi / Kakao T', nameKo: '택시', emoji: '🚕', price: '₩70,000–95,000', where: 'Incheon → city center', note: 'Door to door in ~70 min (a highway toll is included); black deluxe costs more.', caution: "Make sure the meter is on — skip touts offering 'flat fares'." },
       { name: 'Gimpo Airport', nameKo: '김포공항', emoji: '🛫', price: '₩1,500+', where: 'Subway Line 5/9 & AREX', note: 'Much closer than Incheon — the subway reaches the city in ~30 min for a normal fare.' },
     ],
+    blocks: [
+      {
+        type: 'compare', title: 'Which one should I take?', subtitle: 'Incheon → central Seoul, side by side',
+        columns: ['AREX Express', 'Limousine Bus', 'Taxi'],
+        rows: [
+          { label: 'Time', values: ['~43 min', '60–90 min (traffic)', '~70 min'] },
+          { label: 'Price', values: ['₩11,000', '₩16,000–18,000', '₩70,000–95,000'] },
+          { label: 'Luggage', values: ['Racks on board', 'Stowed below — best for 2+ bags', 'Trunk — easiest, no walking'] },
+          { label: 'Best for', values: ['Solo travelers → Seoul Stn', 'Hotel drop-off, groups', 'Late arrivals, door-to-door'] },
+        ],
+        note: 'On a tight budget with light luggage and going near Seoul Station or Hongdae, skip both and take the AREX All-Stop train for ₩4,000–5,000.',
+      },
+    ],
     swatch: ['#1f4d4a', '#4a9d8e'],
+  },
+  {
+    slug: 'intercity-transport', kind: 'guide', category: 'Getting Around', updated: 'Jul 2026',
+    title: 'KTX vs Flight vs Bus', subtitle: 'Getting to other cities, mode by mode', badge: '🚄 Transport',
+    description: "Seoul to Busan, Jeonju, Gyeongju, or the east coast — there's almost always a train, a flight and a bus option, and the right pick depends on your bags, your budget and how much you value the 2 extra hours flying eats up in airport time.",
+    meta: [{ icon: 'clock', label: '2–5 hrs' }, { icon: 'won', label: '₩17,000–90,000' }],
+    tips: [
+      'KTX and SRT are the same speed and cover mostly the same routes — SRT is often a bit cheaper but leaves from Suseo or Dongtan, not Seoul Station, so check which is closer to you.',
+      "Domestic flights save time on paper, but airport check-in + security + the transfer back into downtown usually eats the time advantage on anything under 3 hours by train.",
+      'Book KTX/SRT on the Korail or SRT app (or Naver Map lets you book KTX in-app) — seats sell out fast around weekends and any holiday.',
+      'Express and intercity buses (고속버스/시외버스) are the budget option and surprisingly comfortable — reserved seats, onboard USB, and they leave far more often than trains.',
+      'For the east coast (Sokcho, Gangneung), the KTX-Gangneung line or a direct bus both beat flying — there is no useful airport near Sokcho.',
+    ],
+    blocks: [
+      {
+        type: 'compare', title: 'By destination', subtitle: 'Time and price door-to-door, cheapest booking class',
+        columns: ['KTX / SRT', 'Domestic Flight', 'Express Bus'],
+        rows: [
+          { label: 'Busan', values: ['~2h30m · ₩59,800', '~1h flight + transfers ≈ 3h total · ₩40,000–90,000', '~4h30m · ₩28,700–45,000'] },
+          { label: 'Gyeongju', values: ['~2h10m (to Singyeongju) · ₩47,500', 'No direct airport nearby', '~4h · ₩24,000'] },
+          { label: 'Jeonju', values: ['~1h50m (via Iksan) · ₩29,700', 'No direct airport nearby', '~2h40m · ₩17,000–24,000'] },
+          { label: 'Gangneung / Sokcho', values: ['~2h · ₩27,600', 'No useful airport nearby', '~2h20m · ₩20,000–27,000'] },
+          { label: 'Jeju Island', values: ['No rail link (island)', '~1h · ₩40,000–120,000 — the only fast option', 'N/A'] },
+        ],
+        note: "Jeju is the one route where flying wins outright — it's an island, so KTX/bus aren't options at all. For every mainland city under 3 train-hours away, the train is usually the better call once you count airport time.",
+      },
+    ],
+    itemsTitle: 'Booking apps',
+    items: [
+      { name: 'Korail (KTX)', nameKo: '코레일톡', emoji: '🚄', price: 'Free app', note: 'Book KTX/ITX/Mugunghwa trains nationwide; English interface, foreign card OK.' },
+      { name: 'SRT', nameKo: 'SRT', emoji: '🚈', price: 'Free app', note: 'Slightly cheaper twin to KTX on the same Busan/Mokpo lines — departs Suseo, not Seoul Station.' },
+      { name: 'Kobus / Bustago', nameKo: '고속버스', emoji: '🚌', price: 'Free app', note: 'Book express and intercity bus seats — Korean-only UI but Naver Map links straight to seat selection.' },
+      { name: 'Naver Map', nameKo: '네이버 지도', emoji: '🗺️', price: 'Free app', note: 'Search a route and it surfaces train, bus and flight options with live prices side by side.' },
+    ],
+    swatch: ['#2f4858', '#5b7a99'],
   },
   {
     slug: 'yajang-culture', kind: 'guide', category: 'Food & Drink', photoUrl: COVER.ikseon,
@@ -394,6 +537,34 @@ export const THEMES: Theme[] = [
       { name: 'Kakao T', nameKo: '카카오 T', emoji: '🚕', price: 'Free', note: 'Hail and pay for taxis cashless, Uber-style.', caution: 'Needs a card that works in Korea for in-app payment.' },
       { name: 'Subway', nameKo: '지하철', emoji: '🚇', price: 'Free', note: 'Live train times, fastest transfers and last-train alerts (Kakao/Naver both do this).' },
       { name: 'Korail / SRT', nameKo: '코레일·SRT', emoji: '🚄', price: 'Free', note: 'Book KTX/SRT high-speed trains for day trips and other cities.' },
+    ],
+    swatch: ['#3a2c44', '#7a6a9c'],
+  },
+  {
+    slug: 'delivery-app-guide', kind: 'guide', category: 'Essentials', updated: 'Jul 2026',
+    title: 'Ordering Delivery as a Tourist', subtitle: 'Baemin & Coupang Eats, step by step', badge: '🛵 Essentials',
+    description: "Korea's delivery culture is legendary — hot food to your door in 20–30 minutes, at 1am, in the rain. It's built for residents with a Korean phone number, so tourists hit a few real snags. Here's exactly how to get around them.",
+    meta: [{ icon: 'clock', label: '20–40 min' }, { icon: 'won', label: 'Fee ₩2,000–4,000' }],
+    tips: [
+      "The single biggest blocker: most delivery apps need a Korean phone number for SMS verification. A data-only tourist eSIM won't work — check yours includes an actual Korean number, or ask your hotel/Airbnb host to help register on their number.",
+      'Coupang Eats generally has smoother foreign-card checkout than Baemin, and its address-pin map makes it easier without reading Korean.',
+      "No tipping — the delivery fee (₩2,000–4,000, sometimes free for larger orders) is the entire cost.",
+      'Add a Korean delivery note if you can: "문 앞에 놔주세요" (leave it at the door) is the default now — most riders won\'t knock or call.',
+      'Staying in a hotel? Give the address as your hotel name + room number and have the front desk expecting it — easier than a precise map pin.',
+    ],
+    blocks: [
+      {
+        type: 'steps', title: 'How to order', subtitle: 'From download to doorstep',
+        steps: [
+          { title: 'Confirm you have a Korean number', note: 'Check your SIM/eSIM plan includes voice/SMS, not just data — this is the #1 reason tourists get stuck at signup.', emoji: '📱' },
+          { title: 'Download Coupang Eats (easiest) or Baemin', note: 'Coupang Eats has better foreign-card support; Baemin has more restaurant selection but a more Korean-only UI — use Papago\'s camera mode to read menus in either.', emoji: '⬇️' },
+          { title: 'Set your delivery address', note: 'Drop a pin on the map instead of typing a Korean address — both apps support this. For a hotel, search the hotel name directly.', emoji: '📍' },
+          { title: 'Browse & order', note: 'Photos carry most menus even in Korean; Papago\'s camera translate handles the rest. Check the minimum order amount shown at checkout.', emoji: '🍔' },
+          { title: 'Pay', note: 'Foreign Visa/Mastercard usually works in-app; cash-on-delivery (만나서 결제) is a fallback if your card is declined.', emoji: '💳' },
+          { title: 'Add a delivery note', note: 'Paste in "문 앞에 놔주세요" (leave at the door) — contactless drop-off is the default expectation now.', emoji: '📝' },
+          { title: 'Track & receive', note: 'Live rider tracking shows ETA to the minute; a push notification pings when it arrives.', emoji: '✅' },
+        ],
+      },
     ],
     swatch: ['#3a2c44', '#7a6a9c'],
   },
@@ -535,36 +706,83 @@ export const THEMES: Theme[] = [
     swatch: ['#5a1f4a', '#c2569b'],
   },
   {
-    slug: 'jjimjilbang-guide', kind: 'guide', category: 'Culture', photoUrl: COVER.sauna,
-    title: 'Jjimjilbang: Korean Spa', subtitle: 'How the bathhouse works', badge: '♨️ Culture',
-    description: "A jjimjilbang is a Korean sauna-and-bathhouse — part spa, part social hangout, part budget overnight. Intimidating the first time; blissful once you know the ropes.",
+    slug: 'jjimjilbang-guide', kind: 'guide', category: 'Culture', photoUrl: COVER.sauna, updated: 'Jul 2026',
+    title: 'Jjimjilbang: Korean Spa', subtitle: 'How the bathhouse works, start to finish', badge: '♨️ Culture',
+    description: "A jjimjilbang is a Korean sauna-and-bathhouse — part spa, part social hangout, part budget overnight stay. Intimidating the first time (there's a nude floor and a mixed-gender floor, and nobody explains which is which); genuinely one of the best-value things to do in Seoul once you know the flow.",
     meta: [{ icon: 'won', label: '₩8,000–15,000' }, { icon: 'clock', label: 'Often 24h' }],
     tips: [
-      'Bathing pools are gender-separated and fully nude — totally normal, nobody stares. Shower thoroughly first.',
-      'The communal floors (sauna rooms, sleeping halls, snack bar) are mixed-gender — you wear the provided uniform there.',
-      'They give you everything: uniform, towels, a locker. Bring nothing but yourself and cash.',
-      'You can stay overnight for the entry fee — a cheap, cozy option if you miss the last train.',
-      'Try a sikhye (sweet rice drink) and a baked egg from the snack bar — the classic combo.',
-      'Optional add-on: a seshin (때밀이) full-body scrub — vigorous, and you\'ll feel brand new.',
+      'They give you everything: uniform, towel, a locker key/wristband. Bring nothing but yourself, your ID, and some cash for snacks.',
+      'It\'s two different floors with two different rules — the bathing floor is gender-separated and nude; the sauna/common floor is mixed-gender and you wear the provided uniform. Nobody tells you this on the way in, so it trips up almost every first-timer.',
+      'You can stay overnight for just the entry fee — sleep in the communal hall on a mat and pillow. A genuinely cheap, cozy option if you miss the last train.',
+      'Visible tattoos can occasionally get a second look at stricter bathhouses (a hangover rule from tattoos = organized crime association) — most tourist-frequented spots in Seoul don\'t enforce it, but it\'s not universal.',
+      'Try a sikhye (sweet rice drink) and a baked egg from the snack bar — the classic post-sauna combo everyone does.',
+    ],
+    blocks: [
+      {
+        type: 'steps', title: 'How a visit actually flows', subtitle: 'From the front desk to checkout',
+        steps: [
+          { title: 'Pay at the counter, get a key', note: 'One wristband/key unlocks your shoe locker at the entrance AND your clothing locker inside — don\'t lose it, it\'s also your tab for snacks.', emoji: '🎫' },
+          { title: 'Shoes off immediately', note: 'Shoe lockers are right at the entrance, before you go further in — Korean floors are a shoes-off space from the door.', emoji: '👟' },
+          { title: 'Split by gender → undress → shower', note: 'Follow the color-coded sign to your gender\'s bathing floor. Fully undress at your locker, then shower thoroughly before touching any pool — this part is strictly nude and strictly by the rules.', emoji: '🚿' },
+          { title: 'Soak in the hot/cold pools', note: 'Alternate hot and cold pools as long as you like — this floor is single-gender only, no uniform.', emoji: '♨️' },
+          { title: 'Put on the uniform, go up to the sauna floor', note: 'This floor is mixed-gender — everyone wears the same baggy shorts-and-shirt uniform. Multiple kiln-sauna rooms at different temperatures, TV lounge, sleeping hall.', emoji: '👕' },
+          { title: 'Snack bar break', note: 'Sikhye (sweet rice drink) + a baked egg is the classic combo, charged to your wristband — settle up at checkout.', emoji: '🥚' },
+          { title: 'Sleep over (optional) or check out', note: 'Grab a mat and pillow in the sleeping hall if staying overnight, or return your key/wristband at the counter to pay and leave.', emoji: '💤' },
+        ],
+      },
+    ],
+    itemsTitle: 'Well-known spots to try',
+    items: [
+      { name: 'Dragon Hill Spa', nameKo: '드래곤힐스파', emoji: '🐉', price: '₩13,000–15,000', where: 'Yongsan Stn', note: 'Huge, tourist-famous, genuinely 24h — probably the easiest first jjimjilbang for a foreigner.' },
+      { name: 'Siloam Sauna', nameKo: '실로암 사우나', emoji: '🔥', price: '₩8,000–10,000', where: 'Seoul Stn area', note: 'Classic, no-frills neighborhood bathhouse — cheaper, more local, still foreigner-friendly.' },
+      { name: 'Spa Lei', nameKo: '스파레이', emoji: '🌸', price: '₩15,000–20,000', where: 'Gangnam', note: 'Upscale, women-only spa — nicer facilities, popular with K-beauty-minded visitors.', caution: 'Women only — check before you plan a group visit.' },
     ],
     swatch: ['#5b3a52', '#b06b98'],
   },
 
   // ─────────────── Day Trips ───────────────
   {
-    slug: 'day-trips', kind: 'guide', category: 'Day Trips', photoUrl: COVER.bukhansan,
-    title: 'Day Trips from Seoul', subtitle: 'Big adventures, back by dinner', badge: '🚄 Day Trips',
-    description: "Some of Korea's best sights are a short train or bus from the city. Here are five easy day trips — where they are, how to get there, and what they're for.",
-    meta: [{ icon: 'clock', label: '30–90 min out' }, { icon: 'sparkle', label: '5 picks' }],
+    slug: 'day-trips', kind: 'guide', category: 'Day Trips', photoUrl: COVER.bukhansan, updated: 'Jul 2026',
+    title: 'Day Trips Near Seoul', subtitle: 'Under 90 minutes out, back by dinner', badge: '🚄 Day Trips',
+    description: "Some of Korea's best sights are a short subway ride or shuttle from the city — no KTX ticket needed. Where they are, exactly how to get there without a car, and what each one is actually for.",
+    meta: [{ icon: 'clock', label: '30–90 min out' }, { icon: 'sparkle', label: '7 picks' }],
+    tips: [
+      'All seven of these are doable by public transport alone — no rental car needed.',
+      'Nami Island and the DMZ are the two that need advance booking (ferry ticket and a licensed tour respectively) — sort those first if your dates are fixed.',
+      'Pair a subway-line destination (Suwon, Incheon) with a half-day in the city the same day; save the shuttle-bus ones (Nami, Everland, Paju) for a dedicated full day.',
+    ],
     itemsTitle: 'Where to go',
     items: [
       { name: 'DMZ & JSA', nameKo: '비무장지대', emoji: '🪖', price: 'Tour ₩50,000+', where: '~1 hr north', note: 'The tense, fascinating border with North Korea — the Third Tunnel, observatory and JSA.', caution: 'Must join a licensed tour and bring your passport; book days ahead.' },
-      { name: 'Nami Island', nameKo: '남이섬', emoji: '🌲', price: 'ITX + ferry', where: '~1.5 hr (Gapyeong)', note: 'The tree-lined island of Winter Sonata fame — dreamy in autumn foliage.' },
-      { name: 'Everland', nameKo: '에버랜드', emoji: '🎢', price: '₩60,000+', where: '~1 hr (Yongin)', note: "Korea's biggest theme park — coasters, a zoo, and seasonal flower festivals." },
-      { name: 'Suwon Hwaseong', nameKo: '수원 화성', emoji: '🏯', price: 'Subway Line 1', where: '~1 hr south', note: 'A UNESCO fortress wall you can walk, with archery and a night market.' },
+      { name: 'Nami Island', nameKo: '남이섬', emoji: '🌲', price: 'ITX + ferry ≈ ₩15,000', where: '~1.5 hr (Gapyeong)', note: 'The tree-lined island of Winter Sonata fame — dreamy in autumn foliage. ITX train to Gapyeong, then a short ferry.' },
+      { name: 'Everland', nameKo: '에버랜드', emoji: '🎢', price: '₩60,000+', where: '~1 hr (Yongin)', note: "Korea's biggest theme park — coasters, a zoo, and seasonal flower festivals. Direct shuttle bus from Gangnam/Jamsil stations." },
+      { name: 'Suwon Hwaseong', nameKo: '수원 화성', emoji: '🏯', price: 'Subway Line 1', where: '~1 hr south', note: 'A UNESCO fortress wall you can walk, with archery and a night market — all reachable straight off Line 1, no transfers.' },
       { name: 'Incheon Chinatown', nameKo: '인천 차이나타운', emoji: '🥟', price: 'Subway Line 1', where: '~1 hr west', note: 'Jjajangmyeon\'s birthplace + the colourful Songwol-dong fairy-tale village.' },
+      { name: 'Paju Heyri Art Village', nameKo: '파주 헤이리', emoji: '🎨', price: 'Shuttle ₩3,000+', where: '~1 hr northwest', note: 'A whole village of galleries, bookshops and cafés in odd architecture — pair with Imjingak nearby.' },
+      { name: 'Yangpyeong / Semiwon', nameKo: '양평·세미원', emoji: '🪷', price: 'ITX ₩3,000–5,000', where: '~1 hr east', note: 'Riverside lotus gardens and a scenic rail-bike track along the old line — a quiet, green half-day.' },
     ],
     swatch: ['#2f4858', '#5b7a99'],
+  },
+  {
+    slug: 'city-day-trips', kind: 'guide', category: 'Day Trips', updated: 'Jul 2026',
+    title: 'Day Trips to Other Cities', subtitle: 'KTX out and back, same day', badge: '🚄 Day Trips',
+    description: "Korea is small enough that Busan, Gyeongju, or Jeonju are a real same-day trip by KTX — leave after breakfast, be back for a late dinner. Here's which cities actually work as a day trip, and what to build the day around.",
+    meta: [{ icon: 'clock', label: '2–3 hrs each way' }, { icon: 'sparkle', label: '5 cities' }],
+    tips: [
+      'Book the first KTX out (usually ~06:00–07:00) and the last one back to actually get a full day — fares vary by train time, and early departures tend to be cheaper.',
+      'Store bags in a coin locker at the destination station (every KTX station has them) instead of hauling a day bag around all day.',
+      "Busan and Gyeongju are the most doable — both have a walkable core near the station. Jeonju's hanok village is a 15-min taxi/bus from its KTX-Jeonju stop.",
+      'Check the "KTX vs Flight vs Bus" guide for full fare and time comparisons before you book.',
+    ],
+    itemsTitle: 'Which city, and why',
+    items: [
+      { name: 'Busan', nameKo: '부산', emoji: '🌊', price: 'KTX ~2h30m', where: 'Busan Station', note: 'Haeundae beach, Gamcheon culture village, Jagalchi fish market — Korea\'s second city, coastal and completely different energy from Seoul.', caution: "It's a lot for one day — pick 2 neighborhoods max, don't try to see all of Busan." },
+      { name: 'Gyeongju', nameKo: '경주', emoji: '🏛️', price: 'KTX ~2h10m (Singyeongju)', where: 'Singyeongju Station', note: 'The open-air museum city — Bulguksa Temple, Seokguram Grotto, and royal burial mounds you can walk right up to.', caution: 'Singyeongju station is ~15 min from the sights by bus/taxi, not walkable.' },
+      { name: 'Jeonju', nameKo: '전주', emoji: '🍚', price: 'KTX ~1h50m', where: 'Jeonju Station', note: "Korea's food capital — the hanok village, bibimbap at its birthplace, and the best street-food alley in the country.", caution: "Go hungry. Jeonju is genuinely about the food more than the sights." },
+      { name: 'Gangneung / Sokcho', nameKo: '강릉·속초', emoji: '⛰️', price: 'KTX ~2h (Gangneung)', where: 'Gangneung Station', note: 'East-coast beaches and coffee streets (Gangneung), or Seoraksan mountain views (Sokcho, 1 hr further by bus).', caution: 'Doing Seoraksan properly needs a full day on its own — pick one, not both.' },
+      { name: 'Chuncheon', nameKo: '춘천', emoji: '🥘', price: 'ITX ~1h20m', where: 'Chuncheon Station', note: 'The closest real "other city" trip — dakgalbi (spicy stir-fried chicken) alley and a lakeside cable car.', caution: 'The most relaxed option if a full KTX day feels like too much.' },
+    ],
+    swatch: ['#1f4d4a', '#4a9d8e'],
   },
   {
     slug: 'kpop-fan-guide', kind: 'guide', category: 'K-Content', photoUrl: COVER.ddp,
@@ -610,6 +828,45 @@ export const THEMES: Theme[] = [
       },
     ],
     swatch: ['#5b6f9c', '#8fb0c0'],
+  },
+
+  // ─────────────── Neighborhoods ───────────────
+  {
+    slug: 'gangnam-guide', kind: 'guide', category: 'Neighborhoods', updated: 'Jul 2026',
+    title: 'Gangnam, Beyond the Song', subtitle: 'What the district is actually like on the ground', badge: '🏙️ Neighborhoods',
+    description: "Gangnam is Seoul's glossiest district — but it's really three different neighborhoods stitched together, and most first-time visitors only see one of them (the COEX mall). Here's how the area actually breaks down, and a real spot in each to anchor your visit.",
+    meta: [{ icon: 'sparkle', label: '3 sub-areas' }, { icon: 'won', label: 'Pricier than average' }],
+    tips: [
+      "Gangnam isn't one place — it's Gangnam Station (nightlife/office towers), COEX/Samseong (malls, aquarium, K-pop stores), and Apgujeong/Cheongdam/Garosu-gil (fashion, cafés, plastic-surgery clinics) — each a subway stop or two apart.",
+      'Prices run noticeably higher here than Hongdae or Jongno — a coffee that\'s ₩4,500 elsewhere is often ₩7,000+ on Garosu-gil.',
+      "COEX Mall connects underground to Samseong Station, Starfield Library and the Aquarium — you can spend a whole rainy afternoon without going outside once.",
+      'Bongeunsa Temple sits directly across from the COEX convention center — a genuinely quiet, free escape a two-minute walk from the mall crowds.',
+    ],
+    blocks: [
+      {
+        type: 'places', title: 'Real spots to start with', subtitle: 'Anchor points across the three sub-areas',
+        placeSlugs: ['vs-ENP026558', 'vs-ENP024663', 'vs-ENP000374', 'vs-ENP000411', 'vs-ENP000291', 'vs-ENP001307', 'vs-ENP001414'],
+      },
+    ],
+    swatch: ['#5a1f4a', '#c2569b'],
+  },
+  {
+    slug: 'hidden-seoul', kind: 'guide', category: 'Neighborhoods', updated: 'Jul 2026',
+    title: 'Seoul Off the Main Map', subtitle: 'Real spots outside Hongdae, Myeongdong & Gangnam', badge: '🗺️ Neighborhoods',
+    description: "Most first trips stay inside four or five neighborhoods. One subway ride further out, Seoul has hanok villages with no tour groups, a glass skywalk almost nobody's heard of, and royal tombs you'll often have entirely to yourself.",
+    meta: [{ icon: 'sparkle', label: '7 picks' }, { icon: 'info', label: '1 subway ride out' }],
+    tips: [
+      'None of these are far — most are 20–35 minutes by subway from the city center, just in gu\'s (districts) tour buses skip.',
+      'Go on a weekday if you can — these stay genuinely quiet even on weekends, but weekday mornings are close to empty.',
+      "This is a great pairing with a slower, no-agenda day — nothing here needs advance booking or a ticket line.",
+    ],
+    blocks: [
+      {
+        type: 'places', title: 'Where to go', subtitle: 'Real places, well outside the usual loop',
+        placeSlugs: ['vs-ENP035673', 'vs-ENP998h6q', 'vs-ENPxa3w2o', 'vs-ENP002299', 'vs-ENP023760', 'vs-ENP032546', 'vs-ENP003452'],
+      },
+    ],
+    swatch: ['#2a3225', '#79876b'],
   },
 ];
 

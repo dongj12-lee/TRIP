@@ -78,6 +78,7 @@ export default function PlaceDetail() {
 
   if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
 
+  const fitKeys = fitTagsFor(place.category, place.categoryL2);
   const isSaved = saved.has(place.slug);
   const onSave = () => {
     haptic.tick();
@@ -253,18 +254,32 @@ export default function PlaceDetail() {
         <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
           <H style={{ fontSize: 19, marginBottom: 4 }}>Foreigner Fit</H>
           <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
+          {fitKeys.every((key) => !place.verifiedTags?.includes(key) && (tagCounts[key]?.yes ?? 0) === 0 && (tagCounts[key]?.no ?? 0) === 0) && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.accent50, borderRadius: 12, padding: 11, marginBottom: 10 }}>
+              <T style={{ fontSize: 16 }}>👋</T>
+              <T style={{ flex: 1, fontSize: 12.5, color: c.accent, fontWeight: '600', lineHeight: 17 }}>No one's confirmed this yet — be the first, it helps every traveler after you.</T>
+            </View>
+          )}
           <View style={{ gap: 2 }}>
-            {fitTagsFor(place.category, place.categoryL2).map((key) => {
+            {fitKeys.map((key) => {
               const tag = FIT_TAGS[key];
               const { yes = 0, no = 0 } = tagCounts[key] ?? {};
-              const has = yes > no;
+              const verified = !!place.verifiedTags?.includes(key);
+              const has = yes > no || verified;
               const votingKey = `${place.slug}:${key}`;
               const mineVote = tagVotes[votingKey];
               return (
                 <View key={key} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
                   <T style={{ fontSize: 20 }}>{tag.emoji}</T>
                   <View style={{ flex: 1 }}>
-                    <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
+                      {verified && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: c.sage50, paddingVertical: 1.5, paddingHorizontal: 6, borderRadius: 999 }}>
+                          <T style={{ fontSize: 10, color: c.sage700, fontWeight: '800' }}>✓ TRIP verified</T>
+                        </View>
+                      )}
+                    </View>
                     <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{tag.hint}</T>
                   </View>
                   <TagVoteButton

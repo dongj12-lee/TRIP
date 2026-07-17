@@ -13,7 +13,7 @@ import { Icon } from '@/components/Icon';
 import { SkeletonList, SkeletonThemeCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 
-const CATEGORIES = ['All', 'Essentials', 'Food & Drink', 'K-Content', 'Culture', 'Shopping', 'Getting Around', 'Day Trips', 'Festivals'];
+const CATEGORIES = ['All', 'Essentials', 'Food & Drink', 'K-Content', 'Culture', 'Shopping', 'Getting Around', 'Day Trips', 'Neighborhoods', 'Festivals'];
 
 export default function ThemesScreen() {
   const { c } = useTheme();

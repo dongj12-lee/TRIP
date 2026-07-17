@@ -61,6 +61,13 @@ export type Place = {
   // Community satisfaction — powers the "Recommended" rail.
   likeCount?: number;
   dislikeCount?: number;
+  // Editorial "verified by TRIP" tags — mechanically derived from objective
+  // Visit Seoul fields or a well-established category-level fact (never a
+  // per-place guess), kept separate from the crowd-voted `votes` above so it
+  // can never be confused with or overwrite a real traveler vote. Solves the
+  // cold-start problem for the Foreigner-Fit checklist without fabricating
+  // per-place claims.
+  verifiedTags?: ForeignerTagKey[];
 };
 
 export type GuideItem = {
@@ -104,7 +111,44 @@ export type Theme = {
   // calendar, hacks…) so one theme can hold a real handbook, not 6 picks.
   sections?: { title: string; subtitle?: string; items: GuideItem[] }[];
   updated?: string; // freshness stamp shown on the card, e.g. 'Jul 2026'
+  // "Lounge" content blocks: richer, purpose-built layouts (a fare/time
+  // comparison table, a numbered how-to, a rail of real in-app places) that a
+  // generic items list can't express well. Rendered in order after sections.
+  blocks?: ThemeBlock[];
 };
+
+// A side-by-side comparison (e.g. AREX vs limousine bus vs taxi; KTX vs
+// flight vs express bus for a given route) — columns are option names, each
+// row is one comparison dimension (Time, Price, Best for…).
+export type CompareBlock = {
+  type: 'compare';
+  title: string;
+  subtitle?: string;
+  columns: string[];
+  rows: { label: string; values: string[] }[];
+  note?: string; // one caveat/tip below the table
+};
+
+// A numbered walkthrough (how to use a delivery app, how a jjimjilbang
+// visit flows start to finish, how to queue for a music-show taping).
+export type StepsBlock = {
+  type: 'steps';
+  title: string;
+  subtitle?: string;
+  steps: { title: string; note: string; emoji?: string }[];
+};
+
+// A rail linking into real in-app Place rows (by slug) — for
+// neighborhood/spot themes so the "lounge" surfaces live app content
+// instead of only static copy.
+export type PlacesBlock = {
+  type: 'places';
+  title: string;
+  subtitle?: string;
+  placeSlugs: string[];
+};
+
+export type ThemeBlock = CompareBlock | StepsBlock | PlacesBlock;
 
 export type Author = { name: string; country: string };
 

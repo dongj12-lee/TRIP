@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useRemoteContent } from '@/lib/remoteData';
-import { GuideItem } from '@/data/types';
+import { GuideItem, ThemeBlock } from '@/data/types';
 import { T, H, Screen, DetailHeader, Card } from '@/components/base';
 import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
@@ -110,6 +110,13 @@ export default function ThemeDetail() {
           </View>
         )}
 
+        {/* "Lounge" blocks: comparison tables, step-by-step how-tos, real-place rails.
+            Rendered first — these are the load-bearing content for the newer deep
+            guides (the quick answer / the how-to), with items/sections as detail below. */}
+        {!isWalk && theme.blocks?.map((b, bi) => (
+          <ThemeBlockView key={bi} block={b} placeBySlug={placeBySlug} router={router} />
+        ))}
+
         {/* Guide: items */}
         {!isWalk && theme.items && (
           <View style={{ paddingHorizontal: 18, paddingTop: 22 }}>
@@ -190,5 +197,88 @@ function GuideItemCard({ item }: { item: GuideItem }) {
         )}
       </View>
     </Card>
+  );
+}
+
+function ThemeBlockView({ block, placeBySlug, router }: { block: ThemeBlock; placeBySlug: Record<string, any>; router: ReturnType<typeof useRouter> }) {
+  const { c } = useTheme();
+  return (
+    <View style={{ paddingHorizontal: 18, paddingTop: 24 }}>
+      <H style={{ fontSize: 18 }}>{block.title}</H>
+      {!!block.subtitle && <T style={{ fontSize: 12.5, color: c.muted, marginTop: 2 }}>{block.subtitle}</T>}
+
+      {block.type === 'compare' && (
+        <View style={{ marginTop: 12 }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View>
+              <View style={{ flexDirection: 'row' }}>
+                <View style={{ width: 110 }} />
+                {block.columns.map((col, ci) => (
+                  <View key={ci} style={{ width: 128, paddingHorizontal: 8, paddingBottom: 8 }}>
+                    <T style={{ fontSize: 12.5, fontWeight: '800', color: c.accent }}>{col}</T>
+                  </View>
+                ))}
+              </View>
+              {block.rows.map((row, ri) => (
+                <View key={ri} style={{ flexDirection: 'row', borderTopWidth: 1, borderColor: c.line, paddingVertical: 10 }}>
+                  <View style={{ width: 110 }}>
+                    <T style={{ fontSize: 12.5, fontWeight: '700', color: c.inkSoft }}>{row.label}</T>
+                  </View>
+                  {row.values.map((v, vi) => (
+                    <View key={vi} style={{ width: 128, paddingHorizontal: 8 }}>
+                      <T style={{ fontSize: 13, color: c.ink, lineHeight: 17 }}>{v}</T>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+          {!!block.note && (
+            <View style={{ marginTop: 10, backgroundColor: c.gold50, borderRadius: 10, padding: 10 }}>
+              <T style={{ fontSize: 12.5, color: c.gold700, fontWeight: '600', lineHeight: 17 }}>💡 {block.note}</T>
+            </View>
+          )}
+        </View>
+      )}
+
+      {block.type === 'steps' && (
+        <View style={{ gap: 12, marginTop: 12 }}>
+          {block.steps.map((s, si) => (
+            <View key={si} style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={{ width: 30, height: 30, borderRadius: 999, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {s.emoji ? <T style={{ fontSize: 15 }}>{s.emoji}</T> : <T style={{ color: '#fff', fontSize: 14, fontWeight: '800' }}>{si + 1}</T>}
+              </View>
+              <View style={{ flex: 1, paddingTop: 3 }}>
+                <T style={{ fontSize: 14.5, fontWeight: '700' }}>{s.title}</T>
+                <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, lineHeight: 18 }}>{s.note}</T>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {block.type === 'places' && (
+        <View style={{ gap: 10, marginTop: 12 }}>
+          {block.placeSlugs.map((ps) => {
+            const place = placeBySlug[ps];
+            if (!place) return null;
+            return (
+              <Pressable key={ps} onPress={() => router.push(`/place/${ps}`)}>
+                <Card style={{ padding: 12, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <View style={{ width: 46, height: 46, borderRadius: 10, overflow: 'hidden' }}>
+                    <Photo uri={place.photoUrl} swatch={place.swatch} height={46} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <T style={{ fontSize: 14.5, fontWeight: '700' }} numberOfLines={1}>{place.name}</T>
+                    <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{place.category} · {guLabel(place.neighborhood)}</T>
+                  </View>
+                  <Icon name="chevron" size={18} stroke={c.muted} sw={2} />
+                </Card>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
+    </View>
   );
 }

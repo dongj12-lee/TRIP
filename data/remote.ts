@@ -256,6 +256,7 @@ function mapPlace(row: any): Place {
     wheelchair: row.wheelchair ?? undefined,
     likeCount: row.like_count ?? 0,
     dislikeCount: row.dislike_count ?? 0,
+    verifiedTags: row.verified_tags ?? [],
   };
 }
 
@@ -269,7 +270,7 @@ const BROWSE_COLS =
   'warn_tip,k_content_title,k_content_type,k_content_note,swatch,photo_url,subway,free_entry,' +
   // description is included so the natural-language screener (lib/screener.ts)
   // can match on it — descriptions are its richest signal.
-  'english_site,wheelchair,like_count,dislike_count,description';
+  'english_site,wheelchair,like_count,dislike_count,verified_tags,description';
 
 export async function fetchPlaces(): Promise<Place[]> {
   // PostgREST caps a single response at 1000 rows, so page through the whole
