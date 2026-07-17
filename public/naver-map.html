@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <style>html,body,#map{width:100%;height:100%;margin:0;padding:0}</style>
+  <!--
+    Minimal same-origin shell for the web map (see components/WebMap.web.tsx).
+    It exists only so window.location is a REAL registered Service URL — the
+    Naver SDK reads window.location for its domain check, and a srcDoc/blob
+    iframe (about:srcdoc) can never match. The map runtime is injected here by
+    the parent frame; this file just loads the SDK with the given clientId.
+  -->
+  <script>
+    (function () {
+      var id = new URLSearchParams(location.search).get('clientId') || '';
+      document.write('<scr' + 'ipt src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + encodeURIComponent(id) + '"><\/scr' + 'ipt>');
+    })();
+  </script>
+</head>
+<body>
+  <div id="map"></div>
+</body>
+</html>

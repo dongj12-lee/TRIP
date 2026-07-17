@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, FlatList, ScrollView, Pressable, TextInput, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useRemoteContent } from '@/lib/remoteData';
 import { useStore } from '@/lib/store';
@@ -21,13 +22,10 @@ import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { DayPlanSheet } from '@/components/DayPlanSheet';
 
-// Cap map pins so the Seoul map doesn't turn into an unreadable pin-cloud
-// once hundreds of places are loaded.
-const MAX_MAP_PINS = 40;
-
 export default function ExploreScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { places, posts, refreshAll, loading } = useRemoteContent();
   const { profile } = useStore();
 
@@ -43,7 +41,6 @@ export default function ExploreScreen() {
   const [selectedHoods, setSelectedHoods] = useState<Set<string>>(new Set());
   const [intent, setIntent] = useState<IntentKey | null>(null);
   const [sub, setSub] = useState<string | null>(null);
-  const [selected, setSelected] = useState<string | null>(null);
   const [showMap, setShowMap] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
@@ -115,7 +112,9 @@ export default function ExploreScreen() {
     });
   const clearHoods = () => setSelectedHoods(new Set());
 
-  const mapPlaces = useMemo(() => filtered.slice(0, MAX_MAP_PINS), [filtered]);
+  // Full filtered catalog goes to the map — the WebMap runtime clusters and
+  // viewport-culls, so thousands of pins stay readable and cheap.
+  const mapPlaces = filtered;
 
   // "Recommended" only shows when the user hasn't narrowed the list themselves.
   const noFilters = !query && selectedHoods.size === 0 && !intent && activeTags.size === 0;
@@ -252,7 +251,8 @@ export default function ExploreScreen() {
       {/* Map (hidden while searching to keep results focused) */}
       {showMap && !query && (
         <View style={{ marginHorizontal: 18, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
-          <ExploreMap places={mapPlaces} selectedSlug={selected} onSelect={setSelected} height={220} />
+          {/* Pin tap goes straight to the place card — the map stays put. */}
+          <ExploreMap places={mapPlaces} selectedSlug={null} onSelect={(slug) => slug && router.push(`/place/${slug}`)} height={220} />
         </View>
       )}
 

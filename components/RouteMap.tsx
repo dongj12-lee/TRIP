@@ -3,12 +3,25 @@ import { View } from 'react-native';
 import { Svg, Rect, Path, G, Polyline, Circle } from 'react-native-svg';
 import { useTheme } from '@/theme/theme';
 import { T } from './base';
+import { WebMap } from './WebMap';
 
-// Draws an ordered day route: numbered stops connected by a dashed walking
-// line, on the same stylized Seoul base as ExploreMap. Pure SVG — no map SDK.
 export type RouteMapStop = { name: string; lat?: number; lng?: number };
 
 export function RouteMap({ stops, height = 150 }: { stops: RouteMapStop[]; height?: number }) {
+  const pts = stops.filter((s): s is { name: string; lat: number; lng: number } => s.lat != null && s.lng != null);
+  if (pts.length < 2) return null;
+  return (
+    <WebMap
+      height={height}
+      pins={pts.map((p, i) => ({ id: String(i), lat: p.lat, lng: p.lng, number: i + 1 }))}
+      polyline={pts.map((p) => ({ lat: p.lat, lng: p.lng }))}
+      fallback={<FallbackRouteMap stops={stops} height={height} />}
+    />
+  );
+}
+
+// Stylized stand-in for when no Naver Maps client ID is configured yet.
+function FallbackRouteMap({ stops, height = 150 }: { stops: RouteMapStop[]; height?: number }) {
   const { c } = useTheme();
   const pts = stops.filter((s): s is { name: string; lat: number; lng: number } => s.lat != null && s.lng != null);
   if (pts.length < 2) return null;

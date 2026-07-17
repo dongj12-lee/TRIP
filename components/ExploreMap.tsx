@@ -4,8 +4,9 @@ import { Svg, Rect, Path, G } from 'react-native-svg';
 import { useTheme } from '@/theme/theme';
 import { Place } from '@/data/types';
 import { T } from './base';
+import { WebMap } from './WebMap';
+import { categoryPinColor } from './webMapHtml';
 
-// Styled stand-in for a real Naver/Kakao Maps SDK (see README Assets note).
 // `sub` is category_l2 — lets Cuisine (cafes/bars/restaurants all share the
 // same L1) still get a distinct pin per kind.
 function pinEmoji(cat: string, sub?: string | null) {
@@ -22,6 +23,36 @@ function pinEmoji(cat: string, sub?: string | null) {
 }
 
 export function ExploreMap({
+  places,
+  selectedSlug,
+  onSelect,
+  height = 220,
+}: {
+  places: Place[];
+  selectedSlug: string | null;
+  onSelect: (slug: string | null) => void;
+  height?: number;
+}) {
+  if (places.length === 0) return <FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />;
+  return (
+    <WebMap
+      height={height}
+      cluster
+      pins={places.map((p) => ({
+        id: p.slug,
+        lat: p.lat,
+        lng: p.lng,
+        color: categoryPinColor(p.category, p.categoryL2),
+        selected: p.slug === selectedSlug,
+      }))}
+      onPinPress={(id) => onSelect(id)}
+      fallback={<FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />}
+    />
+  );
+}
+
+// Styled stand-in for when no Naver Maps client ID is configured yet.
+function FallbackExploreMap({
   places,
   selectedSlug,
   onSelect,
