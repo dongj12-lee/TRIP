@@ -10,7 +10,11 @@ export const ACCENTS: Record<
 > = {
   '#c26b4a': { name: 'Terracotta', main: '#c26b4a', d600: '#a9542f', l50: '#f8ebe3', d50: '#3a271d' },
   '#79876b': { name: 'Sage', main: '#79876b', d600: '#5f6d53', l50: '#eceee6', d50: '#2a3225' },
-  '#bd8f33': { name: 'Gold', main: '#bd8f33', d600: '#8a6a1f', l50: '#f7efd8', d50: '#3a2f16' },
+  // main darkened #bd8f33 → #a67a26 so white button text clears 3:1 (3.87:1,
+  // was 2.94 — the only accent that failed it). Still clearly gold; matches
+  // the other accents' ~3.82 contrast. Key stays #bd8f33 (it's the AccentKey
+  // union / stored preference), only the rendered `main` shifts.
+  '#bd8f33': { name: 'Gold', main: '#a67a26', d600: '#8a6a1f', l50: '#f7efd8', d50: '#3a2f16' },
   '#5b6f9c': { name: 'Hanok Blue', main: '#5b6f9c', d600: '#42537a', l50: '#e7ecf4', d50: '#202838' },
 };
 
@@ -29,7 +33,11 @@ const LIGHT = {
   surface2: '#f4ece0',
   ink: '#2e2a24',
   inkSoft: '#6f665a',
-  muted: '#a59a8a',
+  // WCAG AA: 4.57:1 on paper / 4.85:1 on surface (was #a59a8a, 2.57:1 — the
+  // metadata tier was unreadable in bright light, the exact conditions this
+  // travel app is used in). The ink→inkSoft→muted hierarchy is now carried by
+  // size + weight (muted only ever styles small 11–12px labels), not color.
+  muted: '#767063',
   line: '#ece2d3',
   terra50: '#f8ebe3', terra: '#c26b4a', terra700: '#a9542f',
   sage50: '#eceee6', sage: '#79876b', sage700: '#5f6d53',
@@ -47,7 +55,9 @@ const DARK: typeof LIGHT = {
   surface2: '#2f2820',
   ink: '#f3ebde',
   inkSoft: '#b6ab9a',
-  muted: '#837a6b',
+  // WCAG AA: ≥4.59:1 on every dark surface incl. the lightest (surface2)
+  // (was #837a6b, 4.25:1 on paper and failing on surface2).
+  muted: '#99907d',
   line: '#342d24',
   terra50: '#3a271d', terra: '#d07f5d', terra700: '#ecab8a',
   sage50: '#2a3225', sage: '#93a182', sage700: '#b6c6a2',

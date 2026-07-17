@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { View, Animated, StyleProp, ViewStyle } from 'react-native';
 import { useTheme } from '@/theme/theme';
+import { useReducedMotion } from '@/lib/reducedMotion';
 
 // Loading placeholders shown during the initial live-content fetch, so the
 // screen never flashes seed/demo data that then swaps to the real list.
@@ -30,10 +31,15 @@ export function Skeleton({
   style?: StyleProp<ViewStyle>;
 }) {
   const { c } = useTheme();
-  useEffect(ensurePulse, []);
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    if (!reduced) ensurePulse();
+  }, [reduced]);
+  // Reduce Motion: a static placeholder at a steady mid-opacity instead of the
+  // breathing pulse loop.
   return (
     <Animated.View
-      style={[{ width: w ?? '100%', height: h, borderRadius: r, backgroundColor: c.line, opacity: pulse }, style]}
+      style={[{ width: w ?? '100%', height: h, borderRadius: r, backgroundColor: c.line, opacity: reduced ? 0.7 : pulse }, style]}
     />
   );
 }

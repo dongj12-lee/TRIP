@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { Animated, View, Text, Easing } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
+import { useReducedMotion } from '@/lib/reducedMotion';
 
 // App-wide toast: brief bottom confirmation for actions that otherwise happen
 // silently (save, follow, publish, share…). One toast at a time; auto-dismisses.
@@ -13,6 +14,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
+  const reduced = useReducedMotion();
   const [toast, setToast] = useState<ToastState>(null);
   const anim = useRef(new Animated.Value(0)).current;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,7 +44,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <Animated.View
             style={{
               opacity: anim,
-              transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
+              // Reduce Motion: crossfade only, no upward slide.
+              transform: reduced ? [] : [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
               flexDirection: 'row',
               alignItems: 'center',
               gap: 8,

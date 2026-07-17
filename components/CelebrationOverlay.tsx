@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { ConquestTier } from '@/lib/stamps';
 import { haptic } from '@/lib/haptics';
+import { useReducedMotion } from '@/lib/reducedMotion';
 import { T, H, Button } from './base';
 
 // A reward moment shown when a district-conquest tier is newly reached. Simple
@@ -22,6 +23,7 @@ export function CelebrationOverlay({
 }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const reduced = useReducedMotion();
   const pop = useRef(new Animated.Value(0)).current;
   const pieces = useRef(
     Array.from({ length: 16 }, (_, i) => ({
@@ -35,21 +37,27 @@ export function CelebrationOverlay({
   useEffect(() => {
     if (!tier) return;
     haptic.success();
+    // Reduce Motion: the dialog appears at rest (Modal's fade carries it in),
+    // no spring pop and no falling confetti.
+    if (reduced) {
+      pop.setValue(1);
+      return;
+    }
     pop.setValue(0);
     Animated.spring(pop, { toValue: 1, useNativeDriver: true, friction: 6, tension: 80 }).start();
     pieces.forEach((p) => {
       p.fall.setValue(0);
       Animated.timing(p.fall, { toValue: 1, duration: 2600, delay: p.delay, easing: Easing.linear, useNativeDriver: true }).start();
     });
-  }, [tier]);
+  }, [tier, reduced]);
 
   if (!tier) return null;
 
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(15,11,20,0.72)', alignItems: 'center', justifyContent: 'center', padding: 28 }} onPress={onClose}>
-        {/* Confetti */}
-        {pieces.map((p, i) => (
+        {/* Confetti — suppressed under Reduce Motion */}
+        {!reduced && pieces.map((p, i) => (
           <Animated.Text
             key={i}
             style={{
