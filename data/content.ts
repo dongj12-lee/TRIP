@@ -33,7 +33,7 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'order-budae-jjigae-solo', type: 'tip',
+    slug: 'order-budae-jjigae-solo', type: 'post',
     title: 'How to actually eat budae-jjigae as a solo traveler',
     body: "Most budae-jjigae places have a 2-person minimum. Two tricks: (1) ask for '1인분 가능해요?' — some say yes off-menu, (2) go to a kimbap/snack spot that does single portions. Don't get turned away at the door!",
     neighborhood: 'Euljiro', author: { name: 'You', country: '🧳' }, when: '3h ago', votes: 42, comments: 1,
@@ -42,7 +42,7 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'gwangjang-no-tourist-markup', type: 'tip',
+    slug: 'gwangjang-no-tourist-markup', type: 'post',
     title: 'Gwangjang Market without the tourist markup',
     body: 'Always ask the price BEFORE you sit. Point to the menu, confirm the number. The yukhoe alley is great but a few stalls quote inflated prices to foreigners. Cash helps you negotiate.',
     neighborhood: 'Jongno', placeSlug: 'gwangjang-yukhoe', author: { name: 'Mia', country: '🇺🇸' }, when: '1d ago', votes: 38, comments: 0,
@@ -59,14 +59,14 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'best-solo-naengmyeon', type: 'review',
+    slug: 'best-solo-naengmyeon', type: 'post',
     title: 'Eulji Myeonok is the best solo lunch in Seoul',
     body: "Walked in alone at 2pm, no questions asked. Quiet, fast, and the cold broth is unreal on a hot day. They don't speak much English but pointing at the picture menu works fine.",
     neighborhood: 'Euljiro', placeSlug: 'eulji-myeonok', author: { name: 'You', country: '🧳' }, when: '4d ago', votes: 29, comments: 0,
     commentList: [],
   },
   {
-    slug: 'cheap-eats-seoul-station', type: 'tip',
+    slug: 'cheap-eats-seoul-station', type: 'post',
     title: 'Cheap eats near Seoul Station that take foreign cards',
     body: 'Landing late with no cash? Around Seoul Station the basement food court and a cluster of gimbap/bunsik spots all take foreign cards and have picture menus. My go-to: a 4,000-won kimchi-jjigae set that\'s open till midnight. Tap, point, eat.',
     neighborhood: 'Seoul Station', author: { name: 'You', country: '🧳' }, when: '1w ago', votes: 18, comments: 3,
@@ -76,7 +76,7 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'tmoney-card-tip', type: 'tip',
+    slug: 'tmoney-card-tip', type: 'post',
     title: 'Get a T-money card before you do ANYTHING else',
     body: 'Grab one at any CU/GS25 convenience store (~₩3,000) and load cash. One tap covers subway, every bus, AND taxis — plus you get free transfers within 30 min. Don\'t bother buying single tickets; the card pays for itself in a day.',
     neighborhood: 'Citywide', author: { name: 'Marcus', country: '🇬🇧' }, when: '6h ago', votes: 67, comments: 2,
@@ -86,7 +86,7 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'naver-map-not-google', type: 'tip',
+    slug: 'naver-map-not-google', type: 'post',
     title: 'Use Naver Map or Kakao Map — NOT Google Maps',
     body: 'Google Maps walking/transit directions barely work in Korea (national security data rules). Download Naver Map or Kakao Map instead — they have live subway times, bus arrivals, and accurate walking routes. Search in English works fine on both.',
     neighborhood: 'Citywide', author: { name: 'Diego', country: '🇲🇽' }, when: '1d ago', votes: 58, comments: 1,
@@ -95,7 +95,7 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'convenience-store-hacks', type: 'tip',
+    slug: 'convenience-store-hacks', type: 'post',
     title: 'Convenience store meals are genuinely good (and cheap)',
     body: 'CU, GS25 and 7-Eleven have hot bins, microwaves and free hot water. Get a triangle gimbap + cup ramyeon for under ₩4,000, or the viral combos (try the Baekjong-won fried rice). Card accepted everywhere. Perfect for a cheap solo dinner.',
     neighborhood: 'Citywide', author: { name: 'Leo', country: '🇫🇷' }, when: '2d ago', votes: 49, comments: 2,
@@ -105,7 +105,7 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'tax-free-shopping-tip', type: 'tip',
+    slug: 'tax-free-shopping-tip', type: 'post',
     title: 'How tax-free works for tourists (instant vs refund)',
     body: "Spend ₩15,000+ at a 'Tax Free' shop and you can claim ~8–10% back. Many stores do INSTANT tax-free (discount at the register, just show your passport). For the rest, keep receipts and refund at the airport kiosk before security. Always carry your passport when shopping.",
     neighborhood: 'Myeongdong', author: { name: 'Priya', country: '🇨🇦' }, when: '3d ago', votes: 41, comments: 1,
@@ -114,14 +114,14 @@ export const POSTS: Post[] = [
     ],
   },
   {
-    slug: 'esim-data-tip', type: 'tip',
+    slug: 'esim-data-tip', type: 'post',
     title: 'Sort your data: eSIM before you fly, or SIM at arrivals',
     body: 'An eSIM (Airalo etc.) activates the moment you land — easiest if your phone supports it. Otherwise grab a SIM at the airport arrivals counters (KT/SKT). You NEED data here: maps, Kakao T taxis, translation, and a lot of shops/cafés use QR menus.',
     neighborhood: 'Incheon', author: { name: 'Anya', country: '🇩🇪' }, when: '4d ago', votes: 36, comments: 0,
     commentList: [],
   },
   {
-    slug: 'cafe-bathroom-codes', type: 'tip',
+    slug: 'cafe-bathroom-codes', type: 'post',
     title: "Café bathrooms often need a passcode — it's on your receipt",
     body: "Lots of cafés and mall toilets are locked with a keypad. The code is usually printed on your receipt, or posted by the counter. If you're stuck, just ask staff '비밀번호?' (bimilbeonho = password). Saves a confused dance at the door.",
     neighborhood: 'Citywide', author: { name: 'Sora', country: '🇯🇵' }, when: '5d ago', votes: 33, comments: 1,
@@ -277,9 +277,9 @@ export const CREATORS: Creator[] = [
     home: '🇰🇷 Seoul', verified: true, tier: 'expert', expertise: 'Markets & street food', followers: '48.2k',
     bio: 'Lifelong Seoulite mapping the pojangmacha, market alleys and late-night eats locals actually go to.',
     posts: [
-      { type: 'tip', title: 'Gwangjang Market like a local: what to order, what to skip', votes: 612, comments: 41, when: '2d ago' },
-      { type: 'tip', title: '5 pojangmacha etiquette rules foreigners always miss', votes: 388, comments: 22, when: '5d ago' },
-      { type: 'review', title: 'The best 3,000-won gimbap in Jung-gu', votes: 240, comments: 12, when: '1w ago' },
+      { type: 'post', title: 'Gwangjang Market like a local: what to order, what to skip', votes: 612, comments: 41, when: '2d ago' },
+      { type: 'post', title: '5 pojangmacha etiquette rules foreigners always miss', votes: 388, comments: 22, when: '5d ago' },
+      { type: 'post', title: 'The best 3,000-won gimbap in Jung-gu', votes: 240, comments: 12, when: '1w ago' },
     ],
   },
   {
@@ -288,7 +288,7 @@ export const CREATORS: Creator[] = [
     bio: 'Moved to Seoul solo with no Korean. Sharing the unglamorous logistics so your trip is smoother than mine was.',
     posts: [
       { type: 'route', title: "The solo traveler's first 48 hours in Seoul", votes: 421, comments: 33, when: '1d ago' },
-      { type: 'tip', title: 'T-money, transit & the apps that actually work abroad', votes: 295, comments: 18, when: '4d ago' },
+      { type: 'post', title: 'T-money, transit & the apps that actually work abroad', votes: 295, comments: 18, when: '4d ago' },
     ],
   },
   {
@@ -296,8 +296,8 @@ export const CREATORS: Creator[] = [
     home: '🇯🇵 Osaka', verified: false, tier: 'guide', expertise: 'K-drama filming spots', followers: '23.1k',
     bio: 'Chasing every café, rooftop and staircase from my favorite dramas. Scene-by-scene location guides.',
     posts: [
-      { type: 'tip', title: 'Every filming location from that rooftop confession scene', votes: 510, comments: 47, when: '3d ago' },
-      { type: 'review', title: 'The hidden Euljiro café directors keep reusing', votes: 198, comments: 9, when: '6d ago' },
+      { type: 'post', title: 'Every filming location from that rooftop confession scene', votes: 510, comments: 47, when: '3d ago' },
+      { type: 'post', title: 'The hidden Euljiro café directors keep reusing', votes: 198, comments: 9, when: '6d ago' },
     ],
   },
   {
@@ -305,7 +305,7 @@ export const CREATORS: Creator[] = [
     home: '🇨🇦 Toronto', verified: false, tier: 'guide', expertise: 'Couples & food trips', followers: '8.9k',
     bio: 'A couple eating their way across Korea. Reservation tips, sharing-friendly menus, and 2-person portions.',
     posts: [
-      { type: 'tip', title: 'Restaurants that happily seat just two people', votes: 176, comments: 14, when: '2d ago' },
+      { type: 'post', title: 'Restaurants that happily seat just two people', votes: 176, comments: 14, when: '2d ago' },
     ],
   },
 ];
@@ -343,8 +343,8 @@ export const DEFAULT_ITINERARY: Itinerary = {
 export const USER = {
   name: 'You', handle: 'newtraveler', points: 340, helpfulVotes: 128, contributions: 6, followers: 47,
   myPosts: [
-    { type: 'tip' as const, slug: 'order-budae-jjigae-solo', title: 'How to actually eat budae-jjigae as a solo traveler', neighborhood: 'Euljiro', votes: 42, comments: 1, when: '3h ago' },
-    { type: 'review' as const, slug: 'best-solo-naengmyeon', title: 'Eulji Myeonok is the best solo lunch in Seoul', neighborhood: 'Euljiro', votes: 29, comments: 0, when: '4d ago' },
-    { type: 'tip' as const, slug: 'cheap-eats-seoul-station', title: 'Cheap eats near Seoul Station that take foreign cards', neighborhood: 'Seoul Station', votes: 18, comments: 3, when: '1w ago' },
+    { type: 'post' as const, slug: 'order-budae-jjigae-solo', title: 'How to actually eat budae-jjigae as a solo traveler', neighborhood: 'Euljiro', votes: 42, comments: 1, when: '3h ago' },
+    { type: 'post' as const, slug: 'best-solo-naengmyeon', title: 'Eulji Myeonok is the best solo lunch in Seoul', neighborhood: 'Euljiro', votes: 29, comments: 0, when: '4d ago' },
+    { type: 'post' as const, slug: 'cheap-eats-seoul-station', title: 'Cheap eats near Seoul Station that take foreign cards', neighborhood: 'Seoul Station', votes: 18, comments: 3, when: '1w ago' },
   ],
 };

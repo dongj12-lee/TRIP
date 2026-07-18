@@ -5,7 +5,7 @@ import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { haptic } from '@/lib/haptics';
 import { useToast } from './Toast';
-import { FOREIGNER_TAGS, POST_TYPES, placeBySlug } from '@/data';
+import { FOREIGNER_TAGS, POST_TYPES, normalizePostType, placeBySlug } from '@/data';
 import { intentLabel } from '@/data/intents';
 import { Place, Post, RouteDay } from '@/data/types';
 import { Icon } from './Icon';
@@ -15,7 +15,9 @@ import { Avatar } from './Avatar';
 import { T, H, Card } from './base';
 
 export function PostTypeBadge({ type }: { type: string }) {
-  const t = POST_TYPES[type] || POST_TYPES.tip;
+  const nt = normalizePostType(type);
+  if (nt === 'post') return null; // plain posts carry no badge
+  const t = POST_TYPES[nt];
   return <Chip tone={t.tone}>{`${t.emoji} ${t.label}`}</Chip>;
 }
 
@@ -150,11 +152,14 @@ export function PostCard({ post }: { post: Post }) {
   const voteKey = post.id ?? post.slug;
   const voted = votes.has(voteKey);
   const open = () => router.push(`/post/${post.slug}`);
-  // A casual "thought" leads with its body (tweet-like); structured posts lead
-  // with their title.
-  const isThought = post.type === 'thought' || !post.title;
-  const typeTone = tone((POST_TYPES[post.type] || POST_TYPES.tip).tone);
-  const typeLabel = (POST_TYPES[post.type] || POST_TYPES.tip).label;
+  // Untitled posts lead with their body (tweet-like); titled posts lead with the
+  // title. A plain "post" carries no type tag (Threads-style) — only the
+  // meaningful kinds, route & question, get a marker.
+  const nt = normalizePostType(post.type);
+  const leadWithBody = !post.title;
+  const showType = nt !== 'post';
+  const typeTone = tone(POST_TYPES[nt].tone);
+  const typeLabel = POST_TYPES[nt].label;
   const likeN = post.votes + (voted ? 1 : 0);
   return (
     <Card onPress={open} style={{ padding: 16 }}>
@@ -165,7 +170,7 @@ export function PostCard({ post }: { post: Post }) {
         <View style={{ flex: 1, gap: 2 }}>
           <T style={{ fontSize: 14.5, fontWeight: '800', color: c.ink }} numberOfLines={1}>{post.author.name}</T>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
-            {!isThought && (
+            {showType && (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: typeTone.solid }} />
                 <T style={{ fontSize: 12, color: typeTone.fg, fontWeight: '700' }}>{typeLabel}</T>
@@ -179,7 +184,7 @@ export function PostCard({ post }: { post: Post }) {
       </View>
 
       {/* Content */}
-      {isThought ? (
+      {leadWithBody ? (
         <T numberOfLines={6} style={{ marginTop: 11, fontSize: 15.5, lineHeight: 23, color: c.ink }}>{post.body}</T>
       ) : (
         <>
@@ -222,18 +227,22 @@ export function PostCard({ post }: { post: Post }) {
 export function PostCardMini({ post }: { post: Post }) {
   const { c, tone } = useTheme();
   const router = useRouter();
-  const typeTone = tone((POST_TYPES[post.type] || POST_TYPES.tip).tone);
-  const typeLabel = (POST_TYPES[post.type] || POST_TYPES.tip).label;
+  const nt = normalizePostType(post.type);
+  const showType = nt !== 'post';
+  const typeTone = tone(POST_TYPES[nt].tone);
+  const typeLabel = POST_TYPES[nt].label;
   return (
     <Pressable
       onPress={() => router.push(`/post/${post.slug}`)}
       style={{ padding: 14, paddingVertical: 13, borderRadius: 14, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-        <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: typeTone.solid }} />
-        <T style={{ fontSize: 11.5, color: typeTone.fg, fontWeight: '800' }}>{typeLabel}</T>
-      </View>
-      <T style={{ marginTop: 7, fontSize: 15, fontWeight: '700', lineHeight: 20 }} numberOfLines={2}>{post.title || post.body}</T>
+      {showType && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 7 }}>
+          <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: typeTone.solid }} />
+          <T style={{ fontSize: 11.5, color: typeTone.fg, fontWeight: '800' }}>{typeLabel}</T>
+        </View>
+      )}
+      <T style={{ fontSize: 15, fontWeight: '700', lineHeight: 20 }} numberOfLines={2}>{post.title || post.body}</T>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 }}>
         {!!post.author && <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{post.author.name}</T>}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>

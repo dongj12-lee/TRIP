@@ -26,7 +26,7 @@ export default function Compose() {
   const { showToast } = useToast();
 
   const isBuddy = kind === 'buddy';
-  const [type, setType] = useState<PostType>('tip');
+  const [type, setType] = useState<PostType>('post');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [when, setWhen] = useState('');
@@ -94,7 +94,9 @@ export default function Compose() {
             <>
               <T style={{ fontSize: 12, fontWeight: '700', color: c.muted, marginBottom: 8, marginTop: 4 }}>TYPE</T>
               <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
-                {Object.entries(POST_TYPES).filter(([k]) => k !== 'review').map(([k, v]) => {
+                {/* Route posts come from the itinerary-share flow (they carry
+                    route data), so the composer only offers Post vs Question. */}
+                {Object.entries(POST_TYPES).filter(([k]) => k !== 'route').map(([k, v]) => {
                   const on = type === k;
                   return (
                     <Pressable key={k} onPress={() => setType(k as PostType)} style={{ flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent50 : c.surface }}>

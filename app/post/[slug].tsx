@@ -59,7 +59,7 @@ export default function PostDetail() {
 
   if (!post) return <Screen><DetailHeader title="Post" /></Screen>;
   const place = post.placeSlug ? placeBySlug[post.placeSlug] : null;
-  const isThought = post.type === 'thought' || !post.title;
+  const leadWithBody = !post.title; // untitled posts read body-first
   const canWrite = !!post.id && isSupabaseConfigured && !!session;
 
   const startReply = (cm: Comment) => {
@@ -115,14 +115,14 @@ export default function PostDetail() {
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 1 }}>
                 <T style={{ fontSize: 12.5, color: c.muted }}>{post.when}</T>
-                {!isThought && <PostTypeBadge type={post.type} />}
+                <PostTypeBadge type={post.type} />{/* self-hides for plain posts */}
               </View>
             </View>
           </View>
 
           {/* Content */}
-          {!isThought && <H style={{ fontSize: 23, lineHeight: 29, marginTop: 16 }}>{post.title}</H>}
-          {!!post.body && <T style={{ fontSize: 16, lineHeight: 25, color: c.ink, marginTop: isThought ? 14 : 10 }}>{post.body}</T>}
+          {!leadWithBody && <H style={{ fontSize: 23, lineHeight: 29, marginTop: 16 }}>{post.title}</H>}
+          {!!post.body && <T style={{ fontSize: 16, lineHeight: 25, color: c.ink, marginTop: leadWithBody ? 14 : 10 }}>{post.body}</T>}
           {!!post.imageUrl && <Photo uri={post.imageUrl} height={240} radius={16} style={{ marginTop: 14 }} />}
 
           {place && (

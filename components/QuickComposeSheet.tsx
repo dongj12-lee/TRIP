@@ -14,12 +14,11 @@ import { PhotoAttach } from './PhotoAttach';
 import { useToast } from './Toast';
 import { haptic } from '@/lib/haptics';
 
-// A frictionless, body-first composer — the fastest way to share a thought.
-// No forced title, no forced category: type a thought and post. Title and the
-// tip/question distinction are optional, revealed only if you want them.
+// A frictionless, body-first composer — the fastest way to share something.
+// No forced title, no forced category: just type and post. It's a plain post by
+// default; flip to Question only if you're actually asking the community.
 const TYPES: { key: PostType; emoji: string; label: string }[] = [
-  { key: 'thought', emoji: '💭', label: 'Thought' },
-  { key: 'tip', emoji: '💡', label: 'Tip' },
+  { key: 'post', emoji: '💬', label: 'Post' },
   { key: 'question', emoji: '❓', label: 'Question' },
 ];
 
@@ -31,7 +30,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
   const { addLocalPost } = useRemoteContent();
   const { showToast } = useToast();
 
-  const [type, setType] = useState<PostType>('thought');
+  const [type, setType] = useState<PostType>('post');
   const [body, setBody] = useState('');
   const [title, setTitle] = useState('');
   const [showTitle, setShowTitle] = useState(false);
@@ -40,7 +39,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
 
   useEffect(() => {
     if (visible) {
-      setType('thought'); setBody(''); setTitle(''); setShowTitle(false); setImageUrl(undefined); setBusy(false);
+      setType('post'); setBody(''); setTitle(''); setShowTitle(false); setImageUrl(undefined); setBusy(false);
     }
   }, [visible]);
 

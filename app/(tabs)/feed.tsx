@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
-import { POST_TYPES } from '@/data';
+import { normalizePostType } from '@/data';
 import { T, H } from '@/components/base';
 import { PostCard } from '@/components/cards';
 import { Avatar } from '@/components/Avatar';
@@ -14,7 +14,7 @@ import { OfflineBanner } from '@/components/OfflineBanner';
 import { haptic } from '@/lib/haptics';
 
 export default function FeedScreen() {
-  const { c, tone } = useTheme();
+  const { c } = useTheme();
   const insets = useSafeAreaInsets();
   const { sharedPost, profile } = useStore();
   const { posts, refreshPosts, loading } = useRemoteContent();
@@ -31,13 +31,15 @@ export default function FeedScreen() {
   // (see lib/store.tsx shareTrip); only prepend it here for the local/offline
   // fallback case where it isn't part of the loaded list yet.
   const all = sharedPost && !posts.some((p) => p.slug === sharedPost.slug) ? [sharedPost, ...posts] : posts;
-  const list = all.filter((p) => !type || p.type === type);
+  const list = all.filter((p) => !type || normalizePostType(p.type) === type);
 
-  const chips: [string, string][] = [
-    ['all', 'All'],
-    ...Object.entries(POST_TYPES)
-      .filter(([k]) => k !== 'review')
-      .map(([k, v]) => [k, v.label] as [string, string]),
+  // A segmented control instead of chips — three meaningful kinds, so the whole
+  // filter reads at a glance rather than as a scrolling row of pills.
+  const segments: [string | null, string][] = [
+    [null, 'All'],
+    ['post', 'Posts'],
+    ['route', 'Routes'],
+    ['question', 'Questions'],
   ];
 
   const openCompose = () => { haptic.tick(); setComposeOpen(true); };
@@ -48,7 +50,7 @@ export default function FeedScreen() {
         <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
           <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
           <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-            Tips, routes & thoughts from fellow travelers
+            Tips, routes & questions from fellow travelers
           </T>
         </View>
         <SkeletonList card={SkeletonPostCard} n={4} />
@@ -61,7 +63,7 @@ export default function FeedScreen() {
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
         <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
         <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-          Tips, routes & thoughts from fellow travelers
+          Tips, routes & questions from fellow travelers
         </T>
       </View>
 
@@ -86,33 +88,30 @@ export default function FeedScreen() {
         </Pressable>
       </View>
 
-      <View style={{ height: 52 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 8, alignItems: 'center' }}>
-          {chips.map(([k, label]) => {
-            const on = (k === 'all' && !type) || type === k;
-            // Clean, restrained filter: neutral idle, solid ink when selected.
-            // A small type-color dot ties each chip to its card marker without
-            // painting the whole chip (which read as clutter).
-            const dot = k === 'all' ? null : tone(POST_TYPES[k].tone).solid;
+      {/* Segmented filter: one tap between All / Posts / Routes / Questions.
+          A white pill on a paper track — the polished form of the pipe-tab idea. */}
+      <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
+        <View style={{ flexDirection: 'row', backgroundColor: c.surface2, borderRadius: 13, padding: 3 }}>
+          {segments.map(([k, label]) => {
+            const on = type === k;
             return (
               <Pressable
-                key={k}
-                onPress={() => { haptic.tick(); setType(k === 'all' ? null : k); }}
+                key={label}
+                onPress={() => { haptic.tick(); setType(k); }}
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
                 style={{
-                  flexDirection: 'row', alignItems: 'center', gap: 6,
-                  paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
-                  borderWidth: 1, borderColor: on ? c.ink : c.line,
-                  backgroundColor: on ? c.ink : c.surface,
+                  flex: 1, alignItems: 'center', justifyContent: 'center',
+                  paddingVertical: 8, borderRadius: 10,
+                  backgroundColor: on ? c.surface : 'transparent',
+                  ...(on ? { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 1 } : null),
                 }}
               >
-                {dot && <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: on ? '#fff' : dot }} />}
-                <T style={{ fontSize: 13, fontWeight: '700', color: on ? c.paper : c.inkSoft }}>{label}</T>
+                <T style={{ fontSize: 13, fontWeight: on ? '800' : '600', color: on ? c.ink : c.muted }}>{label}</T>
               </Pressable>
             );
           })}
-        </ScrollView>
+        </View>
       </View>
 
       {/* FlatList (not ScrollView): posts are unbounded — keep scrolling cheap */}

@@ -57,13 +57,21 @@ export function fitTagsFor(category: string, categoryL2?: string | null): Foreig
   return FIT_BY_CATEGORY[category] ?? FIT_DEFAULT;
 }
 
+// Three meaningful kinds only. A freeform "post" is the default — it absorbs
+// what used to be split across thought/tip/review, since that distinction was
+// fuzzy and added posting friction. "Route" is structural (auto when a shared
+// itinerary is attached); "question" is a distinct intent (expects answers).
 export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 'terra' | 'sage' | 'gold' | 'rose' | 'blue' }> = {
-  thought: { emoji: '💭', label: 'Thought', tone: 'blue' },
-  tip: { emoji: '💡', label: 'Tip', tone: 'gold' },
+  post: { emoji: '💬', label: 'Post', tone: 'blue' },
   route: { emoji: '🧭', label: 'Route', tone: 'terra' },
   question: { emoji: '❓', label: 'Question', tone: 'sage' },
-  review: { emoji: '⭐', label: 'Review', tone: 'rose' },
 };
+
+// Maps any stored type (including legacy thought/tip/review rows) onto the
+// current three-kind model. Use wherever a post's type drives display/filtering.
+export function normalizePostType(t: string | null | undefined): 'post' | 'route' | 'question' {
+  return t === 'route' || t === 'question' ? t : 'post';
+}
 
 // Real theme cover photos — reused from Visit Seoul place photography (same
 // source & licence as the rest of the app), keyed for readability below.

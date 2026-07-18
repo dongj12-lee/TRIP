@@ -64,7 +64,7 @@ async function seedThemes() {
 async function seedPosts() {
   const rows = POSTS.map((p) => ({
     slug: p.slug,
-    type: p.type === 'review' ? 'tip' : p.type, // schema doesn't model "review" (folded into tip per README)
+    type: p.type, // post | route | question
     title: p.title,
     body: p.body,
     neighborhood: p.neighborhood,

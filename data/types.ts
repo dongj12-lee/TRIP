@@ -166,7 +166,7 @@ export type Comment = {
   likedByMe?: boolean;
 };
 
-export type PostType = 'thought' | 'tip' | 'route' | 'question' | 'review';
+export type PostType = 'post' | 'route' | 'question';
 
 export type Post = {
   id?: string; // Supabase row id, present once backed by the DB (see data/remote.ts)

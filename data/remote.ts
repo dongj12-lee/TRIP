@@ -453,7 +453,7 @@ export async function createPost(input: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not signed in');
-  // Casual "thought" posts have no title — derive a slug from the body instead.
+  // Untitled posts have no title — derive a slug from the body instead.
   const slug = slugify(input.title || input.body.slice(0, 40) || 'post');
   const { data, error } = await supabase
     .from('posts')
