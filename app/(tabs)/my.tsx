@@ -126,10 +126,10 @@ export default function MyScreen() {
               pressed && { opacity: 0.92 },
             ]}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 15, paddingTop: 13 }}>
-              <T style={{ fontSize: 11, fontWeight: '800', color: c.accent, letterSpacing: 1 }}>🎫 SEOUL PASSPORT</T>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 15 }}>
+              <T style={{ fontSize: 15.5, fontWeight: '800', color: c.ink }}>Seoul Passport</T>
               <View style={{ flex: 1 }} />
-              <T style={{ fontSize: 12, fontWeight: '700', color: c.inkSoft }}>{passportRankInfo.emoji} {passportRankInfo.title}</T>
+              <T style={{ fontSize: 12.5, fontWeight: '700', color: c.accent }}>{passportRankInfo.emoji} {passportRankInfo.title}</T>
               <Icon name="chevron" size={16} stroke={c.muted} sw={2} />
             </View>
             <CollectionMap earned={earnedDistricts} height={158} />
@@ -147,18 +147,18 @@ export default function MyScreen() {
 
         {/* Itinerary card */}
         <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
-          <Card style={{ padding: 15 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <T style={{ fontSize: 11, fontWeight: '800', color: c.accent, letterSpacing: 1 }}>MY ITINERARY</T>
+          <Card style={{ padding: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <T style={{ fontSize: 12.5, fontWeight: '800', color: c.accent }}>My itinerary</T>
               {!sharedPost && (
-                <View style={{ backgroundColor: c.surface2, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
-                  <T style={{ fontSize: 9.5, fontWeight: '800', color: c.muted, letterSpacing: 0.5 }}>DRAFT</T>
+                <View style={{ backgroundColor: c.surface2, paddingHorizontal: 7, paddingVertical: 2.5, borderRadius: 6 }}>
+                  <T style={{ fontSize: 10, fontWeight: '800', color: c.muted }}>Draft</T>
                 </View>
               )}
             </View>
-            <H style={{ fontSize: 20, marginTop: 6 }}>{itinerary.title}</H>
-            <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600', marginTop: 3 }}>
-              🗓 {itinerary.dates} · {itinerary.travelers} · {plural(itinerary.days.length, 'day')} ·{' '}
+            <H style={{ fontSize: 21, marginTop: 6, lineHeight: 26 }}>{itinerary.title}</H>
+            <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600', marginTop: 4 }}>
+              {itinerary.dates} · {itinerary.travelers} · {plural(itinerary.days.length, 'day')} ·{' '}
               {plural(itinerary.days.reduce((s, d) => s + d.stops.length, 0), 'stop')}
             </T>
             <View style={{ marginTop: 12, gap: 8 }}>

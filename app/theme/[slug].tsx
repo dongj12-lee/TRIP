@@ -66,8 +66,11 @@ export default function ThemeDetail() {
 
         {/* Know before you go */}
         {theme.tips && theme.tips.length > 0 && (
-          <View style={{ marginHorizontal: 18, marginTop: 16, backgroundColor: c.gold50, borderRadius: 16, padding: 15 }}>
-            <T style={{ fontSize: 12, fontWeight: '800', color: c.gold700, letterSpacing: 0.6, marginBottom: 8 }}>💡 KNOW BEFORE YOU GO</T>
+          <View style={{ marginHorizontal: 18, marginTop: 20, backgroundColor: c.gold50, borderRadius: 16, padding: 16 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+              <T style={{ fontSize: 14 }}>💡</T>
+              <T style={{ fontSize: 14, fontWeight: '800', color: c.gold700 }}>Know before you go</T>
+            </View>
             <View style={{ gap: 8 }}>
               {theme.tips.map((tip, i) => (
                 <View key={i} style={{ flexDirection: 'row', gap: 8 }}>

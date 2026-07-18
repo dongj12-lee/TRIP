@@ -13,7 +13,6 @@ import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
 import { ExploreMap } from '@/components/ExploreMap';
 import { Icon } from '@/components/Icon';
-import { Eyebrow } from '@/components/ui';
 import { FiltersSheet } from '@/components/FiltersSheet';
 import { SeoulWeather } from '@/components/SeoulWeather';
 import { haptic } from '@/lib/haptics';
@@ -236,9 +235,9 @@ export default function ExploreScreen() {
           other travelers liked and put in their routes. */}
       {recommended.length > 0 && (
         <View style={{ paddingBottom: 16 }}>
-          <View style={{ paddingHorizontal: 18, marginBottom: 10 }}>
-            <Eyebrow>Recommended</Eyebrow>
-            <T style={{ fontSize: 12.5, color: c.muted, marginTop: 2 }}>
+          <View style={{ paddingHorizontal: 18, marginBottom: 12 }}>
+            <H style={{ fontSize: 19 }}>Recommended</H>
+            <T style={{ fontSize: 12.5, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
               Liked by travelers & in their routes
             </T>
           </View>
