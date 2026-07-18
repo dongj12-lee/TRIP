@@ -257,7 +257,7 @@ function mapPlace(row: any): Place {
     likeCount: row.like_count ?? 0,
     dislikeCount: row.dislike_count ?? 0,
     verifiedTags: row.verified_tags ?? [],
-    naverMapUrl: row.naver_map_url ?? undefined,
+    websiteUrl: row.website_url ?? undefined,
   };
 }
 

@@ -193,17 +193,17 @@ export default function PlaceDetail() {
               {!!place.priceRange && <T style={{ fontSize: 13.5, color: c.inkSoft, fontWeight: '700' }}>{place.priceRange}</T>}
             </View>
           )}
-          {/* Deep link to the real Naver Map page — reviews live there, not
-              stored in-app (see migration-024 for why). */}
-          {!!place.naverMapUrl && (
+          {/* The business's own official website, when they have one — not a
+              review source (see migration-025 for why there's no such link). */}
+          {!!place.websiteUrl && (
             <Pressable
-              onPress={() => { haptic.tick(); Linking.openURL(place.naverMapUrl!); }}
+              onPress={() => { haptic.tick(); Linking.openURL(place.websiteUrl!); }}
               accessibilityRole="button"
-              accessibilityLabel="View reviews on Naver Map"
+              accessibilityLabel="Visit website"
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 12 }}
             >
-              <Icon name="pin" size={14} stroke={c.accent} sw={2} />
-              <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>View reviews on Naver Map</T>
+              <Icon name="globe" size={14} stroke={c.accent} sw={2} />
+              <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>Visit website</T>
             </Pressable>
           )}
         </View>

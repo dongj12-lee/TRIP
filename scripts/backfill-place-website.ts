@@ -1,18 +1,22 @@
-// One-off backfill for migration-024: resolve each place's real Naver Map
-// page via the Naver Local Search API (a free Open API product, separate
-// from the paid Maps SDK already in use) and store the link permanently.
+// One-off backfill for migration-025 (places.website_url): resolve each
+// place's own official website via the Naver Local Search API (a free Open
+// API product, separate from the paid Maps SDK already in use).
 //
-// Why a link instead of embedded review content: Naver's Local Search API
-// has no rating/review field at all, and Google Places API explicitly
-// forbids caching review content beyond the place ID. A stored deep link is
-// the only durable, ToS-safe way to get travelers to real reviews.
+// This is NOT a Naver Map / review link — Naver has no official API, free or
+// paid, that exposes a place ID or a link to a business's Naver Map review
+// page (verified: NCP Maps only ships Static Map/Directions/Geocoding; the
+// nmap:// app scheme only drops a pin; the Local Search API's `link` field is
+// the business's own external homepage). So the place detail screen instead
+// shows a "Visit website" link when a business has registered one — real,
+// useful, and requires no review-content caching at all.
 //
-// Matching is text search by name (+ neighborhood, to disambiguate chains) —
-// not always a perfect match, so this never overwrites an existing link and
-// logs anything it can't confidently resolve for manual review instead of
-// guessing.
+// Matching is text search by name_ko (Naver's Local Search index is
+// Korean-name-first — an English query reliably returns zero items, response
+// claims total:1 but items:[]). Not always a perfect match, so this never
+// overwrites an existing link and logs anything it can't confidently resolve
+// for manual review instead of guessing.
 //
-//   npx tsx scripts/backfill-naver-map-link.ts [--dry-run] [--force]
+//   npx tsx scripts/backfill-place-website.ts [--dry-run] [--force]
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
@@ -38,11 +42,10 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 const dryRun = process.argv.includes('--dry-run');
 const force = process.argv.includes('--force');
 
-type Row = { slug: string; name: string; neighborhood: string | null; naver_map_url: string | null };
+type Row = { slug: string; name: string; name_ko: string | null; neighborhood: string | null; website_url: string | null };
 
 // Naver wraps matched terms in <b> and HTML-escapes the rest — strip both
-// since we only need the plain link, but the title is useful for the
-// no-confident-match log.
+// since we only need the plain link, but the title is useful for logging.
 function stripTags(s: string) {
   return s
     .replace(/<\/?b>/g, '')
@@ -74,26 +77,27 @@ async function main() {
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await supabase
       .from('places')
-      .select('slug,name,neighborhood,naver_map_url')
+      .select('slug,name,name_ko,neighborhood,website_url')
       .range(from, from + PAGE - 1);
     if (error) throw error;
     all.push(...(data as Row[]));
     if (data.length < PAGE) break;
   }
-  const todo = force ? all : all.filter((r) => !r.naver_map_url);
+  const todo = force ? all : all.filter((r) => !r.website_url);
   console.log(`${all.length} places total, ${todo.length} to resolve${force ? ' (--force: re-resolving all)' : ''}.`);
 
   let resolved = 0;
   const unresolved: string[] = [];
 
   for (const row of todo) {
-    // Neighborhood in the query disambiguates chains (e.g. a café brand with
-    // several Seoul branches) — Visit Seoul names are already in English/Korean
-    // mix, which Naver's search handles fine.
-    const query = row.neighborhood ? `${row.name} ${row.neighborhood}` : row.name;
+    if (!row.name_ko) {
+      unresolved.push(row.slug);
+      await sleep(120);
+      continue;
+    }
     let hit: { title: string; link: string } | null = null;
     try {
-      hit = await searchLocal(query);
+      hit = await searchLocal(row.name_ko);
     } catch (e) {
       console.warn(`  [${row.slug}] search failed: ${(e as Error).message}`);
     }
@@ -103,7 +107,7 @@ async function main() {
     } else {
       resolved++;
       if (!dryRun) {
-        const { error } = await supabase.from('places').update({ naver_map_url: hit.link }).eq('slug', row.slug);
+        const { error } = await supabase.from('places').update({ website_url: hit.link }).eq('slug', row.slug);
         if (error) throw error;
       }
     }

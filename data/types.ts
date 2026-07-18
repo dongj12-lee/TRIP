@@ -68,11 +68,11 @@ export type Place = {
   // cold-start problem for the Foreigner-Fit checklist without fabricating
   // per-place claims.
   verifiedTags?: ForeignerTagKey[];
-  // Deep link to this place's own Naver Map page (resolved once via the Naver
-  // Local Search API, then stored permanently — see migration-024). Tapping
-  // through is how travelers see real, live reviews: neither Google nor Naver
-  // allow storing review content itself, only the place ID / link.
-  naverMapUrl?: string;
+  // The business's own official website, when they have one — resolved once
+  // via the Naver Local Search API, then stored permanently (migration-025).
+  // Not a review source: Naver has no official API that exposes a place ID or
+  // a link to a business's Naver Map review page.
+  websiteUrl?: string;
 };
 
 export type GuideItem = {
