@@ -64,7 +64,7 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
   const { showToast } = useToast();
   const tags = FOREIGNER_TAGS.filter((t) => (place as any)[t.key]);
   const isSaved = saved.has(place.slug);
-  const ph = 144;
+  const ph = 156;
   const onSave = () => {
     haptic.tick();
     if (!isSaved) showToast('Saved to your spots', '🔖');
@@ -101,7 +101,7 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
           {place.rating != null && <Rating value={place.rating} />}
         </View>
         <T style={{ marginTop: 4, fontSize: 12.5, color: c.inkSoft, fontWeight: '600' }}>
-          {intentLabel(place)} · {guLabel(place.neighborhood)} · {place.priceRange}
+          {[intentLabel(place), guLabel(place.neighborhood), place.priceRange].filter(Boolean).join(' · ')}
         </T>
         {!compact && !!place.kContentNote && (
           <T style={{ marginTop: 9, fontSize: 12.5, lineHeight: 18, color: c.gold700, fontWeight: '600' }}>{place.kContentNote}</T>
@@ -116,11 +116,15 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
             ))}
           </View>
         )}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 11 }}>
-          {tags.map((t) => (
-            <TagPill key={t.key} tag={t} />
-          ))}
-        </View>
+        {/* Fit-tag pills only when the place actually has confirmed tags —
+            no phantom bottom gap on the imported catalog (tags mostly empty). */}
+        {tags.length > 0 && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 11 }}>
+            {tags.map((t) => (
+              <TagPill key={t.key} tag={t} />
+            ))}
+          </View>
+        )}
       </View>
     </Card>
   );

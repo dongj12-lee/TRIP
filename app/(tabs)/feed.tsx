@@ -45,8 +45,11 @@ export default function FeedScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: c.paper }}>
-        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 10 }}>
+        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
           <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
+          <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
+            Tips, routes & thoughts from fellow travelers
+          </T>
         </View>
         <SkeletonList card={SkeletonPostCard} n={4} />
       </View>
@@ -55,8 +58,11 @@ export default function FeedScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 10 }}>
+      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
         <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
+        <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
+          Tips, routes & thoughts from fellow travelers
+        </T>
       </View>
 
       <OfflineBanner />

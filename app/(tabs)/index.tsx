@@ -150,7 +150,9 @@ export default function ExploreScreen() {
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
         <H style={{ fontSize: 32, lineHeight: 36 }}>Explore</H>
         <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-          {filtered.length} of {places.length} spots
+          {filtered.length === places.length
+            ? `${places.length.toLocaleString()} real Seoul spots`
+            : `${filtered.length.toLocaleString()} of ${places.length.toLocaleString()} spots`}
         </T>
       </View>
 
@@ -316,7 +318,7 @@ export default function ExploreScreen() {
       {/* List header */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {screenerActive ? `✨ Best matches` : sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length}
+          {screenerActive ? `✨ Best matches` : sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length.toLocaleString()}
         </T>
         {!query && (
           <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
