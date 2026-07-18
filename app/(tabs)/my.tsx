@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Pressable, Image } from 'react-native';
+import { View, ScrollView, Animated, Pressable, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -18,6 +18,7 @@ import { useToast } from '@/components/Toast';
 import { Icon } from '@/components/Icon';
 import { Photo } from '@/components/ui';
 import { Avatar } from '@/components/Avatar';
+import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 import { haptic } from '@/lib/haptics';
 
 export default function MyScreen() {
@@ -29,7 +30,8 @@ export default function MyScreen() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
-
+  const { scrollY, onScroll } = useTabScroll();
+  const topPad = useContentTopPadding();
 
   const name = profile.displayName || 'You';
   const handle = profile.handle || 'traveler';
@@ -61,11 +63,18 @@ export default function MyScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 90 }} showsVerticalScrollIndicator={false}>
-        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <H style={{ fontSize: 32 }}>My TRIP</H>
-          <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} color={c.inkSoft} />
-        </View>
+      <TabBar
+        title="My TRIP"
+        scrollY={scrollY}
+        right={<IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} color={c.inkSoft} />}
+      />
+      <Animated.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <TabTitle title="My TRIP" />
 
         {/* Identity — tap to edit */}
         <Pressable onPress={() => setEditing(true)} style={{ paddingHorizontal: 18, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -240,7 +249,7 @@ export default function MyScreen() {
             </View>
           )}
         </Section>
-      </ScrollView>
+      </Animated.ScrollView>
 
       <EditProfileSheet visible={editing} onClose={() => setEditing(false)} />
     </View>

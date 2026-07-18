@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, ScrollView, Pressable } from 'react-native';
+import { View, ScrollView, Animated, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -11,6 +11,7 @@ import { T, H, Card } from '@/components/base';
 import { Photo } from '@/components/ui';
 import { SkeletonList, SkeletonThemeCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 
 // Editorial browse order — lead with the trip-defining categories, practical
 // essentials mid-page, seasonal last. Only sections with content render.
@@ -31,6 +32,8 @@ export default function ThemesScreen() {
   const insets = useSafeAreaInsets();
   const { themes, loading } = useRemoteContent();
   const { profile } = useStore();
+  const { scrollY, onScroll } = useTabScroll();
+  const topPad = useContentTopPadding();
 
   const byCat = useMemo(() => {
     const m = new Map<string, Theme[]>();
@@ -55,33 +58,33 @@ export default function ThemesScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: c.paper }}>
-        <Header c={c} insets={insets} />
-        <SkeletonList card={SkeletonThemeCard} n={3} />
+        <TabBar title="Themes" scrollY={scrollY} />
+        <View style={{ paddingTop: topPad }}>
+          <TabTitle title="Themes" />
+          <SkeletonList card={SkeletonThemeCard} n={3} />
+        </View>
       </View>
     );
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <Header c={c} insets={insets} />
-      <OfflineBanner />
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 90, paddingTop: 6 }} showsVerticalScrollIndicator={false}>
+      <TabBar title="Themes" scrollY={scrollY} />
+      <Animated.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <TabTitle title="Themes" />
+        <View style={{ paddingHorizontal: 18 }}>
+          <OfflineBanner />
+        </View>
         {forYou.length > 0 && <Rail title="For you" themes={forYou} />}
         {sections.map((cat) => (
           <Rail key={cat} title={cat} themes={byCat.get(cat)!} />
         ))}
-      </ScrollView>
-    </View>
-  );
-}
-
-function Header({ c, insets }: { c: any; insets: { top: number } }) {
-  return (
-    <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 6 }}>
-      <H style={{ fontSize: 32, lineHeight: 36 }}>Themes</H>
-      <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-        Curated walks & guides for the trip you came for
-      </T>
+      </Animated.ScrollView>
     </View>
   );
 }

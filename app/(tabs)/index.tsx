@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, FlatList, ScrollView, Pressable, TextInput, RefreshControl } from 'react-native';
+import { View, FlatList, Animated, ScrollView, Pressable, TextInput, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -20,6 +20,7 @@ import { guLabel } from '@/lib/format';
 import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { DayPlanSheet } from '@/components/DayPlanSheet';
+import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 
 export default function ExploreScreen() {
   const { c } = useTheme();
@@ -27,6 +28,8 @@ export default function ExploreScreen() {
   const router = useRouter();
   const { places, posts, refreshAll, loading } = useRemoteContent();
   const { profile } = useStore();
+  const { scrollY, onScroll } = useTabScroll();
+  const topPad = useContentTopPadding();
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = async () => {
@@ -127,11 +130,11 @@ export default function ExploreScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: c.paper }}>
-        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
-          <H style={{ fontSize: 32, lineHeight: 36 }}>Explore</H>
-          <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>Finding spots…</T>
+        <TabBar title="Explore" scrollY={scrollY} />
+        <View style={{ paddingTop: topPad }}>
+          <TabTitle title="Explore" />
+          <SkeletonList card={SkeletonPlaceCard} n={4} />
         </View>
-        <SkeletonList card={SkeletonPlaceCard} n={4} />
       </View>
     );
   }
@@ -145,15 +148,7 @@ export default function ExploreScreen() {
 
   const header = (
     <>
-      {/* Header */}
-      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
-        <H style={{ fontSize: 32, lineHeight: 36 }}>Explore</H>
-        <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-          {filtered.length === places.length
-            ? `${places.length.toLocaleString()} real Seoul spots`
-            : `${filtered.length.toLocaleString()} of ${places.length.toLocaleString()} spots`}
-        </T>
-      </View>
+      <TabTitle title="Explore" />
 
       <OfflineBanner />
 
@@ -331,14 +326,17 @@ export default function ExploreScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <FlatList
+      <TabBar title="Explore" scrollY={scrollY} />
+      <Animated.FlatList
         data={filtered}
-        keyExtractor={(p) => p.slug}
+        keyExtractor={(p: any) => p.slug}
         renderItem={({ item }: { item: Place }) => (
           <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
             <PlaceCard place={item} reasons={reasonsBySlug[item.slug]} />
           </View>
         )}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
         ListHeaderComponent={header}
         ListEmptyComponent={
           <View style={{ paddingVertical: 50, alignItems: 'center', paddingHorizontal: 40 }}>
@@ -355,7 +353,7 @@ export default function ExploreScreen() {
             </Pressable>
           </View>
         }
-        contentContainerStyle={{ paddingBottom: insets.bottom + 90 }}
+        contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         showsVerticalScrollIndicator={false}

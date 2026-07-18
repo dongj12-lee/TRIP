@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, ScrollView, FlatList, Pressable, RefreshControl } from 'react-native';
+import { View, Animated, Pressable, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
 import { normalizePostType } from '@/data';
-import { T, H } from '@/components/base';
+import { T } from '@/components/base';
 import { PostCard } from '@/components/cards';
 import { Avatar } from '@/components/Avatar';
 import { QuickComposeSheet } from '@/components/QuickComposeSheet';
 import { SkeletonList, SkeletonPostCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 import { haptic } from '@/lib/haptics';
 
 export default function FeedScreen() {
@@ -18,6 +19,8 @@ export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const { sharedPost, profile } = useStore();
   const { posts, refreshPosts, loading } = useRemoteContent();
+  const { scrollY, onScroll } = useTabScroll();
+  const topPad = useContentTopPadding();
   const [type, setType] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [composeOpen, setComposeOpen] = useState(false);
@@ -47,29 +50,23 @@ export default function FeedScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: c.paper }}>
-        <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
-          <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
-          <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-            Tips, routes & questions from fellow travelers
-          </T>
+        <TabBar title="Feed" scrollY={scrollY} />
+        <View style={{ paddingTop: topPad }}>
+          <TabTitle title="Feed" />
+          <SkeletonList card={SkeletonPostCard} n={4} />
         </View>
-        <SkeletonList card={SkeletonPostCard} n={4} />
       </View>
     );
   }
 
-  return (
-    <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 18, paddingBottom: 12 }}>
-        <H style={{ fontSize: 32, lineHeight: 36 }}>Feed</H>
-        <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-          Tips, routes & questions from fellow travelers
-        </T>
+  const ListHeader = (
+    <View>
+      <TabTitle title="Feed" />
+      <View style={{ paddingHorizontal: 18 }}>
+        <OfflineBanner />
       </View>
 
-      <OfflineBanner />
-
-      {/* Inline composer prompt — one tap to share a thought */}
+      {/* Inline composer prompt — one tap to share */}
       <View style={{ paddingHorizontal: 18, paddingBottom: 10 }}>
         <Pressable
           onPress={openCompose}
@@ -88,8 +85,7 @@ export default function FeedScreen() {
         </Pressable>
       </View>
 
-      {/* Segmented filter: one tap between All / Posts / Routes / Questions.
-          A white pill on a paper track — the polished form of the pipe-tab idea. */}
+      {/* Segmented filter: All / Posts / Routes / Questions */}
       <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
         <View style={{ flexDirection: 'row', backgroundColor: c.surface2, borderRadius: 13, padding: 3 }}>
           {segments.map(([k, label]) => {
@@ -113,23 +109,35 @@ export default function FeedScreen() {
           })}
         </View>
       </View>
+    </View>
+  );
 
-      {/* FlatList (not ScrollView): posts are unbounded — keep scrolling cheap */}
-      <FlatList
+  return (
+    <View style={{ flex: 1, backgroundColor: c.paper }}>
+      <TabBar title="Feed" scrollY={scrollY} />
+
+      <Animated.FlatList
         data={list}
-        keyExtractor={(p) => p.slug}
-        renderItem={({ item }) => <PostCard post={item} />}
-        contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 90, gap: 12 }}
+        keyExtractor={(p: any) => p.slug}
+        renderItem={({ item }: any) => (
+          <View style={{ paddingHorizontal: 18, marginBottom: 12 }}>
+            <PostCard post={item} />
+          </View>
+        )}
+        ListHeaderComponent={ListHeader}
+        contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
         showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
         initialNumToRender={7}
         windowSize={9}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} progressViewOffset={topPad} />}
         ListEmptyComponent={
           <Pressable onPress={openCompose} style={{ alignItems: 'center', paddingVertical: 48, paddingHorizontal: 30 }}>
             <T style={{ fontSize: 30 }}>💬</T>
             <T style={{ fontSize: 15, fontWeight: '700', color: c.ink, marginTop: 10 }}>Nothing here yet</T>
             <T style={{ fontSize: 13, color: c.muted, marginTop: 4, textAlign: 'center', lineHeight: 19 }}>
-              Be the first to share a thought with fellow travelers.
+              Be the first to share something with fellow travelers.
             </T>
           </Pressable>
         }
