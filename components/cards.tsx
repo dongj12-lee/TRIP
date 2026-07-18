@@ -19,14 +19,6 @@ export function PostTypeBadge({ type }: { type: string }) {
   return <Chip tone={t.tone}>{`${t.emoji} ${t.label}`}</Chip>;
 }
 
-// Soft pastel card fill per post type — blue / cream / peach / green. Drawn
-// from the SAME tone as the type's filter chip and badge (POST_TYPES.tone via
-// the theme tone fn), so chips, badges and cards read as one colour per type.
-function postTint(toneFn: (t: any) => { bg: string; solid: string }, type: string): { bg: string; border: string } {
-  const t = toneFn((POST_TYPES[type] || POST_TYPES.tip).tone);
-  return { bg: t.bg, border: t.solid + '33' };
-}
-
 // Compact fixed-width card for horizontal carousels (e.g. the "For you" rail).
 export function PlaceCardCompact({ place }: { place: Place }) {
   const { c } = useTheme();
@@ -161,66 +153,66 @@ export function PostCard({ post }: { post: Post }) {
   // A casual "thought" leads with its body (tweet-like); structured posts lead
   // with their title.
   const isThought = post.type === 'thought' || !post.title;
-  const tint = postTint(tone, post.type);
+  const typeTone = tone((POST_TYPES[post.type] || POST_TYPES.tip).tone);
+  const typeLabel = (POST_TYPES[post.type] || POST_TYPES.tip).label;
+  const likeN = post.votes + (voted ? 1 : 0);
   return (
-    <Card onPress={open} style={{ padding: 15, backgroundColor: tint.bg, borderColor: tint.border }}>
-      {/* Author row */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Avatar name={post.author.name} size={38} />
-        <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-            <T style={{ fontSize: 13.5, fontWeight: '800', color: c.ink }} numberOfLines={1}>{post.author.name}</T>
-            <T style={{ fontSize: 13 }}>{post.author.country}</T>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 1 }}>
-            <T style={{ fontSize: 11.5, color: c.muted }}>{post.when}</T>
-            {!isThought && <PostTypeBadge type={post.type} />}
-            {!!post.neighborhood && <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600' }}>· 📍 {post.neighborhood}</T>}
+    <Card onPress={open} style={{ padding: 16 }}>
+      {/* Author row — clean: avatar, name, then one muted meta line. No
+          per-type card tint, no emoji soup (real feeds keep the surface neutral). */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11 }}>
+        <Avatar name={post.author.name} size={40} />
+        <View style={{ flex: 1, gap: 2 }}>
+          <T style={{ fontSize: 14.5, fontWeight: '800', color: c.ink }} numberOfLines={1}>{post.author.name}</T>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+            {!isThought && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: typeTone.solid }} />
+                <T style={{ fontSize: 12, color: typeTone.fg, fontWeight: '700' }}>{typeLabel}</T>
+              </View>
+            )}
+            <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }} numberOfLines={1}>
+              {post.when}{post.neighborhood ? `  ·  ${post.neighborhood}` : ''}
+            </T>
           </View>
         </View>
       </View>
 
       {/* Content */}
       {isThought ? (
-        <T numberOfLines={6} style={{ marginTop: 10, fontSize: 15, lineHeight: 22, color: c.ink }}>{post.body}</T>
+        <T numberOfLines={6} style={{ marginTop: 11, fontSize: 15.5, lineHeight: 23, color: c.ink }}>{post.body}</T>
       ) : (
         <>
-          <H style={{ marginTop: 10, fontSize: 17, lineHeight: 21 }}>{post.title}</H>
-          {!!post.body && <T numberOfLines={2} style={{ marginTop: 5, fontSize: 13.5, lineHeight: 20, color: c.inkSoft }}>{post.body}</T>}
+          <H style={{ marginTop: 12, fontSize: 18, lineHeight: 23 }}>{post.title}</H>
+          {!!post.body && <T numberOfLines={2} style={{ marginTop: 5, fontSize: 14, lineHeight: 20, color: c.inkSoft }}>{post.body}</T>}
         </>
       )}
       {!!post.imageUrl && (
-        <Photo uri={post.imageUrl} height={190} radius={14} style={{ marginTop: 11 }} />
+        <Photo uri={post.imageUrl} height={200} radius={14} style={{ marginTop: 12 }} />
       )}
       {post.routeDays && <RoutePreview days={post.routeDays} />}
 
-      {/* Action row */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 }}>
+      {/* Action row — minimal icon + count, no bordered pills (Threads-style). */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 22, marginTop: 14 }}>
         <Pressable
           onPress={() => { haptic.tick(); toggleVote(post); }}
-          hitSlop={6}
+          hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel={voted ? 'Unlike post' : 'Like post'}
-          style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 999,
-            borderWidth: 1, borderColor: voted ? c.rose : c.line, backgroundColor: voted ? c.rose50 : c.surface,
-          }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
         >
-          <Icon name="heart" size={16} fill={voted ? c.rose : 'none'} stroke={voted ? c.rose : c.inkSoft} sw={1.9} />
-          <T style={{ fontSize: 12.5, fontWeight: '700', color: voted ? c.rose700 : c.inkSoft }}>{post.votes + (voted ? 1 : 0)}</T>
+          <Icon name="heart" size={19} fill={voted ? c.rose : 'none'} stroke={voted ? c.rose : c.muted} sw={1.9} />
+          {likeN > 0 && <T style={{ fontSize: 13, fontWeight: '700', color: voted ? c.rose : c.muted }}>{likeN}</T>}
         </Pressable>
         <Pressable
           onPress={open}
-          hitSlop={6}
+          hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel="View replies"
-          style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6, height: 32, paddingHorizontal: 12, borderRadius: 999,
-            borderWidth: 1, borderColor: c.line, backgroundColor: c.surface,
-          }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
         >
-          <Icon name="comment" size={16} stroke={c.inkSoft} sw={1.9} />
-          <T style={{ fontSize: 12.5, fontWeight: '700', color: c.inkSoft }}>{post.comments > 0 ? post.comments : 'Reply'}</T>
+          <Icon name="comment" size={19} stroke={c.muted} sw={1.9} />
+          {post.comments > 0 && <T style={{ fontSize: 13, fontWeight: '700', color: c.muted }}>{post.comments}</T>}
         </Pressable>
       </View>
     </Card>
@@ -230,17 +222,29 @@ export function PostCard({ post }: { post: Post }) {
 export function PostCardMini({ post }: { post: Post }) {
   const { c, tone } = useTheme();
   const router = useRouter();
-  const tint = postTint(tone, post.type);
+  const typeTone = tone((POST_TYPES[post.type] || POST_TYPES.tip).tone);
+  const typeLabel = (POST_TYPES[post.type] || POST_TYPES.tip).label;
   return (
     <Pressable
       onPress={() => router.push(`/post/${post.slug}`)}
-      style={{ padding: 14, paddingVertical: 12, borderRadius: 14, backgroundColor: tint.bg, borderWidth: 1, borderColor: tint.border }}
+      style={{ padding: 14, paddingVertical: 13, borderRadius: 14, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
     >
-      <PostTypeBadge type={post.type} />
-      <T style={{ marginTop: 8, fontSize: 14.5, fontWeight: '700', lineHeight: 19 }}>{post.title || post.body}</T>
-      <T style={{ marginTop: 5, fontSize: 12, color: c.muted, fontWeight: '600' }}>
-        {post.author ? `${post.author.country} ${post.author.name} · ` : ''}▲ {post.votes} · 💬 {post.comments}
-      </T>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+        <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: typeTone.solid }} />
+        <T style={{ fontSize: 11.5, color: typeTone.fg, fontWeight: '800' }}>{typeLabel}</T>
+      </View>
+      <T style={{ marginTop: 7, fontSize: 15, fontWeight: '700', lineHeight: 20 }} numberOfLines={2}>{post.title || post.body}</T>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 }}>
+        {!!post.author && <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{post.author.name}</T>}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Icon name="heart" size={13} stroke={c.muted} sw={1.9} />
+          <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{post.votes}</T>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Icon name="comment" size={13} stroke={c.muted} sw={1.9} />
+          <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>{post.comments}</T>
+        </View>
+      </View>
     </Pressable>
   );
 }

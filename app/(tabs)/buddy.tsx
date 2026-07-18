@@ -8,6 +8,8 @@ import { useRemoteContent } from '@/lib/remoteData';
 import { Buddy } from '@/data/types';
 import { T, H, Card, IconButton } from '@/components/base';
 import { Flag } from '@/components/ui';
+import { Avatar } from '@/components/Avatar';
+import { Icon } from '@/components/Icon';
 import { SkeletonList, SkeletonBuddyCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 
@@ -83,31 +85,49 @@ function BuddyCard({ buddy }: { buddy: Buddy }) {
   const { joined } = useStore();
   const isJoined = joined.has(buddy.id);
   const count = buddy.interested + (isJoined ? 1 : 0);
+  const spotsLeft = Math.max(0, buddy.groupSize - 1 - count); // host takes one seat
   return (
-    <Card onPress={() => router.push(`/buddy/${buddy.id}`)} style={{ padding: 15 }}>
-      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
-        <View style={{ width: 46, height: 46, borderRadius: 13, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
-          <T style={{ fontSize: 24 }}>{buddy.emoji}</T>
+    <Card onPress={() => router.push(`/buddy/${buddy.id}`)} style={{ padding: 16 }}>
+      <View style={{ flexDirection: 'row', gap: 13, alignItems: 'flex-start' }}>
+        <View style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
+          <T style={{ fontSize: 25 }}>{buddy.emoji}</T>
         </View>
         <View style={{ flex: 1 }}>
-          <H style={{ fontSize: 17, lineHeight: 21 }}>{buddy.activity}</H>
-          <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600', marginTop: 3 }}>
-            🕒 {buddy.when} · 📍 {buddy.neighborhood} · 👥 up to {buddy.groupSize}
-          </T>
+          <H style={{ fontSize: 18, lineHeight: 23 }}>{buddy.activity}</H>
+          {/* Clean meta: line icons, not emoji soup */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 5, flexWrap: 'wrap' }}>
+            <MetaBit icon="clock" text={buddy.when} />
+            <MetaBit icon="pin" text={buddy.neighborhood} />
+          </View>
         </View>
       </View>
-      <T style={{ fontSize: 13.5, color: c.inkSoft, lineHeight: 19, marginTop: 10 }}>{buddy.note}</T>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+
+      <T style={{ fontSize: 14, color: c.inkSoft, lineHeight: 20, marginTop: 11 }} numberOfLines={2}>{buddy.note}</T>
+
+      {/* Footer: host on the left, availability on the right */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Flag country={buddy.author.country} size={22} />
-          <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600' }}>{buddy.author.name}</T>
+          <Avatar name={buddy.author.name} size={26} />
+          <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '700' }}>{buddy.author.name}</T>
+          <Flag country={buddy.author.country} size={16} />
         </View>
-        <View style={{ backgroundColor: count > 0 ? c.surface2 : 'transparent', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
-          <T style={{ fontSize: 12, fontWeight: '700', color: count > 0 ? c.inkSoft : c.muted }}>
-            {count > 0 ? `🙋 ${count} interested` : 'Be the first 🙋'}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Icon name="buddy" size={14} stroke={c.muted} sw={1.9} />
+          <T style={{ fontSize: 12.5, fontWeight: '700', color: spotsLeft > 0 ? c.inkSoft : c.muted }}>
+            {count > 0 ? `${count + 1}/${buddy.groupSize}` : spotsLeft > 0 ? `${spotsLeft} spot${spotsLeft === 1 ? '' : 's'} left` : 'Full'}
           </T>
         </View>
       </View>
     </Card>
+  );
+}
+
+function MetaBit({ icon, text }: { icon: string; text: string }) {
+  const { c } = useTheme();
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+      <Icon name={icon as any} size={13.5} stroke={c.muted} sw={1.9} />
+      <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600' }}>{text}</T>
+    </View>
   );
 }

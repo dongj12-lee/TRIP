@@ -37,7 +37,7 @@ export default function FeedScreen() {
     ['all', 'All'],
     ...Object.entries(POST_TYPES)
       .filter(([k]) => k !== 'review')
-      .map(([k, v]) => [k, `${v.emoji} ${v.label}`] as [string, string]),
+      .map(([k, v]) => [k, v.label] as [string, string]),
   ];
 
   const openCompose = () => { haptic.tick(); setComposeOpen(true); };
@@ -90,12 +90,10 @@ export default function FeedScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 18, paddingVertical: 8, alignItems: 'center' }}>
           {chips.map(([k, label]) => {
             const on = (k === 'all' && !type) || type === k;
-            // Each type chip carries its own colour (the same tone as its cards
-            // & badge); "All" stays neutral accent.
-            const tint = k === 'all' ? null : tone(POST_TYPES[k].tone);
-            const activeBg = tint ? tint.solid : c.accent;
-            const idleBg = tint ? tint.bg : c.surface;
-            const idleFg = tint ? tint.fg : c.inkSoft;
+            // Clean, restrained filter: neutral idle, solid ink when selected.
+            // A small type-color dot ties each chip to its card marker without
+            // painting the whole chip (which read as clutter).
+            const dot = k === 'all' ? null : tone(POST_TYPES[k].tone).solid;
             return (
               <Pressable
                 key={k}
@@ -103,12 +101,14 @@ export default function FeedScreen() {
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
                 style={{
-                  paddingVertical: 6.5, paddingHorizontal: 14, borderRadius: 999,
-                  borderWidth: 1, borderColor: on ? activeBg : tint ? tint.solid + '30' : c.line,
-                  backgroundColor: on ? activeBg : idleBg,
+                  flexDirection: 'row', alignItems: 'center', gap: 6,
+                  paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
+                  borderWidth: 1, borderColor: on ? c.ink : c.line,
+                  backgroundColor: on ? c.ink : c.surface,
                 }}
               >
-                <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : idleFg }}>{label}</T>
+                {dot && <View style={{ width: 6, height: 6, borderRadius: 999, backgroundColor: on ? '#fff' : dot }} />}
+                <T style={{ fontSize: 13, fontWeight: '700', color: on ? c.paper : c.inkSoft }}>{label}</T>
               </Pressable>
             );
           })}
