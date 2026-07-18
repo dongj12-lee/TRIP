@@ -145,13 +145,15 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
             {plan ? (
               <>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '700' }}>
-                    {v.emoji} {v.blurb}
-                  </T>
-                  <T style={{ fontSize: 12, color: c.muted, fontWeight: '600' }}>
-                    ~{plan.totalKm.toFixed(1)}km on foot{plan.usedSaved > 0 ? ` · ♥ ${plan.usedSaved} of your saves` : ''}
-                  </T>
+                {/* At-a-glance metric strip — the day summed up before the
+                    stops, echoing the reference's activity-summary grid. */}
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                  <Metric value={String(plan.stops.length)} label="stops" />
+                  <Metric value={plan.totalKm.toFixed(1)} label="km on foot" />
+                  <Metric
+                    value={plan.usedSaved > 0 ? `♥ ${plan.usedSaved}` : v.emoji}
+                    label={plan.usedSaved > 0 ? 'your saves' : v.label}
+                  />
                 </View>
                 <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
                   <RouteMap stops={plan.stops.map((s) => ({ name: s.place.name, lat: s.place.lat, lng: s.place.lng }))} height={140} />
@@ -218,6 +220,18 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
       handle={profile.handle}
     />
     </>
+  );
+}
+
+// Compact metric cell — Fraunces value + muted label, echoing the reference's
+// activity-summary grid but scaled to a sheet (restrained, not a hero metric).
+function Metric({ value, label }: { value: string; label: string }) {
+  const { c } = useTheme();
+  return (
+    <View style={{ flex: 1, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 14, paddingVertical: 11, alignItems: 'center' }}>
+      <H style={{ fontSize: 19 }}>{value}</H>
+      <T style={{ fontSize: 10.5, color: c.muted, fontWeight: '700', marginTop: 1 }}>{label}</T>
+    </View>
   );
 }
 

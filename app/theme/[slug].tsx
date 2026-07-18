@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ScrollView, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -21,12 +22,19 @@ export default function ThemeDetail() {
   const theme = themeBySlug[slug!];
   if (!theme) return <Screen><DetailHeader title="Theme" /></Screen>;
   const isWalk = theme.kind === 'walk';
+  // Editorial lead: opening sentence set large, the rest as supporting body.
+  // Same real-boundary heuristic as the place screen (Hermes-safe).
+  const dMatch = theme.description.match(/^([\s\S]{40,}?[.!?])\s+([A-Z"'“][\s\S]*)$/);
+  const descLead = dMatch ? dMatch[1] : theme.description;
+  const descRest = dMatch ? dMatch[2] : '';
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
+        {/* Hero photo — a clean band; the headline lives below on paper. */}
         <View style={{ height: 200 }}>
           <Photo uri={theme.photoUrl} swatch={theme.swatch} height={200} />
+          <LinearGradient colors={['rgba(0,0,0,0.4)', 'transparent']} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 110 }} />
           <View style={{ position: 'absolute', top: insets.top, left: 8 }}>
             <Pressable
               onPress={() => router.back()}
@@ -38,25 +46,22 @@ export default function ThemeDetail() {
               <Icon name="back" size={22} stroke="#fff" sw={2.2} />
             </Pressable>
           </View>
-          {!!theme.badge && (
-            <View style={{ position: 'absolute', top: insets.top, right: 14, backgroundColor: 'rgba(28,20,14,.6)', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
-              <T style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>{theme.badge}</T>
-            </View>
-          )}
         </View>
 
-        {/* Title + description below the photo, in dark text for readability */}
-        <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
-          <H style={{ fontSize: 26, color: c.ink, lineHeight: 31 }}>{theme.title}</H>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 }}>
-            <T style={{ fontSize: 14, color: c.accent, fontWeight: '700', flexShrink: 1 }}>{theme.subtitle}</T>
+        {/* Editorial header */}
+        <View style={{ paddingHorizontal: 18, paddingTop: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <T style={{ fontSize: 12.5, fontWeight: '800', color: c.accent, letterSpacing: 0.2 }}>{theme.badge || theme.category}</T>
             {!!theme.updated && (
               <View style={{ backgroundColor: c.sage50, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999 }}>
                 <T style={{ fontSize: 10.5, fontWeight: '800', color: c.sage700 }}>UPDATED {theme.updated.toUpperCase()}</T>
               </View>
             )}
           </View>
-          <T style={{ fontSize: 14.5, lineHeight: 22, color: c.inkSoft, marginTop: 12 }}>{theme.description}</T>
+          <H style={{ fontSize: 30, color: c.ink, lineHeight: 36, marginTop: 7 }}>{theme.title}</H>
+          <T style={{ fontSize: 14.5, color: c.inkSoft, fontWeight: '600', marginTop: 6 }}>{theme.subtitle}</T>
+          <T style={{ fontSize: 16.5, lineHeight: 27, color: c.ink, marginTop: 16 }}>{descLead}</T>
+          {!!descRest && <T style={{ fontSize: 14.5, lineHeight: 23, color: c.inkSoft, marginTop: 11 }}>{descRest}</T>}
         </View>
 
         {/* Know before you go */}
