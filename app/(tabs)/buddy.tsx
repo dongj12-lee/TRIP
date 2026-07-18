@@ -98,15 +98,15 @@ export default function BuddyScreen() {
 function BuddyRow({ buddy }: { buddy: Buddy }) {
   const { c } = useTheme();
   const router = useRouter();
-  const { joined, toggleJoin } = useStore();
-  const isJoined = joined.has(buddy.id);
-  const count = buddy.interested + (isJoined ? 1 : 0);
+  const { joined } = useStore();
+  const requested = joined.has(buddy.id); // asked to join — host still approves
+  const count = buddy.interested + (requested ? 1 : 0);
   const spotsLeft = Math.max(0, buddy.groupSize - 1 - count); // host takes one seat
-  const canJoin = isJoined || spotsLeft > 0;
+  const open = () => router.push(`/buddy/${buddy.id}`);
 
   return (
     <Pressable
-      onPress={() => router.push(`/buddy/${buddy.id}`)}
+      onPress={open}
       style={({ pressed }) => [
         { flexDirection: 'row', gap: 12, paddingHorizontal: 18, paddingVertical: 15, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: c.line },
         pressed && { backgroundColor: c.surface2 },
@@ -132,19 +132,22 @@ function BuddyRow({ buddy }: { buddy: Buddy }) {
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 11, gap: 12 }}>
           <MetaBit icon="pin" text={buddy.neighborhood} />
           <View style={{ flex: 1 }} />
-          {canJoin ? (
+          {requested ? (
+            // Already asked — host approves before it's confirmed
+            <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
+              <T style={{ fontSize: 12.5, fontWeight: '800', color: c.inkSoft }}>Requested</T>
+            </View>
+          ) : spotsLeft > 0 ? (
             <>
-              {!isJoined && spotsLeft <= 3 && (
-                <T style={{ fontSize: 12, color: c.muted, fontWeight: '700' }}>{spotsLeft} left</T>
-              )}
+              {spotsLeft <= 3 && <T style={{ fontSize: 12, color: c.muted, fontWeight: '700' }}>{spotsLeft} left</T>}
               <Pressable
-                onPress={() => { haptic.tick(); toggleJoin(buddy.id); }}
+                onPress={(e) => { e.stopPropagation?.(); haptic.tick(); open(); }}
                 hitSlop={8}
                 accessibilityRole="button"
-                accessibilityLabel={isJoined ? 'Leave plan' : 'Join plan'}
-                style={{ paddingVertical: 6, paddingHorizontal: 15, borderRadius: 999, backgroundColor: isJoined ? c.surface : c.ink, borderWidth: 1, borderColor: isJoined ? c.line : c.ink }}
+                accessibilityLabel="Join plan"
+                style={{ paddingVertical: 6, paddingHorizontal: 15, borderRadius: 999, backgroundColor: c.ink }}
               >
-                <T style={{ fontSize: 12.5, fontWeight: '800', color: isJoined ? c.inkSoft : c.paper }}>{isJoined ? 'Going ✓' : 'Join'}</T>
+                <T style={{ fontSize: 12.5, fontWeight: '800', color: c.paper }}>Join</T>
               </Pressable>
             </>
           ) : (

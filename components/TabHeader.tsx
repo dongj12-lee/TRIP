@@ -8,8 +8,12 @@ import { H } from './base';
 // title + descriptive subtitle (a template tell), each tab shows a big title
 // at rest that scrolls away behind a slim bar; the compact title + hairline
 // fade in as you scroll — the pattern Apple's own apps use.
+//
+// The bar is transparent at rest (so the large title sits right under the
+// status bar with no dead gap) and only paints its paper background + compact
+// title + hairline once you scroll — the large title slides up beneath it.
 
-export const BAR_HEIGHT = 44; // nav-bar height below the status bar
+const BAR_HEIGHT = 44; // nav-bar band below the status bar
 
 export function useTabScroll() {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -19,9 +23,6 @@ export function useTabScroll() {
   return { scrollY, onScroll };
 }
 
-// The slim sticky bar. Its background is always paper (so scrolled content
-// passes cleanly beneath it); only the compact title and hairline fade in.
-// A `right` action, if given, stays visible at all times.
 export function TabBar({
   title,
   scrollY,
@@ -33,22 +34,31 @@ export function TabBar({
 }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const titleOpacity = scrollY.interpolate({ inputRange: [18, 46], outputRange: [0, 1], extrapolate: 'clamp' });
-  const borderOpacity = scrollY.interpolate({ inputRange: [4, 32], outputRange: [0, 1], extrapolate: 'clamp' });
+  const bgOpacity = scrollY.interpolate({ inputRange: [16, 44], outputRange: [0, 1], extrapolate: 'clamp' });
+  const titleOpacity = scrollY.interpolate({ inputRange: [30, 54], outputRange: [0, 1], extrapolate: 'clamp' });
   return (
-    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, backgroundColor: c.paper, paddingTop: insets.top }}>
+    <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, paddingTop: insets.top }}>
+      {/* Paper background + hairline — fade in only once scrolled */}
+      <Animated.View
+        pointerEvents="none"
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top + BAR_HEIGHT, backgroundColor: c.paper, opacity: bgOpacity }}
+      />
+      <Animated.View
+        pointerEvents="none"
+        style={{ position: 'absolute', left: 0, right: 0, top: insets.top + BAR_HEIGHT, height: StyleSheet.hairlineWidth, backgroundColor: c.line, opacity: bgOpacity }}
+      />
       <View style={{ height: BAR_HEIGHT, alignItems: 'center', justifyContent: 'center' }}>
-        <Animated.View style={{ opacity: titleOpacity }}>
+        <Animated.View pointerEvents="none" style={{ opacity: titleOpacity }}>
           <H style={{ fontSize: 17, color: c.ink }}>{title}</H>
         </Animated.View>
         {right ? <View style={{ position: 'absolute', right: 10, top: 0, bottom: 0, justifyContent: 'center' }}>{right}</View> : null}
       </View>
-      <Animated.View style={{ height: StyleSheet.hairlineWidth, backgroundColor: c.line, opacity: borderOpacity }} />
     </View>
   );
 }
 
-// The big in-content title. Sits just below the bar and scrolls away naturally.
+// The big in-content title. Sits just under the status bar and scrolls away
+// beneath the (transparent-at-rest) bar.
 export function TabTitle({ title, style }: { title: string; style?: any }) {
   return (
     <View style={[{ paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10 }, style]}>
@@ -57,8 +67,9 @@ export function TabTitle({ title, style }: { title: string; style?: any }) {
   );
 }
 
-// Top padding the scroll content needs so the large title clears the bar.
+// Top padding the scroll content needs. Small — the bar is transparent at rest,
+// so the large title tucks right under the status bar with no empty band.
 export function useContentTopPadding() {
   const insets = useSafeAreaInsets();
-  return insets.top + BAR_HEIGHT;
+  return insets.top + 8;
 }
