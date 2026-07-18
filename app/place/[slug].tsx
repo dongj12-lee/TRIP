@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Pressable, Modal } from 'react-native';
+import { View, ScrollView, Pressable, Modal, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -192,6 +192,19 @@ export default function PlaceDetail() {
               {place.rating != null && !!place.priceRange && <T style={{ color: c.muted }}>·</T>}
               {!!place.priceRange && <T style={{ fontSize: 13.5, color: c.inkSoft, fontWeight: '700' }}>{place.priceRange}</T>}
             </View>
+          )}
+          {/* Deep link to the real Naver Map page — reviews live there, not
+              stored in-app (see migration-024 for why). */}
+          {!!place.naverMapUrl && (
+            <Pressable
+              onPress={() => { haptic.tick(); Linking.openURL(place.naverMapUrl!); }}
+              accessibilityRole="button"
+              accessibilityLabel="View reviews on Naver Map"
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 12 }}
+            >
+              <Icon name="pin" size={14} stroke={c.accent} sw={2} />
+              <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>View reviews on Naver Map</T>
+            </Pressable>
           )}
         </View>
 

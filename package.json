@@ -62,6 +62,7 @@
     "seed:themes": "tsx scripts/seed-themes.ts",
     "prune:events": "tsx scripts/prune-expired-events.ts",
     "backfill:verified-tags": "tsx scripts/backfill-verified-tags.ts",
+    "backfill:naver-map-link": "tsx scripts/backfill-naver-map-link.ts",
     "db:setup-sql": "node scripts/print-setup-sql.mjs"
   },
   "private": true

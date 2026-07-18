@@ -191,3 +191,28 @@ node -r dotenv/config ./node_modules/.bin/tsx scripts/backfill-verified-tags.ts 
 ```
 Add `-- --dry-run` to preview counts without writing. The rules live in
 `scripts/backfill-verified-tags.ts` — idempotent, safe to re-run anytime.
+
+## Naver Map deep link (migration-024)
+
+Neither Google Places nor Naver's Local Search API allow storing review
+content long-term (Google: place ID is the only cacheable field; Naver: no
+review field exists at all in the API). So instead of embedding reviews,
+`places.naver_map_url` stores a permanent link to the place's real Naver Map
+page — the traveler taps "View reviews on Naver Map" on the place detail
+screen and sees live reviews/photos/hours there.
+
+Needs its own free credential — a **Search** app, not the Maps app already
+registered: NCP Console → developers.naver.com/apps → 애플리케이션 등록 → check
+"검색" (Search) → copy the Client ID/Secret into `NAVER_SEARCH_CLIENT_ID` /
+`NAVER_SEARCH_CLIENT_SECRET` (`.env` / `.env.production`, server-only).
+
+Re-run after a fresh Visit Seoul import so newly-added places get covered:
+```
+npm run backfill:naver-map-link            # dev (.env)
+node -r dotenv/config ./node_modules/.bin/tsx scripts/backfill-naver-map-link.ts dotenv_config_path=.env.production   # prod
+```
+Add `-- --dry-run` to preview without writing, `-- --force` to re-resolve
+places that already have a link. Matching is a text search by name (+
+neighborhood to disambiguate chains) — not perfect, so it never overwrites an
+existing link and logs slugs it couldn't confidently resolve rather than
+guessing.
