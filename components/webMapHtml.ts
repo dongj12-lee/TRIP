@@ -151,7 +151,7 @@ export function buildNativeShell(clientId: string) {
     '<!DOCTYPE html><html><head><meta charset="utf-8" />' +
     '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />' +
     '<style>html,body,#map{width:100%;height:100%;margin:0;padding:0}</style>' +
-    '<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + clientId + '"></script>' +
+    '<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + clientId + '&language=en"></script>' +
     '</head><body><div id="map"></div>' +
     '<script>' + MAP_RUNTIME_JS + '</script>' +
     '<script>window.__onPin=function(id){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"pinPress",id:id}));};</script>' +
