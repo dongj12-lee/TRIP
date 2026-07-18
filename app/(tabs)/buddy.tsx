@@ -39,7 +39,7 @@ export default function BuddyScreen() {
 
       {loading ? (
         <View style={{ paddingTop: topPad }}>
-          <TabTitle title="Buddy" />
+          <TabTitle title="Travel Buddies" />
           <SkeletonList card={SkeletonBuddyCard} n={4} />
         </View>
       ) : (
@@ -52,7 +52,7 @@ export default function BuddyScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} progressViewOffset={topPad} />
           }
         >
-          <TabTitle title="Buddy" />
+          <TabTitle title="Travel Buddies" />
 
           <View style={{ paddingHorizontal: 18 }}>
             <OfflineBanner />

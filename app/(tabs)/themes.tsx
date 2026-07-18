@@ -60,7 +60,7 @@ export default function ThemesScreen() {
       <View style={{ flex: 1, backgroundColor: c.paper }}>
         <TabBar title="Themes" scrollY={scrollY} />
         <View style={{ paddingTop: topPad }}>
-          <TabTitle title="Themes" />
+          <TabTitle title="Trip Themes" />
           <SkeletonList card={SkeletonThemeCard} n={3} />
         </View>
       </View>
@@ -76,7 +76,7 @@ export default function ThemesScreen() {
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
         showsVerticalScrollIndicator={false}
       >
-        <TabTitle title="Themes" />
+        <TabTitle title="Trip Themes" />
         <View style={{ paddingHorizontal: 18 }}>
           <OfflineBanner />
         </View>

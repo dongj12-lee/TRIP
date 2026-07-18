@@ -52,7 +52,7 @@ export default function FeedScreen() {
       <View style={{ flex: 1, backgroundColor: c.paper }}>
         <TabBar title="Feed" scrollY={scrollY} />
         <View style={{ paddingTop: topPad }}>
-          <TabTitle title="Feed" />
+          <TabTitle title="Traveler Feed" />
           <SkeletonList card={SkeletonPostCard} n={4} />
         </View>
       </View>
@@ -61,7 +61,7 @@ export default function FeedScreen() {
 
   const ListHeader = (
     <View>
-      <TabTitle title="Feed" />
+      <TabTitle title="Traveler Feed" />
       <View style={{ paddingHorizontal: 18 }}>
         <OfflineBanner />
       </View>

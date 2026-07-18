@@ -132,7 +132,7 @@ export default function ExploreScreen() {
       <View style={{ flex: 1, backgroundColor: c.paper }}>
         <TabBar title="Explore" scrollY={scrollY} />
         <View style={{ paddingTop: topPad }}>
-          <TabTitle title="Explore" />
+          <TabTitle title="Explore Seoul" />
           <SkeletonList card={SkeletonPlaceCard} n={4} />
         </View>
       </View>
@@ -148,7 +148,7 @@ export default function ExploreScreen() {
 
   const header = (
     <>
-      <TabTitle title="Explore" />
+      <TabTitle title="Explore Seoul" />
 
       <OfflineBanner />
 
