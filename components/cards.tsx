@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
@@ -9,8 +10,7 @@ import { useToast } from './Toast';
 import { FOREIGNER_TAGS, POST_TYPES, normalizePostType, placeBySlug } from '@/data';
 import { intentLabel } from '@/data/intents';
 import { Place, Post, RouteDay } from '@/data/types';
-import { Svg, Path, Circle, G } from 'react-native-svg';
-import { SEOUL_DISTRICTS, SEOUL_MAP_W, SEOUL_MAP_H, projectLngLat } from '@/data/seoulDistricts';
+import { staticRouteMapUrl } from '@/lib/staticMap';
 import { Icon } from './Icon';
 import { Photo, Chip, Rating, TagPill, Flag } from './ui';
 import { guLabel } from '@/lib/format';
@@ -128,7 +128,7 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
 }
 
 export function RoutePreview({ days }: { days: RouteDay[] }) {
-  const { c, tone, dark } = useTheme();
+  const { c, tone } = useTheme();
   const terra = tone('terra');
   // Prefer the live catalog (real posts reference live slugs); fall back to the
   // bundled seed map so a route still resolves offline / before fetch.
@@ -136,6 +136,7 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
   const resolve = (slug?: string) => (slug ? livePlaces[slug] ?? placeBySlug[slug] : undefined);
   const stops = days.flatMap((d) => d.stops);
   const names = stops.map((st) => resolve(st.slug)?.name ?? st.name).filter(Boolean);
+  const [mapFailed, setMapFailed] = useState(false);
 
   const caption = (
     <View style={{ padding: 12, paddingVertical: 11 }}>
@@ -152,146 +153,32 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
     </View>
   );
 
-  // Project each day's geocoded stops onto the shared Seoul silhouette space.
-  const dayPts = days.map((d) =>
-    d.stops
-      .map((st) => resolve(st.slug))
-      .filter((p): p is NonNullable<typeof p> => !!p && typeof p.lat === 'number' && typeof p.lng === 'number')
-      .map((p) => projectLngLat(p.lng, p.lat)),
-  );
-  const allPts = dayPts.flat();
+  const geoStops = stops
+    .map((st) => resolve(st.slug))
+    .filter((p): p is NonNullable<typeof p> => !!p && typeof p.lat === 'number' && typeof p.lng === 'number');
+  const mapUrl = staticRouteMapUrl(geoStops);
 
-  // Fewer than 2 geocoded stops — no meaningful shape, keep the text preview.
-  if (allPts.length < 2) {
+  // Fewer than 2 geocoded stops (or the map image failed to load) — no
+  // meaningful map to show, keep the text-only preview.
+  if (!mapUrl || mapFailed) {
     return <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.terra50 }}>{caption}</View>;
   }
 
-  // Crop the viewBox to the route's own bounding box (+ padding) instead of
-  // always showing the whole Seoul metro — most routes cluster in 1-2
-  // neighborhoods, so a fixed full-city viewBox draws them as a tiny squiggle
-  // lost in mostly-empty silhouette. Same "fit to content" idea as the
-  // Explore map. A floor keeps very tight clusters from zooming in absurdly.
-  const xs = allPts.map((p) => p.x);
-  const ys = allPts.map((p) => p.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
-  const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const MIN_SPAN = 16; // ~6km — a reasonable "neighborhood" floor zoom
-  const padX = Math.max((maxX - minX) * 0.28, 3);
-  const padY = Math.max((maxY - minY) * 0.28, 3);
-  let cropMinX = minX - padX, cropMaxX = maxX + padX;
-  let cropMinY = minY - padY, cropMaxY = maxY + padY;
-  if (cropMaxX - cropMinX < MIN_SPAN) {
-    const cx = (cropMinX + cropMaxX) / 2;
-    cropMinX = cx - MIN_SPAN / 2;
-    cropMaxX = cx + MIN_SPAN / 2;
-  }
-  if (cropMaxY - cropMinY < MIN_SPAN) {
-    const cy = (cropMinY + cropMaxY) / 2;
-    cropMinY = cy - MIN_SPAN / 2;
-    cropMaxY = cy + MIN_SPAN / 2;
-  }
-  const cropW = cropMaxX - cropMinX;
-  const cropH = cropMaxY - cropMinY;
-  // Line/dot weights were tuned for the full 100-unit view — scale them down
-  // as the crop tightens so they stay proportionate, floored so a very tight
-  // cluster doesn't render hairline-thin.
-  const strokeScale = Math.max(0.35, Math.min(1, cropW / SEOUL_MAP_W));
-
-  // Cropping in loses the one thing that made the full-city silhouette
-  // legible: its recognizable outline. Without a label, a zoomed-in slice of
-  // district borders is just abstract gray lines. Label whichever district(s)
-  // the crop actually shows (falling back to the nearest one so there's
-  // always at least one) — same overlay technique as SeoulMapPicker.
-  const inCrop = SEOUL_DISTRICTS.filter((d) => d.cx >= cropMinX && d.cx <= cropMaxX && d.cy >= cropMinY && d.cy <= cropMaxY);
-  const labelDistricts =
-    inCrop.length > 0
-      ? inCrop
-      : [SEOUL_DISTRICTS.reduce((best, d) => {
-          const dist = (d.cx - (cropMinX + cropMaxX) / 2) ** 2 + (d.cy - (cropMinY + cropMaxY) / 2) ** 2;
-          const bestDist = (best.cx - (cropMinX + cropMaxX) / 2) ** 2 + (best.cy - (cropMinY + cropMaxY) / 2) ** 2;
-          return dist < bestDist ? d : best;
-        })];
-
-  // The route drawn over a faint real Seoul silhouette (same projection as the
-  // Seoul Passport) — a true "trip map", not an abstract line on blank space.
+  // A real map image with numbered pins in visit order — an abstract
+  // district-boundary silhouette read as unrecognizable scribbles even when
+  // cropped and labeled; only actual street/landmass cartography reads as
+  // "a real place" at a glance. No connecting line (NCP's Static Map API has
+  // no polyline parameter) — the numbering + caption above carry the order.
   return (
     <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.surface2, overflow: 'hidden' }}>
       <View style={{ height: 150 }}>
-        <Svg width="100%" height="100%" viewBox={`${cropMinX} ${cropMinY} ${cropW} ${cropH}`} preserveAspectRatio="xMidYMid meet">
-          <G>
-            {SEOUL_DISTRICTS.map((d) => (
-              <Path key={d.name} d={d.path} fill={c.paper} stroke={c.line} strokeWidth={0.4 * strokeScale} />
-            ))}
-          </G>
-          {/* The Han River — Seoul's single most recognizable feature — only
-              actually shows up when the crop happens to cross it, same arc as
-              SeoulMapPicker; harmless to always draw since the viewBox clips it. */}
-          <Path
-            d="M-3 49 C 12 50, 24 53, 36 53 S 54 55, 64 53 S 82 51, 94 50 L 103 50"
-            fill="none"
-            stroke={c.mapWater}
-            strokeWidth={2.6 * strokeScale}
-            strokeLinecap="round"
-            opacity={0.9}
-          />
-          {dayPts.map((pts, di) => {
-            if (pts.length === 0) return null;
-            const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
-            return (
-              <G key={di}>
-                {pts.length > 1 && (
-                  <Path d={path} stroke={terra.solid} strokeWidth={1 * strokeScale} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.95} />
-                )}
-                {pts.map((p, i) => {
-                  const isStart = di === 0 && i === 0;
-                  return (
-                    <Circle
-                      key={i}
-                      cx={p.x}
-                      cy={p.y}
-                      r={(isStart ? 2 : 1.35) * strokeScale}
-                      fill={isStart ? terra.solid : c.paper}
-                      stroke={terra.solid}
-                      strokeWidth={(isStart ? 0 : 0.8) * strokeScale}
-                    />
-                  );
-                })}
-              </G>
-            );
-          })}
-        </Svg>
-
-        {/* District label(s) so a tight crop still reads as "a real place in
-            Seoul", not just abstract lines — positioned the same way as
-            SeoulMapPicker's labels, but relative to the crop, not full map. */}
-        {labelDistricts.map((d) => (
-          <View
-            key={d.name}
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              left: `${((d.cx - cropMinX) / cropW) * 100}%`,
-              top: `${((d.cy - cropMinY) / cropH) * 100}%`,
-              transform: [{ translateX: -43 }, { translateY: -6 }],
-              width: 86,
-              alignItems: 'center',
-            }}
-          >
-            <T
-              style={{
-                fontSize: 10.5,
-                fontWeight: '800',
-                color: c.ink,
-                textShadowColor: dark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.85)',
-                textShadowOffset: { width: 0, height: 0.5 },
-                textShadowRadius: 2,
-              }}
-              numberOfLines={1}
-            >
-              {d.name}
-            </T>
-          </View>
-        ))}
+        <Image
+          source={{ uri: mapUrl }}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+          transition={150}
+          onError={() => setMapFailed(true)}
+        />
       </View>
       <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' }}>{caption}</View>
     </View>
