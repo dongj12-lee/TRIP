@@ -9,6 +9,8 @@ import { personalizedThemes } from '@/lib/personalize';
 import { Theme } from '@/data/types';
 import { T, H, Card } from '@/components/base';
 import { Photo } from '@/components/ui';
+import { Icon } from '@/components/Icon';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SkeletonList, SkeletonThemeCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
@@ -55,6 +57,12 @@ export default function ThemesScreen() {
     return [...known, ...extra];
   }, [byCat]);
 
+  // Lead with one cinematic cover (the personalized top pick, or the first
+  // trip-defining theme) — Apple News+ / Arts & Culture style — then rails.
+  const featured = forYou[0] ?? (sections.length ? byCat.get(sections[0])![0] : null);
+  const featuredSlug = featured?.slug;
+  const forYouRest = forYou.filter((t) => t.slug !== featuredSlug);
+
   if (loading) {
     return (
       <View style={{ flex: 1, backgroundColor: c.paper }}>
@@ -80,12 +88,50 @@ export default function ThemesScreen() {
         <View style={{ paddingHorizontal: 18 }}>
           <OfflineBanner />
         </View>
-        {forYou.length > 0 && <Rail title="For you" themes={forYou} />}
-        {sections.map((cat) => (
-          <Rail key={cat} title={cat} themes={byCat.get(cat)!} />
-        ))}
+        {featured && <FeaturedTheme theme={featured} />}
+        {forYouRest.length > 0 && <Rail title="For you" themes={forYouRest} />}
+        {sections.map((cat) => {
+          const items = byCat.get(cat)!.filter((t) => t.slug !== featuredSlug);
+          return items.length > 0 ? <Rail key={cat} title={cat} themes={items} /> : null;
+        })}
       </Animated.ScrollView>
     </View>
+  );
+}
+
+// The cover story — one large, cinematic full-bleed card with the title set
+// over a gradient scrim. Gives Themes an editorial "magazine cover" lead
+// instead of opening straight into uniform rails (Apple News+ / Arts & Culture).
+function FeaturedTheme({ theme }: { theme: Theme }) {
+  const { c } = useTheme();
+  const router = useRouter();
+  return (
+    <Pressable
+      onPress={() => router.push(`/theme/${theme.slug}`)}
+      accessibilityRole="button"
+      style={({ pressed }) => [
+        { marginHorizontal: 14, marginTop: 6, marginBottom: 2, borderRadius: 22, overflow: 'hidden' },
+        pressed && { opacity: 0.94 },
+      ]}
+    >
+      <Photo uri={theme.photoUrl} swatch={theme.swatch} height={290} />
+      <LinearGradient
+        colors={['transparent', 'rgba(18,12,8,0.12)', 'rgba(18,12,8,0.88)']}
+        locations={[0, 0.42, 1]}
+        style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
+      />
+      <View style={{ position: 'absolute', top: 14, left: 14, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,255,255,0.94)', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
+        <Icon name="sparkle" size={13} stroke={c.accent} sw={2} />
+        <T style={{ fontSize: 11.5, fontWeight: '800', color: c.ink }}>Featured</T>
+      </View>
+      <View style={{ position: 'absolute', left: 18, right: 18, bottom: 18 }}>
+        <T style={{ fontSize: 12.5, fontWeight: '800', color: 'rgba(255,255,255,0.85)', marginBottom: 5 }} numberOfLines={1}>
+          {theme.badge || theme.category}
+        </T>
+        <H style={{ fontSize: 27, lineHeight: 31, color: '#fff' }} numberOfLines={2}>{theme.title}</H>
+        <T style={{ fontSize: 14, lineHeight: 19, color: 'rgba(255,255,255,0.92)', fontWeight: '600', marginTop: 6 }} numberOfLines={2}>{theme.subtitle}</T>
+      </View>
+    </Pressable>
   );
 }
 
