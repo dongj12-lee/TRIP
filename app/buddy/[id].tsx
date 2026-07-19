@@ -11,9 +11,11 @@ import { haptic } from '@/lib/haptics';
 import { useToast } from '@/components/Toast';
 import { fetchBuddyInterests, setInterestStatus } from '@/data/remote';
 import { BuddyInterest } from '@/data/types';
-import { T, H, Screen, DetailHeader, Card, Button } from '@/components/base';
+import { T, H, Screen, DetailHeader, Button } from '@/components/base';
 import { Avatar } from '@/components/Avatar';
+import { Photo } from '@/components/ui';
 import { Icon } from '@/components/Icon';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ReportSheet } from '@/components/ReportSheet';
 
 // The buddy flow: request (with a short intro) → the host accepts/declines →
@@ -93,38 +95,45 @@ export default function BuddyDetail() {
         }
       />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
-        <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center', marginTop: 4 }}>
-          <View style={{ width: 56, height: 56, borderRadius: 15, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
-            <T style={{ fontSize: 28 }}>{buddy.emoji}</T>
-          </View>
-          <View style={{ flex: 1 }}>
-            <H style={{ fontSize: 22, lineHeight: 26 }}>{buddy.activity}</H>
-            {isFull && (
-              <View style={{ alignSelf: 'flex-start', marginTop: 6, backgroundColor: c.rose50, paddingVertical: 3, paddingHorizontal: 9, borderRadius: 999 }}>
-                <T style={{ fontSize: 11.5, fontWeight: '800', color: c.rose700 }}>FULL</T>
-              </View>
-            )}
+        {/* Event cover — the place photo when it's a specific spot, else a warm
+            banner — with the emoji + activity set over it, party-invite style. */}
+        <View style={{ borderRadius: 20, overflow: 'hidden', marginTop: 4 }}>
+          {place?.photoUrl ? (
+            <Photo uri={place.photoUrl} swatch={place.swatch} height={178} />
+          ) : (
+            <LinearGradient colors={[c.accent, '#a2502f']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ height: 150 }} />
+          )}
+          <LinearGradient colors={['rgba(20,14,10,0.04)', 'rgba(20,14,10,0.82)']} locations={[0.35, 1]} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+          {isFull && (
+            <View style={{ position: 'absolute', top: 14, right: 14, backgroundColor: 'rgba(255,255,255,0.94)', paddingVertical: 4, paddingHorizontal: 11, borderRadius: 999 }}>
+              <T style={{ fontSize: 11.5, fontWeight: '800', color: c.rose700 }}>Full</T>
+            </View>
+          )}
+          <View style={{ position: 'absolute', left: 18, right: 18, bottom: 16 }}>
+            <T style={{ fontSize: 32, marginBottom: 4 }}>{buddy.emoji}</T>
+            <H style={{ fontSize: 25, lineHeight: 29, color: '#fff' }} numberOfLines={3}>{buddy.activity}</H>
           </View>
         </View>
 
-        <Card style={{ padding: 15, marginTop: 16, gap: 8 }}>
-          <Row label="🕒 When" value={buddy.when} />
-          <Row label="📍 Where" value={place ? `${place.name} · ${buddy.neighborhood}` : buddy.neighborhood} />
-          <Row label="👥 Group" value={`${accepted.length + 1}/${buddy.groupSize} going`} />
-        </Card>
+        {/* When / Where */}
+        <View style={{ marginTop: 18, gap: 13 }}>
+          <InfoLine icon="clock" text={buddy.when} />
+          <InfoLine icon="pin" text={place ? `${place.name} · ${buddy.neighborhood}` : buddy.neighborhood} />
+        </View>
 
-        <T style={{ fontSize: 14.5, lineHeight: 22, color: c.ink, marginTop: 16 }}>{buddy.note}</T>
-
+        {/* Host */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 18 }}>
-          <Avatar name={buddy.author.name} size={34} />
-          <View style={{ flex: 1 }}>
-            <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '700' }}>HOST</T>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <T style={{ fontSize: 14.5, fontWeight: '700' }}>{buddy.author.name}</T>
-              <T style={{ fontSize: 13 }}>{buddy.author.country}</T>
+          <Avatar name={buddy.author.name} size={38} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
+            <T style={{ fontSize: 14.5, fontWeight: '800' }} numberOfLines={1}>{buddy.author.name}</T>
+            <T style={{ fontSize: 13 }}>{buddy.author.country}</T>
+            <View style={{ backgroundColor: c.accent50, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 999 }}>
+              <T style={{ fontSize: 10.5, fontWeight: '800', color: c.accent }}>Host</T>
             </View>
           </View>
         </View>
+
+        {!!buddy.note && <T style={{ fontSize: 14.5, lineHeight: 22, color: c.ink, marginTop: 16 }}>{buddy.note}</T>}
 
         {/* Safety — contact stays in the app, host gates who gets in */}
         <View style={{ backgroundColor: c.gold50, borderRadius: 14, padding: 12, flexDirection: 'row', gap: 10, alignItems: 'flex-start', marginTop: 18 }}>
@@ -168,18 +177,19 @@ export default function BuddyDetail() {
           </>
         )}
 
-        {/* Who's going */}
-        <T style={{ fontSize: 14, fontWeight: '800', marginTop: 24, marginBottom: 12 }}>
-          Going ({accepted.length + 1}/{buddy.groupSize})
-        </T>
-        <View style={{ gap: 12 }}>
-          <PersonRow name={buddy.author.name} country={buddy.author.country} message="" tag="Host" />
+        {/* Who's going — faces first, with the open spots shown (Partiful-style) */}
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8, marginTop: 26, marginBottom: 14 }}>
+          <T style={{ fontSize: 16, fontWeight: '800' }}>Who's going</T>
+          <T style={{ fontSize: 13, color: c.muted, fontWeight: '700' }}>{accepted.length + 1}/{buddy.groupSize}</T>
+        </View>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, rowGap: 18 }}>
+          <GoingAvatar name={buddy.author.name} country={buddy.author.country} host />
           {accepted.map((p) => (
-            <PersonRow key={p.userId ?? p.name} name={p.name} country={p.country} message={p.message} />
+            <GoingAvatar key={p.userId ?? p.name} name={p.name} country={p.country} />
           ))}
-          {accepted.length === 0 && (
-            <T style={{ fontSize: 13, color: c.muted }}>No one yet — {isHost ? 'accept a request to fill the group.' : 'be the first to request a spot.'}</T>
-          )}
+          {Array.from({ length: Math.max(0, buddy.groupSize - 1 - accepted.length) }).map((_, i) => (
+            <OpenSlot key={`open-${i}`} />
+          ))}
         </View>
 
         {/* Pending, seen by non-hosts (social proof without exposing decisions) */}
@@ -209,23 +219,46 @@ export default function BuddyDetail() {
   );
 }
 
-function PersonRow({ name, country, message, tag }: { name: string; country: string; message: string; tag?: string }) {
+function InfoLine({ icon, text }: { icon: string; text: string }) {
   const { c } = useTheme();
   return (
-    <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-      <Avatar name={name} size={34} />
-      <View style={{ flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <T style={{ fontSize: 13, fontWeight: '700' }}>{name}</T>
-          <T style={{ fontSize: 12 }}>{country}</T>
-          {tag && (
-            <View style={{ backgroundColor: c.accent50, paddingVertical: 2, paddingHorizontal: 7, borderRadius: 999 }}>
-              <T style={{ fontSize: 10.5, fontWeight: '800', color: c.accent }}>{tag}</T>
-            </View>
-          )}
-        </View>
-        {!!message && <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 2 }}>{message}</T>}
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11 }}>
+      <View style={{ width: 34, height: 34, borderRadius: 999, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name={icon as any} size={17} stroke={c.inkSoft} sw={2} />
       </View>
+      <T style={{ flex: 1, fontSize: 14.5, color: c.ink, fontWeight: '600' }}>{text}</T>
+    </View>
+  );
+}
+
+// A single attendee, face first — Partiful's "who's going" grid.
+function GoingAvatar({ name, country, host }: { name: string; country: string; host?: boolean }) {
+  const { c } = useTheme();
+  return (
+    <View style={{ alignItems: 'center', width: 60 }}>
+      <View>
+        <Avatar name={name} size={52} />
+        {host && (
+          <View style={{ position: 'absolute', bottom: -4, alignSelf: 'center', backgroundColor: c.accent, paddingVertical: 1.5, paddingHorizontal: 7, borderRadius: 999, borderWidth: 2, borderColor: c.paper }}>
+            <T style={{ fontSize: 8.5, fontWeight: '800', color: '#fff' }}>Host</T>
+          </View>
+        )}
+      </View>
+      <T style={{ fontSize: 11.5, fontWeight: '700', color: c.ink, marginTop: 8 }} numberOfLines={1}>{name.split(' ')[0]}</T>
+      <T style={{ fontSize: 11 }}>{country}</T>
+    </View>
+  );
+}
+
+// An unfilled spot — shows the group still has room, invite-page style.
+function OpenSlot() {
+  const { c } = useTheme();
+  return (
+    <View style={{ alignItems: 'center', width: 60 }}>
+      <View style={{ width: 52, height: 52, borderRadius: 999, borderWidth: 1.5, borderColor: c.line, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="plus" size={19} stroke={c.muted} sw={2} />
+      </View>
+      <T style={{ fontSize: 11, color: c.muted, marginTop: 8 }}>Open</T>
     </View>
   );
 }
@@ -270,12 +303,3 @@ function RequestSheet({ visible, onClose, onSend, hostName }: { visible: boolean
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  const { c } = useTheme();
-  return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
-      <T style={{ fontSize: 13, color: c.muted, fontWeight: '700' }}>{label}</T>
-      <T style={{ fontSize: 13.5, color: c.ink, fontWeight: '600', flex: 1, textAlign: 'right' }}>{value}</T>
-    </View>
-  );
-}
