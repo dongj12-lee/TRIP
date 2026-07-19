@@ -3,11 +3,13 @@ import { View, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
+import { useRemoteContent } from '@/lib/remoteData';
 import { haptic } from '@/lib/haptics';
 import { useToast } from './Toast';
 import { FOREIGNER_TAGS, POST_TYPES, normalizePostType, placeBySlug } from '@/data';
 import { intentLabel } from '@/data/intents';
 import { Place, Post, RouteDay } from '@/data/types';
+import { Svg, Path, Circle, G } from 'react-native-svg';
 import { Icon } from './Icon';
 import { Photo, Chip, Rating, TagPill, Flag } from './ui';
 import { guLabel } from '@/lib/format';
@@ -127,13 +129,18 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
 export function RoutePreview({ days }: { days: RouteDay[] }) {
   const { c, tone } = useTheme();
   const terra = tone('terra');
+  // Prefer the live catalog (real posts reference live slugs); fall back to the
+  // bundled seed map so a route still resolves offline / before fetch.
+  const { placeBySlug: livePlaces } = useRemoteContent();
+  const resolve = (slug?: string) => (slug ? livePlaces[slug] ?? placeBySlug[slug] : undefined);
   const stops = days.flatMap((d) => d.stops);
-  const names = stops.map((st) => (st.slug && placeBySlug[st.slug] ? placeBySlug[st.slug].name : st.name)).filter(Boolean);
-  return (
-    <View style={{ marginTop: 10, padding: 12, paddingVertical: 10, borderRadius: 13, backgroundColor: c.terra50 }}>
+  const names = stops.map((st) => resolve(st.slug)?.name ?? st.name).filter(Boolean);
+
+  const caption = (
+    <View style={{ padding: 12, paddingVertical: 11 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <Icon name="route" size={14} stroke={terra.fg} sw={2} />
-        <T style={{ fontSize: 11.5, fontWeight: '700', color: terra.fg }}>
+        <T style={{ fontSize: 11.5, fontWeight: '800', color: terra.fg }}>
           {days.length} days · {stops.length} stops
         </T>
       </View>
@@ -141,6 +148,61 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
         {names.slice(0, 4).join('  ›  ')}
         {names.length > 4 ? '  ›  …' : ''}
       </T>
+    </View>
+  );
+
+  // Resolve each day's geocoded stops to draw a Strava-style route trace.
+  const dayPts = days.map((d) =>
+    d.stops
+      .map((st) => resolve(st.slug))
+      .filter((p): p is NonNullable<typeof p> => !!p && typeof p.lat === 'number' && typeof p.lng === 'number')
+      .map((p) => ({ x: p.lng, y: p.lat })),
+  );
+  const allPts = dayPts.flat();
+
+  // Fewer than 2 geocoded stops — no meaningful shape, keep the text preview.
+  if (allPts.length < 2) {
+    return <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.terra50 }}>{caption}</View>;
+  }
+
+  const VBW = 320, VBH = 108, pad = 20;
+  const xs = allPts.map((p) => p.x), ys = allPts.map((p) => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const cosLat = Math.cos((((minY + maxY) / 2) * Math.PI) / 180); // lng compresses toward the pole
+  const dx = (maxX - minX) * cosLat || 1e-6, dy = (maxY - minY) || 1e-6;
+  const scale = Math.min((VBW - pad * 2) / dx, (VBH - pad * 2) / dy);
+  const w = dx * scale, h = dy * scale;
+  const offX = (VBW - w) / 2, offY = (VBH - h) / 2;
+  const proj = (p: { x: number; y: number }) => ({
+    X: offX + (p.x - minX) * cosLat * scale,
+    Y: offY + (maxY - p.y) * scale, // north up
+  });
+
+  return (
+    <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.terra50, overflow: 'hidden' }}>
+      <View style={{ height: VBH }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 ${VBW} ${VBH}`} preserveAspectRatio="xMidYMid meet">
+          {dayPts.map((pts, di) => {
+            if (pts.length === 0) return null;
+            const P = pts.map(proj);
+            const d = P.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.X.toFixed(1)} ${p.Y.toFixed(1)}`).join(' ');
+            return (
+              <G key={di}>
+                {P.length > 1 && (
+                  <Path d={d} stroke={terra.solid} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.92} />
+                )}
+                {P.map((p, i) => {
+                  const isStart = di === 0 && i === 0;
+                  return (
+                    <Circle key={i} cx={p.X} cy={p.Y} r={isStart ? 4.6 : 3} fill={isStart ? terra.solid : '#fff'} stroke={terra.solid} strokeWidth={isStart ? 0 : 1.6} />
+                  );
+                })}
+              </G>
+            );
+          })}
+        </Svg>
+      </View>
+      <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' }}>{caption}</View>
     </View>
   );
 }
