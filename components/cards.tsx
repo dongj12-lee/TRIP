@@ -128,7 +128,7 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
 }
 
 export function RoutePreview({ days }: { days: RouteDay[] }) {
-  const { c, tone } = useTheme();
+  const { c, tone, dark } = useTheme();
   const terra = tone('terra');
   // Prefer the live catalog (real posts reference live slugs); fall back to the
   // bundled seed map so a route still resolves offline / before fetch.
@@ -197,6 +197,21 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
   // cluster doesn't render hairline-thin.
   const strokeScale = Math.max(0.35, Math.min(1, cropW / SEOUL_MAP_W));
 
+  // Cropping in loses the one thing that made the full-city silhouette
+  // legible: its recognizable outline. Without a label, a zoomed-in slice of
+  // district borders is just abstract gray lines. Label whichever district(s)
+  // the crop actually shows (falling back to the nearest one so there's
+  // always at least one) — same overlay technique as SeoulMapPicker.
+  const inCrop = SEOUL_DISTRICTS.filter((d) => d.cx >= cropMinX && d.cx <= cropMaxX && d.cy >= cropMinY && d.cy <= cropMaxY);
+  const labelDistricts =
+    inCrop.length > 0
+      ? inCrop
+      : [SEOUL_DISTRICTS.reduce((best, d) => {
+          const dist = (d.cx - (cropMinX + cropMaxX) / 2) ** 2 + (d.cy - (cropMinY + cropMaxY) / 2) ** 2;
+          const bestDist = (best.cx - (cropMinX + cropMaxX) / 2) ** 2 + (best.cy - (cropMinY + cropMaxY) / 2) ** 2;
+          return dist < bestDist ? d : best;
+        })];
+
   // The route drawn over a faint real Seoul silhouette (same projection as the
   // Seoul Passport) — a true "trip map", not an abstract line on blank space.
   return (
@@ -208,6 +223,17 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
               <Path key={d.name} d={d.path} fill={c.paper} stroke={c.line} strokeWidth={0.4 * strokeScale} />
             ))}
           </G>
+          {/* The Han River — Seoul's single most recognizable feature — only
+              actually shows up when the crop happens to cross it, same arc as
+              SeoulMapPicker; harmless to always draw since the viewBox clips it. */}
+          <Path
+            d="M-3 49 C 12 50, 24 53, 36 53 S 54 55, 64 53 S 82 51, 94 50 L 103 50"
+            fill="none"
+            stroke={c.mapWater}
+            strokeWidth={2.6 * strokeScale}
+            strokeLinecap="round"
+            opacity={0.9}
+          />
           {dayPts.map((pts, di) => {
             if (pts.length === 0) return null;
             const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
@@ -234,6 +260,38 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
             );
           })}
         </Svg>
+
+        {/* District label(s) so a tight crop still reads as "a real place in
+            Seoul", not just abstract lines — positioned the same way as
+            SeoulMapPicker's labels, but relative to the crop, not full map. */}
+        {labelDistricts.map((d) => (
+          <View
+            key={d.name}
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              left: `${((d.cx - cropMinX) / cropW) * 100}%`,
+              top: `${((d.cy - cropMinY) / cropH) * 100}%`,
+              transform: [{ translateX: -43 }, { translateY: -6 }],
+              width: 86,
+              alignItems: 'center',
+            }}
+          >
+            <T
+              style={{
+                fontSize: 10.5,
+                fontWeight: '800',
+                color: c.ink,
+                textShadowColor: dark ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.85)',
+                textShadowOffset: { width: 0, height: 0.5 },
+                textShadowRadius: 2,
+              }}
+              numberOfLines={1}
+            >
+              {d.name}
+            </T>
+          </View>
+        ))}
       </View>
       <View style={{ borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.05)' }}>{caption}</View>
     </View>
