@@ -37,7 +37,7 @@ export function categoryPinColor(category: string, sub?: string | null): string 
   if (sub?.includes('Bar')) return '#7a4a8c';
   if (sub?.includes('Restaurant')) return '#c15b3f';
   if (category.includes('Cuisine')) return '#c15b3f';
-  if (category.includes('Culture')) return '#5b6f9c';
+  if (category.includes('Culture')) return '#4d5589';
   if (category.includes('History')) return '#9c4a54';
   if (category.includes('Nature')) return '#5f7d53';
   if (category.includes('Shopping')) return '#c28a3f';

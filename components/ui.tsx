@@ -115,7 +115,7 @@ export function Flag({ country, size = 28 }: { country?: string | null; size?: n
 // ─── Striped photo placeholder (swap for real <Image> later) ─────────────
 export function Photo({
   uri,
-  swatch = ['#3a2c22', '#c26b4a'],
+  swatch = ['#3a2c22', '#a36643'],
   label,
   height = 160,
   radius = 0,

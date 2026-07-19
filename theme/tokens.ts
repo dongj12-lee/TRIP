@@ -8,14 +8,18 @@ export const ACCENTS: Record<
   AccentKey,
   { name: string; main: string; d600: string; l50: string; d50: string }
 > = {
-  '#c26b4a': { name: 'Terracotta', main: '#c26b4a', d600: '#a9542f', l50: '#f8ebe3', d50: '#3a271d' },
-  '#79876b': { name: 'Sage', main: '#79876b', d600: '#5f6d53', l50: '#eceee6', d50: '#2a3225' },
+  // main/d600/l50/d50 rebuilt alongside LIGHT/DARK's terra/sage/blue (see the
+  // comment there — the old hues sat ~2-4° from Anthropic's own brand colors).
+  // Keys stay the original hex (AccentKey union / stored user preference);
+  // only the rendered values shift, same pattern already used for Gold below.
+  '#c26b4a': { name: 'Terracotta', main: '#a36643', d600: '#7a4429', l50: '#f7ebe3', d50: '#3f291c' },
+  '#79876b': { name: 'Sage', main: '#4c766e', d600: '#2d584f', l50: '#e8f2f0', d50: '#1f332f' },
   // main darkened #bd8f33 → #a67a26 so white button text clears 3:1 (3.87:1,
   // was 2.94 — the only accent that failed it). Still clearly gold; matches
   // the other accents' ~3.82 contrast. Key stays #bd8f33 (it's the AccentKey
   // union / stored preference), only the rendered `main` shifts.
   '#bd8f33': { name: 'Gold', main: '#a67a26', d600: '#8a6a1f', l50: '#f7efd8', d50: '#3a2f16' },
-  '#5b6f9c': { name: 'Hanok Blue', main: '#5b6f9c', d600: '#42537a', l50: '#e7ecf4', d50: '#202838' },
+  '#5b6f9c': { name: 'Hanok Blue', main: '#4d5589', d600: '#2f376a', l50: '#ebecf5', d50: '#22253a' },
 };
 
 export const DEFAULT_ACCENT: AccentKey = '#c26b4a';
@@ -56,11 +60,19 @@ const LIGHT = {
   // (was #767063, 4.28:1 on surface2 — under AA for its small 11–12px labels).
   muted: '#726c5f',
   line: '#e6e4e0',
-  terra50: '#f8ebe3', terra: '#c26b4a', terra700: '#a9542f',
-  sage50: '#eceee6', sage: '#79876b', sage700: '#5f6d53',
+  // terra/sage/blue hues rebuilt: the old ones sat within ~2-4° of Anthropic's
+  // own brand orange/green (#d97757 h15 / #788c5d h86) — coincidence at that
+  // proximity reads as "made with Claude Code." terra keeps its hue near that
+  // family (rose h4 and gold h39 bookend the available warm range) but drops
+  // to a muted brick/rust (was S50/L53 bright coral, now S42/L45) instead of
+  // Anthropic's bright coral. sage moves off olive-green entirely into a
+  // Korean-celadon teal (h169, was h90) and blue deepens toward indigo (h232,
+  // was h222) — both now comfortably clear of Anthropic's hues.
+  terra50: '#f7ebe3', terra: '#a36643', terra700: '#7a4429',
+  sage50: '#e8f2f0', sage: '#4c766e', sage700: '#2d584f',
   gold50: '#f7efd8', gold: '#c39b42', gold700: '#8a6a1f',
   rose50: '#f9e7e3', rose: '#c75c54', rose700: '#b04942',
-  blue50: '#e8edf5', blue: '#5b6f9c', blue700: '#42537a',
+  blue50: '#ebecf5', blue: '#4d5589', blue700: '#2f376a',
   mapBg: '#eaf0ee', mapRoad: '#ffffff', mapWater: '#bcd6e6', mapPark: '#cfe3c4',
   // scrim / overlay helpers (RN-specific additions)
   scrim: 'rgba(46,42,36,0.45)',
@@ -78,11 +90,11 @@ const DARK: typeof LIGHT = {
   // (was #837a6b, 4.25:1 on paper and failing on surface2).
   muted: '#99907d',
   line: '#302f2c',
-  terra50: '#3a271d', terra: '#d07f5d', terra700: '#ecab8a',
-  sage50: '#2a3225', sage: '#93a182', sage700: '#b6c6a2',
+  terra50: '#3f291c', terra: '#d39069', terra700: '#ebbda2',
+  sage50: '#1f332f', sage: '#7ab8ab', sage700: '#abd9d0',
   gold50: '#3a2f16', gold: '#d4ab52', gold700: '#e8cd86',
   rose50: '#3a2320', rose: '#d97a72', rose700: '#eb9b93',
-  blue50: '#212a3a', blue: '#8296bd', blue700: '#aebdd6',
+  blue50: '#22253a', blue: '#848ecd', blue700: '#b3b9e6',
   mapBg: '#222a2c', mapRoad: '#3c474a', mapWater: '#27424f', mapPark: '#2c3d2e',
   scrim: 'rgba(0,0,0,0.55)',
 };
