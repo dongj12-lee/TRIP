@@ -61,7 +61,7 @@ export default function FeedScreen() {
 
   const ListHeader = (
     <View>
-      <TabTitle title="Traveler Feed" />
+      <TabTitle title="Traveler Feed" subtitle="See what other travelers are asking, sharing, and planning." />
       <View style={{ paddingHorizontal: 18 }}>
         <OfflineBanner />
       </View>

@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Animated, View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
-import { H } from './base';
+import { H, T } from './base';
 
 // iOS-style large title that collapses on scroll. Instead of a permanent
 // title + descriptive subtitle (a template tell), each tab shows a big title
@@ -58,11 +58,18 @@ export function TabBar({
 }
 
 // The big in-content title. Sits just under the status bar and scrolls away
-// beneath the (transparent-at-rest) bar.
-export function TabTitle({ title, style }: { title: string; style?: any }) {
+// beneath the (transparent-at-rest) bar. `subtitle` is a one-line purpose
+// statement — used only where the tab name alone doesn't say what it's for
+// (kept short and concrete, never generic marketing copy, so it doesn't read
+// as templated boilerplate).
+export function TabTitle({ title, subtitle, style }: { title: string; subtitle?: string; style?: any }) {
+  const { c } = useTheme();
   return (
     <View style={[{ paddingHorizontal: 18, paddingTop: 4, paddingBottom: 10 }, style]}>
       <H style={{ fontSize: 32, lineHeight: 37 }}>{title}</H>
+      {!!subtitle && (
+        <T style={{ fontSize: 13, color: c.inkSoft, fontWeight: '600', marginTop: 3 }}>{subtitle}</T>
+      )}
     </View>
   );
 }

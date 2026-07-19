@@ -52,17 +52,13 @@ export default function BuddyScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} progressViewOffset={topPad} />
           }
         >
-          <TabTitle title="Travel Buddies" />
+          {/* The safety reminder that used to sit here now lives on the plan
+              detail screen instead, right before you request to join — a more
+              relevant moment. */}
+          <TabTitle title="Travel Buddies" subtitle="Find someone for a 2-person dish or a day trip out of town." />
 
           <View style={{ paddingHorizontal: 18 }}>
             <OfflineBanner />
-            {/* Purpose line — "Buddy" alone doesn't say what the tab is for
-                (unlike Feed/Explore, this is a novel concept), so it earns one.
-                The safety reminder lives on the plan detail screen instead,
-                right before you request to join — a more relevant moment. */}
-            <T style={{ fontSize: 13, color: c.inkSoft, fontWeight: '600', marginBottom: 4 }}>
-              Find someone for a 2-person dish or a day trip out of town.
-            </T>
           </View>
 
           {buddies.length === 0 ? (
