@@ -66,7 +66,7 @@ export default function ThemeDetail() {
 
         {/* Know before you go */}
         {theme.tips && theme.tips.length > 0 && (
-          <View style={{ marginHorizontal: 18, marginTop: 20, backgroundColor: c.gold50, borderRadius: 16, padding: 16 }}>
+          <View style={{ marginHorizontal: 18, marginTop: 20, backgroundColor: c.gold50, borderRadius: 14, padding: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
               <T style={{ fontSize: 14 }}>💡</T>
               <T style={{ fontSize: 14, fontWeight: '800', color: c.gold700 }}>Know before you go</T>
@@ -175,11 +175,11 @@ function GuideItemCard({ item }: { item: GuideItem }) {
   return (
     <Card style={{ padding: 13, flexDirection: 'row', gap: 12 }}>
       {item.emoji ? (
-        <View style={{ width: 46, height: 46, borderRadius: 12, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: 46, height: 46, borderRadius: 10, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
           <T style={{ fontSize: 24 }}>{item.emoji}</T>
         </View>
       ) : (
-        <View style={{ width: 46, height: 46, borderRadius: 12, overflow: 'hidden' }}>
+        <View style={{ width: 46, height: 46, borderRadius: 10, overflow: 'hidden' }}>
           <Photo swatch={item.swatch || ['#7a4a2a', '#e0a05a']} height={46} />
         </View>
       )}
@@ -199,7 +199,7 @@ function GuideItemCard({ item }: { item: GuideItem }) {
         <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 4, lineHeight: 18 }}>{item.note}</T>
         {!!item.where && <T style={{ fontSize: 12, color: c.muted, marginTop: 4, fontWeight: '600' }}>📍 {item.where}</T>}
         {!!item.caution && (
-          <View style={{ marginTop: 6, backgroundColor: c.rose50, borderRadius: 8, padding: 8 }}>
+          <View style={{ marginTop: 6, backgroundColor: c.rose50, borderRadius: 6, padding: 8 }}>
             <T style={{ fontSize: 12, color: c.rose700, fontWeight: '600', lineHeight: 17 }}>⚠️ {item.caution}</T>
           </View>
         )}

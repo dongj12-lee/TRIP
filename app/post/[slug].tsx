@@ -123,7 +123,7 @@ export default function PostDetail() {
           {/* Content */}
           {!leadWithBody && <H style={{ fontSize: 23, lineHeight: 29, marginTop: 16 }}>{post.title}</H>}
           {!!post.body && <T style={{ fontSize: 16, lineHeight: 25, color: c.ink, marginTop: leadWithBody ? 14 : 10 }}>{post.body}</T>}
-          {!!post.imageUrl && <Photo uri={post.imageUrl} height={240} radius={16} style={{ marginTop: 14 }} />}
+          {!!post.imageUrl && <Photo uri={post.imageUrl} height={240} radius={14} style={{ marginTop: 14 }} />}
 
           {place && (
             <View style={{ marginTop: 18 }}>
@@ -149,7 +149,7 @@ export default function PostDetail() {
                       return { name: s.name ?? p?.name ?? '', lat: p?.lat, lng: p?.lng };
                     });
                     return mapStops.filter((s) => s.lat != null).length >= 2 ? (
-                      <View style={{ borderRadius: 13, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
+                      <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
                         <RouteMap stops={mapStops} height={130} />
                       </View>
                     ) : null;

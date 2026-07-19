@@ -75,7 +75,7 @@ export function CelebrationOverlay({
 
         <Animated.View
           style={{
-            width: '100%', maxWidth: 340, backgroundColor: c.paper, borderRadius: 26, padding: 26, alignItems: 'center',
+            width: '100%', maxWidth: 340, backgroundColor: c.paper, borderRadius: 22, padding: 26, alignItems: 'center',
             transform: [{ scale: pop.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) }],
             opacity: pop,
           }}

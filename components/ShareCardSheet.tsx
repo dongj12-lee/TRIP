@@ -104,7 +104,7 @@ export function ShareCardSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: c.scrim }}>
         <Pressable style={{ flex: 1 }} onPress={onClose} accessibilityLabel="Close" />
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingBottom: insets.bottom + 16 }}>
+        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: insets.bottom + 16 }}>
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 8 }}>
             <H style={{ fontSize: 20 }}>{isPassport ? 'Share your passport' : isPlace ? 'Share this spot' : 'Share your day'}</H>
@@ -171,7 +171,7 @@ export function ShareCardSheet({
 
           <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
             {isWeb ? (
-              <View style={{ backgroundColor: c.gold50, borderRadius: 12, padding: 12, flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+              <View style={{ backgroundColor: c.gold50, borderRadius: 10, padding: 12, flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                 <T style={{ fontSize: 15 }}>📱</T>
                 <T style={{ flex: 1, fontSize: 12.5, color: c.gold700, fontWeight: '600', lineHeight: 17 }}>
                   Open TRIP on your phone to share this straight to Instagram.

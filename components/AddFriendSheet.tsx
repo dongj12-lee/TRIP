@@ -53,7 +53,7 @@ export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean
   };
 
   const field = {
-    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
+    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 10,
     paddingHorizontal: 13, paddingVertical: 12, fontSize: 16, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 
@@ -61,7 +61,7 @@ export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} accessibilityLabel="Close" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: 20, paddingBottom: insets.bottom + 20 }}>
+        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20 }}>
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
           <H style={{ fontSize: 21, marginBottom: 4 }}>Add a friend</H>
           <T style={{ fontSize: 13, color: c.muted, marginBottom: 16 }}>Enter their @handle to compare passports.</T>
@@ -81,7 +81,7 @@ export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean
                 style={[field, { flex: 1, paddingLeft: 26 }]}
               />
             </View>
-            <Pressable onPress={search} disabled={busy} style={{ paddingHorizontal: 18, borderRadius: 12, backgroundColor: c.ink, alignItems: 'center', justifyContent: 'center', opacity: busy ? 0.6 : 1 }}>
+            <Pressable onPress={search} disabled={busy} style={{ paddingHorizontal: 18, borderRadius: 10, backgroundColor: c.ink, alignItems: 'center', justifyContent: 'center', opacity: busy ? 0.6 : 1 }}>
               {busy ? <ActivityIndicator size="small" color={c.paper} /> : <T style={{ color: c.paper, fontWeight: '800', fontSize: 14 }}>Find</T>}
             </Pressable>
           </View>

@@ -78,7 +78,7 @@ export default function TripPlanner() {
   const health = analyzeTrip(itinerary);
 
   const field = {
-    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
+    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 10,
     paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 
@@ -133,7 +133,7 @@ export default function TripPlanner() {
 
                 {/* Route preview — appears once two placed stops give it a shape */}
                 {day.stops.filter((s) => s.lat != null).length >= 2 && (
-                  <View style={{ marginTop: 12, borderRadius: 13, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
+                  <View style={{ marginTop: 12, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
                     <RouteMap stops={day.stops} height={130} />
                   </View>
                 )}
@@ -189,7 +189,7 @@ export default function TripPlanner() {
 
           {/* Trip health */}
           {(health.warnings.length > 0 || health.positives.length > 0) && (
-            <View style={{ marginTop: 22, backgroundColor: c.surface2, borderRadius: 16, padding: 15 }}>
+            <View style={{ marginTop: 22, backgroundColor: c.surface2, borderRadius: 14, padding: 15 }}>
               <T style={{ fontSize: 12, fontWeight: '800', color: c.inkSoft, letterSpacing: 0.6, marginBottom: 4 }}>ROUTE CHECK</T>
               <T style={{ fontSize: 13, color: c.inkSoft, marginBottom: 10 }}>
                 {health.dayCount} days · {health.totalStops} stops

@@ -128,7 +128,7 @@ function Welcome() {
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 40, paddingBottom: 20 }}>
       <View
         style={{
-          width: 70, height: 70, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+          width: 70, height: 70, borderRadius: 22, alignItems: 'center', justifyContent: 'center',
           backgroundColor: c.accent, marginBottom: 26, ...(shadow as object),
         }}
       >
@@ -147,7 +147,7 @@ function Welcome() {
       <View style={{ marginTop: 26, gap: 12 }}>
         {rows.map(([e, t, s]) => (
           <View key={t} style={{ flexDirection: 'row', gap: 13, alignItems: 'flex-start' }}>
-            <View style={{ width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: c.surface2 }}>
+            <View style={{ width: 42, height: 42, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: c.surface2 }}>
               <T style={{ fontSize: 20 }}>{e}</T>
             </View>
             <View style={{ flex: 1 }}>
@@ -216,7 +216,7 @@ function PickInterests({ interests, toggle }: { interests: Set<string>; toggle: 
               onPress={() => toggle(it.key)}
               style={{
                 width: '48%', flexGrow: 1, justifyContent: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 14,
-                borderRadius: 15, backgroundColor: on ? c.accent : c.surface,
+                borderRadius: 14, backgroundColor: on ? c.accent : c.surface,
                 borderWidth: 1.5, borderColor: on ? c.accent : c.line,
               }}
             >

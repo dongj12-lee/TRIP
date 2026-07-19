@@ -93,7 +93,7 @@ export default function Passport() {
             accessibilityRole="button"
             accessibilityLabel="Open Seoul Explorers leaderboard"
             style={({ pressed }) => [
-              { marginHorizontal: 18, marginTop: 16, backgroundColor: c.ink, borderRadius: 16, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+              { marginHorizontal: 18, marginTop: 16, backgroundColor: c.ink, borderRadius: 14, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
               pressed && { opacity: 0.92 },
             ]}
           >
@@ -109,7 +109,7 @@ export default function Passport() {
         )}
 
         {/* The map fills in */}
-        <View style={{ marginHorizontal: 18, marginTop: 18, backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.line, paddingVertical: 14 }}>
+        <View style={{ marginHorizontal: 18, marginTop: 18, backgroundColor: c.surface, borderRadius: 22, borderWidth: 1, borderColor: c.line, paddingVertical: 14 }}>
           <T style={{ fontSize: 12, fontWeight: '800', color: c.muted, letterSpacing: 0.8, textAlign: 'center' }}>YOUR SEOUL</T>
           <CollectionMap earned={earnedDistricts} height={250} />
           <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600', textAlign: 'center', marginTop: 2 }}>
@@ -202,7 +202,7 @@ function StampBadge({ stamp, got }: { stamp: StampDef; got: boolean }) {
   const { c } = useTheme();
   // 3 per row.
   return (
-    <View style={{ width: '31%', alignItems: 'center', backgroundColor: got ? c.accent50 : c.surface, borderRadius: 16, borderWidth: 1, borderColor: got ? c.accent : c.line, paddingVertical: 14, paddingHorizontal: 6 }}>
+    <View style={{ width: '31%', alignItems: 'center', backgroundColor: got ? c.accent50 : c.surface, borderRadius: 14, borderWidth: 1, borderColor: got ? c.accent : c.line, paddingVertical: 14, paddingHorizontal: 6 }}>
       <View
         style={{
           width: 52, height: 52, borderRadius: 999, alignItems: 'center', justifyContent: 'center',

@@ -32,7 +32,7 @@ export function PlaceCardCompact({ place }: { place: Place }) {
     <Pressable
       onPress={() => router.push(`/place/${place.slug}`)}
       style={({ pressed }) => [
-        { width: 172, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: c.line, backgroundColor: c.surface },
+        { width: 172, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line, backgroundColor: c.surface },
         pressed && { opacity: 0.9 },
       ]}
     >
@@ -163,13 +163,13 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
 
   // Fewer than 2 geocoded stops — no meaningful shape, keep the text preview.
   if (allPts.length < 2) {
-    return <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.terra50 }}>{caption}</View>;
+    return <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.terra50 }}>{caption}</View>;
   }
 
   // The route drawn over a faint real Seoul silhouette (same projection as the
   // Seoul Passport) — a true "trip map", not an abstract line on blank space.
   return (
-    <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.surface2, overflow: 'hidden' }}>
+    <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.surface2, overflow: 'hidden' }}>
       <View style={{ height: 150 }}>
         <Svg width="100%" height="100%" viewBox={`0 0 ${SEOUL_MAP_W} ${SEOUL_MAP_H}`} preserveAspectRatio="xMidYMid meet">
           <G>

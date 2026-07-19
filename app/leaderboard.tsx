@@ -124,7 +124,7 @@ export default function Leaderboard() {
                 onPress={() => { haptic.tick(); setTab(t); }}
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
-                style={{ flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center', backgroundColor: on ? c.ink : c.surface, borderWidth: 1, borderColor: on ? c.ink : c.line }}
+                style={{ flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', backgroundColor: on ? c.ink : c.surface, borderWidth: 1, borderColor: on ? c.ink : c.line }}
               >
                 <T style={{ fontSize: 13.5, fontWeight: '800', color: on ? c.paper : c.inkSoft }}>
                   {t === 'everyone' ? '🌍 Everyone' : `👥 Friends${friends.length ? ` · ${friends.length}` : ''}`}

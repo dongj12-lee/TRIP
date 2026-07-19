@@ -27,6 +27,20 @@ export const FONTS = {
   ui: 'Pretendard',
 } as const;
 
+// Corner-radius scale — the single source of truth for rounding. Replaces the
+// 16 ad-hoc values that had accumulated (a "no system" tell). Five deliberate
+// steps + a pill, biased slightly crisp to suit the editorial voice. Nest
+// concentrically: an inner element's radius should be its container's minus the
+// padding between them (see components that pass `radius={...}`).
+export const RADII = {
+  xs: 6, // tiny insets, progress bars, small tags
+  sm: 10, // inputs, small tiles, compact chips
+  md: 14, // the default — most cards, buttons, media
+  lg: 18, // large cards / feature surfaces
+  xl: 22, // bottom sheets, hero blocks
+  pill: 999,
+} as const;
+
 const LIGHT = {
   paper: '#fbf6ee',
   surface: '#fffdfa',

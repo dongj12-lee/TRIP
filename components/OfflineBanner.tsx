@@ -21,7 +21,7 @@ export function OfflineBanner() {
   return (
     <View
       style={{
-        marginHorizontal: 18, marginBottom: 10, borderRadius: 12,
+        marginHorizontal: 18, marginBottom: 10, borderRadius: 10,
         backgroundColor: c.gold50, paddingVertical: 9, paddingHorizontal: 12,
         flexDirection: 'row', alignItems: 'center', gap: 8,
       }}

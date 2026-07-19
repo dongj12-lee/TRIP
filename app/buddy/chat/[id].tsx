@@ -91,7 +91,7 @@ export default function BuddyChat() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Safety note pinned at the top of every chat */}
-          <View style={{ backgroundColor: c.gold50, borderRadius: 12, padding: 10, flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
+          <View style={{ backgroundColor: c.gold50, borderRadius: 10, padding: 10, flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
             <T style={{ fontSize: 14 }}>🛟</T>
             <T style={{ flex: 1, fontSize: 12, lineHeight: 17, color: c.gold700, fontWeight: '600' }}>
               Only the host and accepted members can see this chat. Meet in public, and report anything off via ···
@@ -130,7 +130,7 @@ export default function BuddyChat() {
                       backgroundColor: mine ? c.accent : c.surface,
                       borderWidth: mine ? 0 : 1,
                       borderColor: c.line,
-                      borderRadius: 16,
+                      borderRadius: 14,
                       borderTopLeftRadius: !mine && showName ? 5 : 16,
                       borderTopRightRadius: mine ? 5 : 16,
                       paddingHorizontal: 13,

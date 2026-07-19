@@ -21,7 +21,7 @@ export default function AuthScreen() {
   const [sentConfirm, setSentConfirm] = useState(false);
 
   const field = {
-    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
+    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 10,
     paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 

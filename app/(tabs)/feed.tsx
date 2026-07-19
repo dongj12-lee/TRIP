@@ -74,7 +74,7 @@ export default function FeedScreen() {
           accessibilityLabel="Write a post"
           style={{
             flexDirection: 'row', alignItems: 'center', gap: 11,
-            backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 16, padding: 11, paddingRight: 14,
+            backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 14, padding: 11, paddingRight: 14,
           }}
         >
           <Avatar name={profile.displayName || 'You'} uri={profile.avatarUrl} size={34} />
@@ -87,7 +87,7 @@ export default function FeedScreen() {
 
       {/* Segmented filter: All / Posts / Routes / Questions */}
       <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
-        <View style={{ flexDirection: 'row', backgroundColor: c.surface2, borderRadius: 13, padding: 3 }}>
+        <View style={{ flexDirection: 'row', backgroundColor: c.surface2, borderRadius: 14, padding: 3 }}>
           {segments.map(([k, label]) => {
             const on = type === k;
             return (

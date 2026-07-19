@@ -211,7 +211,7 @@ export default function PlaceDetail() {
         {/* Show-to-staff card */}
         <Pressable
           onPress={() => setSheet(true)}
-          style={{ marginHorizontal: 18, marginTop: 20, padding: 15, borderRadius: 16, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, flexDirection: 'row', alignItems: 'center', gap: 12 }}
+          style={{ marginHorizontal: 18, marginTop: 20, padding: 15, borderRadius: 14, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, flexDirection: 'row', alignItems: 'center', gap: 12 }}
         >
           <Icon name="translate" size={24} stroke={c.accent} sw={1.9} />
           <View style={{ flex: 1 }}>
@@ -291,7 +291,7 @@ export default function PlaceDetail() {
           <H style={{ fontSize: 19, marginBottom: 4 }}>Foreigner Fit</H>
           <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
           {fitKeys.every((key) => !place.verifiedTags?.includes(key) && (tagCounts[key]?.yes ?? 0) === 0 && (tagCounts[key]?.no ?? 0) === 0) && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.accent50, borderRadius: 12, padding: 11, marginBottom: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.accent50, borderRadius: 10, padding: 11, marginBottom: 10 }}>
               <T style={{ fontSize: 16 }}>👋</T>
               <T style={{ flex: 1, fontSize: 12.5, color: c.accent, fontWeight: '600', lineHeight: 17 }}>No one's confirmed this yet — be the first, it helps every traveler after you.</T>
             </View>
@@ -339,7 +339,7 @@ export default function PlaceDetail() {
             })}
           </View>
           {place.warnTip && (
-            <View style={{ marginTop: 12, padding: 12, borderRadius: 12, backgroundColor: c.rose50, flexDirection: 'row', gap: 8 }}>
+            <View style={{ marginTop: 12, padding: 12, borderRadius: 10, backgroundColor: c.rose50, flexDirection: 'row', gap: 8 }}>
               <T style={{ fontSize: 15 }}>⚠️</T>
               <T style={{ flex: 1, fontSize: 12.5, color: c.rose700, fontWeight: '600', lineHeight: 18 }}>{place.warnTip}</T>
             </View>
@@ -386,7 +386,7 @@ export default function PlaceDetail() {
       {/* Translate sheet */}
       <Modal visible={sheet} transparent animationType="slide" onRequestClose={() => setSheet(false)}>
         <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={() => setSheet(false)} />
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: 20, paddingBottom: insets.bottom + 20 }}>
+        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20 }}>
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
           <View style={{ backgroundColor: c.ink, borderRadius: 18, padding: 20 }}>
             <T style={{ fontSize: 12, color: c.muted, fontWeight: '700' }}>SHOW THIS</T>
@@ -439,7 +439,7 @@ function ReactionButton({
       onPress={onPress}
       style={{
         flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
-        paddingVertical: 11, borderRadius: 13,
+        paddingVertical: 11, borderRadius: 14,
         backgroundColor: active ? activeBg : c.surface,
         borderWidth: 1, borderColor: active ? 'transparent' : c.line,
       }}

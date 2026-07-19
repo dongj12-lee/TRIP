@@ -343,11 +343,11 @@ export default function ExploreScreen() {
                 style={{
                   position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 116,
                   flexDirection: 'row', gap: 12, alignItems: 'center',
-                  backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 10,
+                  backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 10,
                   ...(shadow as object),
                 }}
               >
-                <Photo uri={pinnedPlace.photoUrl} swatch={pinnedPlace.swatch} height={64} radius={12} style={{ width: 64 }} />
+                <Photo uri={pinnedPlace.photoUrl} swatch={pinnedPlace.swatch} height={64} radius={10} style={{ width: 64 }} />
                 <View style={{ flex: 1 }}>
                   <T style={{ fontSize: 11.5, fontWeight: '800', color: c.accent }} numberOfLines={1}>
                     {pinnedPlace.category}{pinnedPlace.neighborhood ? ` · ${guLabel(pinnedPlace.neighborhood)}` : ''}
@@ -458,7 +458,7 @@ function IntentItem({ emoji, label, active, onPress }: { emoji: string; label: s
     >
       <View
         style={{
-          width: 48, height: 48, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
+          width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
           backgroundColor: active ? c.ink : c.surface,
           borderWidth: 1.5, borderColor: active ? c.ink : c.line,
         }}

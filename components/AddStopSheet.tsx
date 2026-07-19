@@ -51,7 +51,7 @@ export function AddStopSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
-      <View style={{ height: '85%', backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingTop: 12 }}>
+      <View style={{ height: '85%', backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 12 }}>
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 14 }} />
 
         {suggestions.length > 0 && !query && (
@@ -136,7 +136,7 @@ export function AddStopSheet({
                 pressed && { opacity: 0.6 },
               ]}
             >
-              <View style={{ width: 52, height: 52, borderRadius: 12, overflow: 'hidden' }}>
+              <View style={{ width: 52, height: 52, borderRadius: 10, overflow: 'hidden' }}>
                 <Photo uri={item.photoUrl} swatch={item.swatch} height={52} />
               </View>
               <View style={{ flex: 1 }}>

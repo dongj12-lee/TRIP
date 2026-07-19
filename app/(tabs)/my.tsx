@@ -131,7 +131,7 @@ export default function MyScreen() {
             accessibilityRole="button"
             accessibilityLabel="Open Seoul Passport"
             style={({ pressed }) => [
-              { backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.line, overflow: 'hidden' },
+              { backgroundColor: c.surface, borderRadius: 22, borderWidth: 1, borderColor: c.line, overflow: 'hidden' },
               pressed && { opacity: 0.92 },
             ]}
           >
@@ -203,7 +203,7 @@ export default function MyScreen() {
           {myPosts.length === 0 ? (
             <Pressable
               onPress={() => router.push('/compose?kind=post')}
-              style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line }}
+              style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line }}
             >
               <T style={{ fontSize: 26 }}>✍️</T>
               <T style={{ color: c.ink, marginTop: 6, fontWeight: '700' }}>Share your first tip</T>
@@ -232,7 +232,7 @@ export default function MyScreen() {
         {/* Saved places — compact scannable rows (full cards buried the list) */}
         <Section title={savedPlaces.length > 0 ? `Saved places · ${savedPlaces.length}` : 'Saved places'}>
           {savedPlaces.length === 0 ? (
-            <View style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line }}>
+            <View style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line }}>
               <T style={{ fontSize: 26 }}>🔖</T>
               <T style={{ color: c.muted, marginTop: 6, fontWeight: '600' }}>Start exploring — tap ♥ on any spot.</T>
             </View>
@@ -263,7 +263,7 @@ function SavedRow({ place, onOpen, onUnsave }: { place: Place; onOpen: () => voi
       onPress={onOpen}
       style={{ flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 10 }}
     >
-      <View style={{ width: 46, height: 46, borderRadius: 11, overflow: 'hidden' }}>
+      <View style={{ width: 46, height: 46, borderRadius: 10, overflow: 'hidden' }}>
         <Photo uri={place.photoUrl} swatch={place.swatch} height={46} />
       </View>
       <View style={{ flex: 1 }}>

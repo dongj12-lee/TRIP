@@ -38,7 +38,7 @@ export function SeoulWeather() {
           flexDirection: 'row', alignItems: 'center', gap: 14,
           backgroundColor: dark ? '#1f2937' : '#eef3f8',
           borderWidth: 1, borderColor: dark ? '#2b3a4d' : '#dbe6f0',
-          borderRadius: 16, paddingVertical: 12, paddingHorizontal: 15,
+          borderRadius: 14, paddingVertical: 12, paddingHorizontal: 15,
         }}
       >
         {/* Emoji + temp */}

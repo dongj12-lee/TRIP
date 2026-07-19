@@ -99,7 +99,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
     <>
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} accessibilityLabel="Close" />
-      <View style={{ maxHeight: '88%', backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26 }}>
+      <View style={{ maxHeight: '88%', backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22 }}>
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
         <View style={{ paddingHorizontal: 20, paddingTop: 6, paddingBottom: 2 }}>
           <H style={{ fontSize: 22 }}>✨ Plan my day</H>
@@ -173,7 +173,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
                           </T>
                         )}
                       </View>
-                      <View style={{ width: 46, height: 46, borderRadius: 11, overflow: 'hidden' }}>
+                      <View style={{ width: 46, height: 46, borderRadius: 10, overflow: 'hidden' }}>
                         <Photo uri={s.place.photoUrl} swatch={s.place.swatch} height={46} />
                       </View>
                       <View style={{ flex: 1 }}>

@@ -111,7 +111,7 @@ function BrandFooter({ handle }: { handle?: string }) {
           {handle ? `@${handle} · ` : ''}Plan your Seoul trip
         </T>
       </View>
-      <View style={{ width: 46, height: 46, borderRadius: 13, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 46, height: 46, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' }}>
         <T style={{ fontSize: 24 }}>📍</T>
       </View>
     </View>
@@ -134,7 +134,7 @@ export const FourCutsCard = forwardRef<View, { title: string; stops: ShareStop[]
       <View ref={ref} collapsable={false} style={{ width: SHARE_W, height: SHARE_H, backgroundColor: '#141210', padding: PAD }}>
         <View style={{ gap: GAP }}>
           {cuts.map((s, i) => (
-            <View key={i} style={{ height: photoH, borderRadius: 3, overflow: 'hidden', backgroundColor: '#26221e' }}>
+            <View key={i} style={{ height: photoH, borderRadius: 6, overflow: 'hidden', backgroundColor: '#26221e' }}>
               <Photo uri={s.photoUrl} swatch={s.swatch ?? ['#5a4636', '#2e241c']} height={photoH} />
               {/* film date stamp on the last frame */}
               {i === 3 && (
@@ -143,7 +143,7 @@ export const FourCutsCard = forwardRef<View, { title: string; stops: ShareStop[]
                 </T>
               )}
               {/* stop name tag */}
-              <View style={{ position: 'absolute', left: 8, bottom: 6, backgroundColor: 'rgba(0,0,0,0.55)', paddingVertical: 2, paddingHorizontal: 7, borderRadius: 4 }}>
+              <View style={{ position: 'absolute', left: 8, bottom: 6, backgroundColor: 'rgba(0,0,0,0.55)', paddingVertical: 2, paddingHorizontal: 7, borderRadius: 6 }}>
                 <T style={{ fontSize: 9.5, fontWeight: '700', color: 'rgba(255,255,255,0.92)' }} numberOfLines={1}>
                   {i + 1}/4 · {s.name}
                 </T>
@@ -247,11 +247,11 @@ export const ShareCard = forwardRef<View, {
         )}
         <View style={{ flex: 1, justifyContent: 'center', gap: 9, paddingVertical: 16 }}>
           {shown.map((s, i) => (
-            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 15, padding: 8 }}>
+            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 11, backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 14, padding: 8 }}>
               <View style={{ width: 30, alignItems: 'center' }}>
                 <T style={{ fontSize: 12.5, fontWeight: '800', color: g.grad[1] }}>{s.time || `${i + 1}`}</T>
               </View>
-              <View style={{ width: 50, height: 50, borderRadius: 11, overflow: 'hidden' }}>
+              <View style={{ width: 50, height: 50, borderRadius: 10, overflow: 'hidden' }}>
                 <Photo uri={s.photoUrl} swatch={s.swatch ?? ['#c98a5e', '#a8512f']} height={50} />
               </View>
               <View style={{ flex: 1 }}>
@@ -300,7 +300,7 @@ export const MagazineCard = forwardRef<View, { place: PlaceShareData; handle?: s
           </T>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
             <T style={{ fontSize: 10.5, fontWeight: '700', color: 'rgba(255,255,255,0.6)' }}>{handle ? `found by @${handle}` : 'find yours on TRIP'}</T>
-            <View style={{ backgroundColor: 'rgba(255,255,255,0.92)', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 4 }}>
+            <View style={{ backgroundColor: 'rgba(255,255,255,0.92)', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6 }}>
               <Barcode seed={place.name} height={16} color="#1c150e" />
             </View>
           </View>
@@ -340,7 +340,7 @@ export const PolaroidCard = forwardRef<View, { place: PlaceShareData; handle?: s
           </View>
 
           {/* Tape */}
-          <View style={{ position: 'absolute', top: '11%', alignSelf: 'center', width: 92, height: 26, backgroundColor: 'rgba(255,255,240,0.55)', transform: [{ rotate: '3deg' }], borderRadius: 2 }} />
+          <View style={{ position: 'absolute', top: '11%', alignSelf: 'center', width: 92, height: 26, backgroundColor: 'rgba(255,255,240,0.55)', transform: [{ rotate: '3deg' }], borderRadius: 6 }} />
 
           {/* Brand */}
           <View style={{ position: 'absolute', bottom: 26, alignItems: 'center' }}>
@@ -362,7 +362,7 @@ export const PlaceShareCard = forwardRef<View, { place: PlaceShareData; handle?:
       <View ref={ref} collapsable={false} style={{ width: SHARE_W, height: SHARE_H, backgroundColor: g.grad[1] }}>
         <LinearGradient colors={g.grad} start={{ x: 0, y: 0 }} end={{ x: 0.4, y: 1 }} style={{ flex: 1, padding: 18 }}>
           <T style={{ fontSize: 12, fontWeight: '800', letterSpacing: 2, color: CREAM_DIM, marginBottom: 12 }}>🇰🇷  A SEOUL SPOT I LOVE</T>
-          <View style={{ height: heroH, borderRadius: 20, overflow: 'hidden' }}>
+          <View style={{ height: heroH, borderRadius: 22, overflow: 'hidden' }}>
             <Photo uri={place.photoUrl} swatch={place.swatch ?? ['#c98a5e', '#a8512f']} height={heroH} />
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.15)', 'rgba(0,0,0,0.72)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0 }} />
             <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 16 }}>
@@ -447,7 +447,7 @@ export const PassportShareCard = forwardRef<View, { data: PassportShareData; han
               <H style={{ fontSize: 24, color: CREAM, letterSpacing: 0.5 }}>TRIP</H>
               <T style={{ fontSize: 11, fontWeight: '700', color: CREAM_DIM }}>{handle ? `@${handle} · ` : ''}collect yours on TRIP</T>
             </View>
-            <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(242,162,77,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: 'rgba(242,162,77,0.16)', alignItems: 'center', justifyContent: 'center' }}>
               <T style={{ fontSize: 22 }}>🎫</T>
             </View>
           </View>

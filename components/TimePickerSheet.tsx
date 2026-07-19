@@ -37,7 +37,7 @@ export function TimePickerSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
-      <View style={{ height: '60%', backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingTop: 12 }}>
+      <View style={{ height: '60%', backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingTop: 12 }}>
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 12 }} />
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
           <T style={{ fontSize: 17, fontWeight: '800' }}>Set a time</T>
@@ -56,7 +56,7 @@ export function TimePickerSheet({
                 key={t}
                 onPress={() => { onSelect(t); onClose(); }}
                 style={{
-                  height: 48, borderRadius: 12, paddingHorizontal: 14, marginBottom: 2,
+                  height: 48, borderRadius: 10, paddingHorizontal: 14, marginBottom: 2,
                   flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
                   backgroundColor: on ? c.accent50 : 'transparent',
                 }}

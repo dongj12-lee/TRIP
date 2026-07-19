@@ -38,7 +38,7 @@ export default function Compose() {
   const canSubmit = isSupabaseConfigured && !!session;
 
   const field = {
-    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 12,
+    backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, borderRadius: 10,
     paddingHorizontal: 12, paddingVertical: 11, fontSize: 15, color: c.ink, fontFamily: 'Pretendard',
   } as const;
 
@@ -99,7 +99,7 @@ export default function Compose() {
                 {Object.entries(POST_TYPES).filter(([k]) => k !== 'route').map(([k, v]) => {
                   const on = type === k;
                   return (
-                    <Pressable key={k} onPress={() => setType(k as PostType)} style={{ flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent50 : c.surface }}>
+                    <Pressable key={k} onPress={() => setType(k as PostType)} style={{ flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center', borderWidth: 1, borderColor: on ? c.accent : c.line, backgroundColor: on ? c.accent50 : c.surface }}>
                       <T style={{ fontSize: 13, fontWeight: '700', color: on ? c.accent : c.inkSoft }}>{v.emoji} {v.label}</T>
                     </Pressable>
                   );
@@ -139,7 +139,7 @@ export default function Compose() {
           )}
 
           {!canSubmit && (
-            <View style={{ marginTop: 16, backgroundColor: c.gold50, borderRadius: 12, padding: 12 }}>
+            <View style={{ marginTop: 16, backgroundColor: c.gold50, borderRadius: 10, padding: 12 }}>
               <T style={{ fontSize: 12.5, color: c.gold700, lineHeight: 18, fontWeight: '600' }}>
                 {isSupabaseConfigured ? 'Sign in to publish.' : "Backend isn't connected yet — publishing is disabled until Supabase is configured."}
               </T>

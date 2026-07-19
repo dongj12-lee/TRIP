@@ -69,7 +69,7 @@ export default function AdminScreen() {
               {reports.length > 0 ? `${reports.length} OPEN ${reports.length === 1 ? 'REPORT' : 'REPORTS'}` : ' '}
             </T>
             {reports.map((r) => (
-              <View key={r.reportId} style={{ backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 14 }}>
+              <View key={r.reportId} style={{ backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 14 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <T style={{ fontSize: 15 }}>{TYPE_EMOJI[r.targetType] ?? '⚑'}</T>
                   <T style={{ fontSize: 12.5, fontWeight: '700', color: c.inkSoft, textTransform: 'capitalize' }}>{r.targetType}</T>

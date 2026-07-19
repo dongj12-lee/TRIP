@@ -109,7 +109,7 @@ function FallbackExploreMap({
           >
             <View
               style={{
-                width: 32, height: 32, borderRadius: 16, borderBottomLeftRadius: 2,
+                width: 32, height: 32, borderRadius: 14, borderBottomLeftRadius: 6,
                 transform: [{ rotate: '45deg' }],
                 alignItems: 'center', justifyContent: 'center',
                 backgroundColor: on ? c.accent : c.surface,

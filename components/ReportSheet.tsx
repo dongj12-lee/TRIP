@@ -58,7 +58,7 @@ export function ReportSheet({ visible, onClose, target }: { visible: boolean; on
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
-      <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: 20, paddingBottom: insets.bottom + 20 }}>
+      <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20 }}>
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
         <T style={{ fontSize: 16, fontWeight: '800', marginBottom: 4 }}>Report this content</T>
         <T style={{ fontSize: 13, color: c.muted, marginBottom: 16 }}>Your report is anonymous to other users.</T>
@@ -68,7 +68,7 @@ export function ReportSheet({ visible, onClose, target }: { visible: boolean; on
               key={r}
               onPress={() => submitReport(r)}
               disabled={busy}
-              style={{ paddingVertical: 13, paddingHorizontal: 14, borderRadius: 12, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
+              style={{ paddingVertical: 13, paddingHorizontal: 14, borderRadius: 10, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
             >
               <T style={{ fontSize: 14.5, fontWeight: '600' }}>{r}</T>
             </Pressable>

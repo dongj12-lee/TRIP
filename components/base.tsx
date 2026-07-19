@@ -6,6 +6,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
+import { RADII } from '@/theme/tokens';
 import { Icon, IconName } from './Icon';
 
 // Weight → Pretendard family map (RN needs a distinct family per weight).
@@ -82,7 +83,7 @@ export function Card({
   const { c, shadow } = useTheme();
   const base: ViewStyle = {
     backgroundColor: c.surface,
-    borderRadius: 18,
+    borderRadius: RADII.lg,
     borderWidth: 1,
     borderColor: c.line,
     ...(shadow as object),
@@ -189,7 +190,7 @@ export function Button({
       accessibilityState={{ disabled: !!disabled }}
       style={({ pressed }) => [
         {
-          height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8,
+          height: 52, borderRadius: RADII.md, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8,
           backgroundColor: bg,
           borderWidth: variant === 'soft' ? 1 : 0,
           borderColor: c.line,
