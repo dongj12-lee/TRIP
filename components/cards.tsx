@@ -10,6 +10,7 @@ import { FOREIGNER_TAGS, POST_TYPES, normalizePostType, placeBySlug } from '@/da
 import { intentLabel } from '@/data/intents';
 import { Place, Post, RouteDay } from '@/data/types';
 import { Svg, Path, Circle, G } from 'react-native-svg';
+import { SEOUL_DISTRICTS, SEOUL_MAP_W, SEOUL_MAP_H, projectLngLat } from '@/data/seoulDistricts';
 import { Icon } from './Icon';
 import { Photo, Chip, Rating, TagPill, Flag } from './ui';
 import { guLabel } from '@/lib/format';
@@ -151,12 +152,12 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
     </View>
   );
 
-  // Resolve each day's geocoded stops to draw a Strava-style route trace.
+  // Project each day's geocoded stops onto the shared Seoul silhouette space.
   const dayPts = days.map((d) =>
     d.stops
       .map((st) => resolve(st.slug))
       .filter((p): p is NonNullable<typeof p> => !!p && typeof p.lat === 'number' && typeof p.lng === 'number')
-      .map((p) => ({ x: p.lng, y: p.lat })),
+      .map((p) => projectLngLat(p.lng, p.lat)),
   );
   const allPts = dayPts.flat();
 
@@ -165,36 +166,29 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
     return <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.terra50 }}>{caption}</View>;
   }
 
-  const VBW = 320, VBH = 108, pad = 20;
-  const xs = allPts.map((p) => p.x), ys = allPts.map((p) => p.y);
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const cosLat = Math.cos((((minY + maxY) / 2) * Math.PI) / 180); // lng compresses toward the pole
-  const dx = (maxX - minX) * cosLat || 1e-6, dy = (maxY - minY) || 1e-6;
-  const scale = Math.min((VBW - pad * 2) / dx, (VBH - pad * 2) / dy);
-  const w = dx * scale, h = dy * scale;
-  const offX = (VBW - w) / 2, offY = (VBH - h) / 2;
-  const proj = (p: { x: number; y: number }) => ({
-    X: offX + (p.x - minX) * cosLat * scale,
-    Y: offY + (maxY - p.y) * scale, // north up
-  });
-
+  // The route drawn over a faint real Seoul silhouette (same projection as the
+  // Seoul Passport) — a true "trip map", not an abstract line on blank space.
   return (
-    <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.terra50, overflow: 'hidden' }}>
-      <View style={{ height: VBH }}>
-        <Svg width="100%" height="100%" viewBox={`0 0 ${VBW} ${VBH}`} preserveAspectRatio="xMidYMid meet">
+    <View style={{ marginTop: 10, borderRadius: 13, backgroundColor: c.surface2, overflow: 'hidden' }}>
+      <View style={{ height: 150 }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 ${SEOUL_MAP_W} ${SEOUL_MAP_H}`} preserveAspectRatio="xMidYMid meet">
+          <G>
+            {SEOUL_DISTRICTS.map((d) => (
+              <Path key={d.name} d={d.path} fill={c.paper} stroke={c.line} strokeWidth={0.4} />
+            ))}
+          </G>
           {dayPts.map((pts, di) => {
             if (pts.length === 0) return null;
-            const P = pts.map(proj);
-            const d = P.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.X.toFixed(1)} ${p.Y.toFixed(1)}`).join(' ');
+            const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ');
             return (
               <G key={di}>
-                {P.length > 1 && (
-                  <Path d={d} stroke={terra.solid} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.92} />
+                {pts.length > 1 && (
+                  <Path d={path} stroke={terra.solid} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.95} />
                 )}
-                {P.map((p, i) => {
+                {pts.map((p, i) => {
                   const isStart = di === 0 && i === 0;
                   return (
-                    <Circle key={i} cx={p.X} cy={p.Y} r={isStart ? 4.6 : 3} fill={isStart ? terra.solid : '#fff'} stroke={terra.solid} strokeWidth={isStart ? 0 : 1.6} />
+                    <Circle key={i} cx={p.x} cy={p.y} r={isStart ? 2 : 1.35} fill={isStart ? terra.solid : c.paper} stroke={terra.solid} strokeWidth={isStart ? 0 : 0.8} />
                   );
                 })}
               </G>
