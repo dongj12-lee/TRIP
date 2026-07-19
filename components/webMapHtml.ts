@@ -142,9 +142,21 @@ export const MAP_RUNTIME_JS = String.raw`
     if(key===fitKey){ return; }
     fitKey=key;
     if(DATA.pins.length===1){ map.setCenter(new naver.maps.LatLng(DATA.pins[0].lat,DATA.pins[0].lng)); map.setZoom(15); return; }
+    // The unfiltered catalog (~2,300+ pins) spans Incheon airport to Ganghwado
+    // — fitBounds' center is the midpoint of those extremes, not Seoul, and
+    // its zoom shrinks everything to fit them in. For a set that large just
+    // center on Seoul proper at a fixed, readable zoom instead of fitting to
+    // the outliers; smaller (filtered/searched) sets still fit-to-bounds
+    // normally, floored so a couple of far pins can't zoom it out too far.
+    if(DATA.pins.length>400){
+      map.setCenter(new naver.maps.LatLng(37.5519,126.995));
+      map.setZoom(11);
+      return;
+    }
     var b=new naver.maps.LatLngBounds(new naver.maps.LatLng(DATA.pins[0].lat,DATA.pins[0].lng),new naver.maps.LatLng(DATA.pins[0].lat,DATA.pins[0].lng));
     for(var i=1;i<DATA.pins.length;i++){ b.extend(new naver.maps.LatLng(DATA.pins[i].lat,DATA.pins[i].lng)); }
     map.fitBounds(b,{top:50,right:50,bottom:50,left:50});
+    if(map.getZoom()<11){ map.setZoom(11); }
   }
   window.__renderMap=function(data){
     DATA=data;
