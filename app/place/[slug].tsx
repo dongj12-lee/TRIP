@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Pressable, Modal, Linking } from 'react-native';
+import * as Speech from 'expo-speech';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,12 +22,72 @@ import { guLabel } from '@/lib/format';
 import { normalizeDistrict } from '@/lib/stamps';
 import { haptic } from '@/lib/haptics';
 
-const PHRASES = [
-  { en: 'Table for one, please.', ko: '혼자 왔어요. 한 명이요.', ro: 'Honja wasseoyo. Han myeong-iyo.' },
-  { en: 'Can I pay by card?', ko: '카드로 결제할 수 있어요?', ro: 'Kadeu-ro gyeoljehal su isseoyo?' },
-  { en: 'Do you have an English menu?', ko: '영어 메뉴 있어요?', ro: 'Yeong-eo menyu isseoyo?' },
-  { en: 'Please take me to this address.', ko: '이 주소로 가주세요.', ro: 'I juso-ro gajuseyo.' },
-];
+// Handy phrases are specific to the kind of place — a temple and a bar call
+// for different lines, and knowing WHO to say it to (the "audience" tag)
+// matters as much as the phrase itself. Keyed by `category`, with a couple of
+// `category:categoryL2` overrides where the L1 bucket is too broad (e.g.
+// Cuisine covers everything from a bar to a café). `ko`/`ro` are read aloud
+// via the speaker button (expo-speech, ko-KR) as well as shown on screen.
+type Phrase = { en: string; ko: string; ro: string; audience: string };
+
+const TAXI_PHRASE: Phrase = { en: 'Please take me to this address.', ko: '이 주소로 가주세요.', ro: 'I juso-ro gajuseyo.', audience: 'Taxi driver' };
+const CARD_PHRASE: Phrase = { en: 'Can I pay by card?', ko: '카드로 결제할 수 있어요?', ro: 'Kadeu-ro gyeoljehal su isseoyo?', audience: 'Cashier' };
+
+const PHRASES_BY_CATEGORY: Record<string, Phrase[]> = {
+  Cuisine: [
+    { en: 'Table for one, please.', ko: '혼자 왔어요. 한 명이요.', ro: 'Honja wasseoyo. Han myeong-iyo.', audience: 'Server' },
+    { en: 'Do you have an English menu?', ko: '영어 메뉴 있어요?', ro: 'Yeong-eo menyu isseoyo?', audience: 'Server' },
+    { en: 'Not spicy, please.', ko: '안 맵게 해주세요.', ro: 'An maepge haejuseyo.', audience: 'Server' },
+    CARD_PHRASE,
+  ],
+  'Cuisine:Bars & Clubs': [
+    { en: 'One beer, please.', ko: '맥주 한 잔 주세요.', ro: 'Maekju han jan juseyo.', audience: 'Bartender' },
+    { en: 'Is there a cover charge?', ko: '입장료 있어요?', ro: 'Ipjangnyo isseoyo?', audience: 'Staff' },
+    CARD_PHRASE,
+  ],
+  'Cuisine:Cafes & Tea Shops': [
+    { en: 'For here, please.', ko: '여기서 마실게요.', ro: 'Yeogiseo masilgeyo.', audience: 'Cashier' },
+    { en: 'Iced, please.', ko: '아이스로 주세요.', ro: 'Aiseu-ro juseyo.', audience: 'Cashier' },
+    { en: 'Do you have Wi-Fi?', ko: '와이파이 있어요?', ro: 'Waipai isseoyo?', audience: 'Staff' },
+    CARD_PHRASE,
+  ],
+  Shopping: [
+    { en: 'Can I try this on?', ko: '이거 입어봐도 돼요?', ro: 'Igeo ibeobwado dwaeyo?', audience: 'Shop staff' },
+    { en: 'Do you have this in a different size?', ko: '다른 사이즈 있어요?', ro: 'Dareun saijeu isseoyo?', audience: 'Shop staff' },
+    { en: 'Tax refund, please.', ko: '택스 리펀드 해주세요.', ro: 'Taekseu ripeondeu haejuseyo.', audience: 'Cashier' },
+    CARD_PHRASE,
+  ],
+  'Shopping:Traditional Markets': [
+    { en: 'How much is this?', ko: '이거 얼마예요?', ro: 'Igeo eolmayeyo?', audience: 'Vendor' },
+    { en: 'Can you make it a bit cheaper?', ko: '조금 깎아주세요.', ro: 'Jogeum kkakkajuseyo.', audience: 'Vendor' },
+  ],
+  Culture: [
+    { en: 'One adult ticket, please.', ko: '성인 한 장이요.', ro: 'Seong-in han jang-iyo.', audience: 'Ticket counter' },
+    { en: 'Is there an English audio guide?', ko: '영어 오디오 가이드 있어요?', ro: 'Yeong-eo odio gaideu isseoyo?', audience: 'Staff' },
+    { en: 'What time does it close?', ko: '몇 시에 닫아요?', ro: 'Myeot si-e dadayo?', audience: 'Staff' },
+  ],
+  History: [
+    { en: 'One adult ticket, please.', ko: '성인 한 장이요.', ro: 'Seong-in han jang-iyo.', audience: 'Ticket counter' },
+    { en: 'Is photography allowed here?', ko: '여기 사진 찍어도 돼요?', ro: 'Yeogi sajin jjigeodo dwaeyo?', audience: 'Staff' },
+    { en: 'What time does it close?', ko: '몇 시에 닫아요?', ro: 'Myeot si-e dadayo?', audience: 'Staff' },
+  ],
+  Nature: [
+    { en: 'Where is the trail entrance?', ko: '등산로 입구가 어디예요?', ro: 'Deungsanno ipgu-ga eodiyeyo?', audience: 'Staff' },
+    { en: 'Is there a shuttle bus?', ko: '셔틀버스 있어요?', ro: 'Syeoteulbeoseu isseoyo?', audience: 'Staff' },
+  ],
+  'Experience Programs': [
+    { en: 'Is there an English-speaking instructor?', ko: '영어 가능한 강사님 있어요?', ro: 'Yeong-eo ganeunghan gangsanim isseoyo?', audience: 'Staff' },
+    { en: 'How long does this take?', ko: '얼마나 걸려요?', ro: 'Eolmana geollyeoyo?', audience: 'Staff' },
+    CARD_PHRASE,
+  ],
+};
+
+// Taxi phrase always appears last — every place needs "take me here" regardless
+// of what kind of place it is.
+function phrasesFor(category: string, categoryL2?: string | null): Phrase[] {
+  const specific = (categoryL2 && PHRASES_BY_CATEGORY[`${category}:${categoryL2}`]) || PHRASES_BY_CATEGORY[category] || [];
+  return [...specific, TAXI_PHRASE];
+}
 
 // Over-photo hero controls — a dark scrim circle so they read on any cover
 // (a light button vanished on bright photos).
@@ -45,6 +106,7 @@ export default function PlaceDetail() {
   const { showToast } = useToast();
   const [sheet, setSheet] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
 
   const place = placeBySlug[slug!];
   // Optimistic like/dislike counts — seed from the server counts and re-sync
@@ -55,6 +117,12 @@ export default function PlaceDetail() {
     setLikeN(place?.likeCount ?? 0);
     setDislikeN(place?.dislikeCount ?? 0);
   }, [place?.likeCount, place?.dislikeCount]);
+
+  // Stop any in-progress phrase playback when the sheet closes (swipe-down,
+  // backdrop tap, or Android back button all route through this).
+  useEffect(() => {
+    if (!sheet) { Speech.stop(); setSpeakingIdx(null); }
+  }, [sheet]);
 
   // Optimistic Foreigner Fit yes/no counts — seeded once per place, then
   // nudged locally on each tap (the server trigger keeps the real counts in
@@ -79,6 +147,14 @@ export default function PlaceDetail() {
   if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
 
   const fitKeys = fitTagsFor(place.category, place.categoryL2);
+  const phrases = phrasesFor(place.category, place.categoryL2);
+  const speak = (i: number, ko: string) => {
+    haptic.tick();
+    Speech.stop();
+    if (speakingIdx === i) { setSpeakingIdx(null); return; } // tap again to stop
+    setSpeakingIdx(i);
+    Speech.speak(ko, { language: 'ko-KR', rate: 0.92, onDone: () => setSpeakingIdx(null), onStopped: () => setSpeakingIdx(null), onError: () => setSpeakingIdx(null) });
+  };
   const isSaved = saved.has(place.slug);
   // Split the description into an editorial lead (first sentence, set large)
   // and the rest (supporting body). Only break at a real sentence boundary —
@@ -394,14 +470,36 @@ export default function PlaceDetail() {
             <T style={{ fontSize: 14, color: c.muted, marginTop: 8 }}>{place.address}</T>
           </View>
           <T style={{ fontSize: 13, fontWeight: '700', color: c.inkSoft, marginTop: 18, marginBottom: 8 }}>Handy phrases</T>
-          <ScrollView style={{ maxHeight: 260 }}>
-            {PHRASES.map((p, i) => (
-              <View key={i} style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: c.line }}>
-                <T style={{ fontSize: 14, fontWeight: '700' }}>{p.en}</T>
-                <T style={{ fontSize: 15, color: c.accent, marginTop: 3 }}>{p.ko}</T>
-                <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{p.ro}</T>
-              </View>
-            ))}
+          <ScrollView style={{ maxHeight: 320 }}>
+            {phrases.map((p, i) => {
+              const speaking = speakingIdx === i;
+              return (
+                <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: c.line }}>
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <T style={{ fontSize: 14, fontWeight: '700', flexShrink: 1 }} numberOfLines={2}>{p.en}</T>
+                      <View style={{ backgroundColor: c.surface2, borderRadius: 999, paddingVertical: 2.5, paddingHorizontal: 8 }}>
+                        <T style={{ fontSize: 10.5, fontWeight: '800', color: c.inkSoft }} numberOfLines={1}>{p.audience}</T>
+                      </View>
+                    </View>
+                    <T style={{ fontSize: 15, color: c.accent, marginTop: 3 }}>{p.ko}</T>
+                    <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{p.ro}</T>
+                  </View>
+                  <Pressable
+                    onPress={() => speak(i, p.ko)}
+                    hitSlop={10}
+                    accessibilityRole="button"
+                    accessibilityLabel={speaking ? 'Stop playback' : `Play "${p.ko}" aloud`}
+                    style={{
+                      width: 34, height: 34, borderRadius: 999, alignItems: 'center', justifyContent: 'center',
+                      backgroundColor: speaking ? c.accent : c.surface2,
+                    }}
+                  >
+                    <Icon name="speaker" size={16} stroke={speaking ? '#fff' : c.inkSoft} sw={2} />
+                  </Pressable>
+                </View>
+              );
+            })}
           </ScrollView>
           <Button label="Close" variant="soft" style={{ marginTop: 16 }} onPress={() => setSheet(false)} />
         </View>
