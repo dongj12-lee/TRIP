@@ -28,7 +28,7 @@ export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { places, posts, refreshAll, loading } = useRemoteContent();
-  const { profile } = useStore();
+  const { profile, saved, toggleSave } = useStore();
   const { scrollY, onScroll } = useTabScroll();
   const topPad = useContentTopPadding();
 
@@ -333,7 +333,7 @@ export default function ExploreScreen() {
           </View>
           <View style={{ flex: 1 }} onLayout={(e) => setMapH(e.nativeEvent.layout.height)}>
             {mapH > 0 && (
-              <ExploreMap places={filtered} selectedSlug={pinnedSlug} onSelect={(slug) => setPinnedSlug(slug)} height={mapH} />
+              <ExploreMap places={filtered} selectedSlug={pinnedSlug} onSelect={(slug) => setPinnedSlug(slug)} savedSlugs={saved} height={mapH} />
             )}
             {/* Tapped-pin place card — the Airbnb/Beli "peek" before committing */}
             {pinnedPlace && (
@@ -357,9 +357,19 @@ export default function ExploreScreen() {
                     <View style={{ marginTop: 3 }}><Rating value={pinnedPlace.rating} count={pinnedPlace.reviews} size={13} /></View>
                   )}
                 </View>
-                <Pressable onPress={() => setPinnedSlug(null)} hitSlop={10} style={{ padding: 4 }} accessibilityLabel="Dismiss">
-                  <Icon name="close" size={18} stroke={c.muted} sw={2} />
-                </Pressable>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                  <Pressable
+                    onPress={(e) => { e.stopPropagation?.(); haptic.tick(); toggleSave(pinnedPlace.slug); }}
+                    hitSlop={8}
+                    style={{ padding: 5 }}
+                    accessibilityLabel={saved.has(pinnedPlace.slug) ? 'Unsave' : 'Save'}
+                  >
+                    <Icon name="heart" size={20} fill={saved.has(pinnedPlace.slug) ? c.rose : 'none'} stroke={saved.has(pinnedPlace.slug) ? c.rose : c.muted} sw={2} />
+                  </Pressable>
+                  <Pressable onPress={(e) => { e.stopPropagation?.(); setPinnedSlug(null); }} hitSlop={8} style={{ padding: 5 }} accessibilityLabel="Dismiss">
+                    <Icon name="close" size={18} stroke={c.muted} sw={2} />
+                  </Pressable>
+                </View>
               </Pressable>
             )}
           </View>

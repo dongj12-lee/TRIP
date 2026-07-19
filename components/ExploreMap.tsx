@@ -26,11 +26,13 @@ export function ExploreMap({
   places,
   selectedSlug,
   onSelect,
+  savedSlugs,
   height = 220,
 }: {
   places: Place[];
   selectedSlug: string | null;
   onSelect: (slug: string | null) => void;
+  savedSlugs?: Set<string>;
   height?: number;
 }) {
   if (places.length === 0) return <FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />;
@@ -44,6 +46,7 @@ export function ExploreMap({
         lng: p.lng,
         color: categoryPinColor(p.category, p.categoryL2),
         selected: p.slug === selectedSlug,
+        saved: savedSlugs?.has(p.slug) ?? false,
       }))}
       onPinPress={(id) => onSelect(id)}
       fallback={<FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />}

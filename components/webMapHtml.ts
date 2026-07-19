@@ -13,6 +13,7 @@ export type MapPin = {
   color?: string; // pin fill (category color); falls back to accent
   number?: number; // numbered circle (route-stop style)
   selected?: boolean;
+  saved?: boolean; // a place the traveler saved — drawn with a heart center
 };
 
 export type MapData = {
@@ -67,8 +68,13 @@ export const MAP_RUNTIME_JS = String.raw`
       return '<div style="width:28px;height:28px;border-radius:999px;background:'+cs.accent+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font:800 13px system-ui;color:#fff">'+p.number+'</div>';
     }
     var fill=p.selected?cs.accent:(p.color||cs.accent);
-    var h=p.selected?34:27, w=Math.round(h*0.72);
-    return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 24 33" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"><path d="M12 0C5.4 0 0 5.4 0 12c0 8.6 10 19.6 11.2 20.8a1.1 1.1 0 0 0 1.6 0C14 31.6 24 20.6 24 12 24 5.4 18.6 0 12 0z" fill="'+fill+'"/><circle cx="12" cy="11.6" r="4.6" fill="rgba(255,255,255,.92)"/></svg>';
+    // Saved spots sit between normal and selected in size and carry a heart
+    // center instead of a dot — so a traveler's shortlist stands out on the map.
+    var h=p.selected?34:(p.saved?31:27), w=Math.round(h*0.72);
+    var center=p.saved
+      ? '<path d="M12 15s-3.3-2.3-3.3-4.5a1.75 1.75 0 0 1 3.3-.85 1.75 1.75 0 0 1 3.3.85C15.3 12.7 12 15 12 15z" fill="rgba(255,255,255,.96)"/>'
+      : '<circle cx="12" cy="11.6" r="4.6" fill="rgba(255,255,255,.92)"/>';
+    return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 24 33" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"><path d="M12 0C5.4 0 0 5.4 0 12c0 8.6 10 19.6 11.2 20.8a1.1 1.1 0 0 0 1.6 0C14 31.6 24 20.6 24 12 24 5.4 18.6 0 12 0z" fill="'+fill+'"/>'+center+'</svg>';
   }
   // Cluster bubble — quiet Airbnb-style white disc, ink count, hairline ring.
   function bubbleHtml(n,cs){
@@ -83,7 +89,7 @@ export const MAP_RUNTIME_JS = String.raw`
     overlays.push(m); return m;
   }
   function pinAt(p,cs){
-    var ax=p.number!=null?14:(p.selected?12:9), ay=p.number!=null?14:(p.selected?34:27);
+    var ax=p.number!=null?14:(p.selected?12:(p.saved?11:9)), ay=p.number!=null?14:(p.selected?34:(p.saved?31:27));
     addMarker(new naver.maps.LatLng(p.lat,p.lng),pinHtml(p,cs),ax,ay,(function(pin){return function(){ if(window.__onPin){ window.__onPin(pin.id); } };})(p));
   }
   function build(){
