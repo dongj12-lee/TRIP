@@ -42,17 +42,20 @@ export const RADII = {
 } as const;
 
 const LIGHT = {
-  paper: '#fbf6ee',
-  surface: '#fffdfa',
-  surface2: '#f4ece0',
+  // Neutral, not cream: the previous #fbf6ee sat close enough to Claude's own
+  // brand cream (#F0ECE0) + serif-headline pairing to read as "made with
+  // Claude Code" rather than an intentional editorial choice. A near-white
+  // with only a hair of warmth avoids that association while staying off the
+  // clinical, eye-straining pure #fff.
+  paper: '#faf9f7',
+  surface: '#ffffff',
+  surface2: '#f0efec',
   ink: '#2e2a24',
   inkSoft: '#6f665a',
-  // WCAG AA: 4.57:1 on paper / 4.85:1 on surface (was #a59a8a, 2.57:1 — the
-  // metadata tier was unreadable in bright light, the exact conditions this
-  // travel app is used in). The ink→inkSoft→muted hierarchy is now carried by
-  // size + weight (muted only ever styles small 11–12px labels), not color.
-  muted: '#767063',
-  line: '#ece2d3',
+  // WCAG AA: ≥4.54:1 against every light surface incl. the tinted surface2
+  // (was #767063, 4.28:1 on surface2 — under AA for its small 11–12px labels).
+  muted: '#726c5f',
+  line: '#e6e4e0',
   terra50: '#f8ebe3', terra: '#c26b4a', terra700: '#a9542f',
   sage50: '#eceee6', sage: '#79876b', sage700: '#5f6d53',
   gold50: '#f7efd8', gold: '#c39b42', gold700: '#8a6a1f',
@@ -64,15 +67,17 @@ const LIGHT = {
 };
 
 const DARK: typeof LIGHT = {
-  paper: '#1a1611',
-  surface: '#241f18',
-  surface2: '#2f2820',
+  // Neutralized alongside LIGHT's paper — a warm-brown-black read the same
+  // way the light cream did; a near-neutral charcoal doesn't.
+  paper: '#171614',
+  surface: '#201f1d',
+  surface2: '#2a2927',
   ink: '#f3ebde',
   inkSoft: '#b6ab9a',
-  // WCAG AA: ≥4.59:1 on every dark surface incl. the lightest (surface2)
+  // WCAG AA: ≥4.6:1 on every dark surface incl. the lightest (surface2)
   // (was #837a6b, 4.25:1 on paper and failing on surface2).
   muted: '#99907d',
-  line: '#342d24',
+  line: '#302f2c',
   terra50: '#3a271d', terra: '#d07f5d', terra700: '#ecab8a',
   sage50: '#2a3225', sage: '#93a182', sage700: '#b6c6a2',
   gold50: '#3a2f16', gold: '#d4ab52', gold700: '#e8cd86',

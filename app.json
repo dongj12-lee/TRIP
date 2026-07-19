@@ -17,7 +17,7 @@
     "android": {
       "package": "com.trip.korea",
       "adaptiveIcon": {
-        "backgroundColor": "#fbf6ee",
+        "backgroundColor": "#faf9f7",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -47,11 +47,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#fbf6ee",
+          "backgroundColor": "#faf9f7",
           "image": "./assets/splash-icon.png",
           "imageWidth": 180,
           "dark": {
-            "backgroundColor": "#1a1611"
+            "backgroundColor": "#171614"
           }
         }
       ]

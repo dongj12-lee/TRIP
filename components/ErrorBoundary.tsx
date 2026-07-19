@@ -20,7 +20,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <View style={{ flex: 1, backgroundColor: '#fbf6ee', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+      <View style={{ flex: 1, backgroundColor: '#faf9f7', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
         <Text style={{ fontSize: 40 }}>🧭</Text>
         <Text style={{ fontSize: 20, fontWeight: '700', color: '#2a221b', marginTop: 14, textAlign: 'center' }}>
           Something went wrong
