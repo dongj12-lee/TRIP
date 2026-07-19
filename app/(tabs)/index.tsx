@@ -211,7 +211,7 @@ export default function ExploreScreen() {
 
   const header = (
     <>
-      <TabTitle title="Explore Seoul" subtitle="Real local places, not tourist traps." />
+      <TabTitle title="Explore Seoul" subtitle="Real local places, not tourist traps" />
 
       <OfflineBanner />
 

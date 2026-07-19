@@ -84,7 +84,7 @@ export default function ThemesScreen() {
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
         showsVerticalScrollIndicator={false}
       >
-        <TabTitle title="Seoul Themes" subtitle="Themed walks and guides across Seoul, curated by category." />
+        <TabTitle title="Seoul Themes" subtitle="Themed walks and guides across Seoul, curated by category" />
         <View style={{ paddingHorizontal: 18 }}>
           <OfflineBanner />
         </View>

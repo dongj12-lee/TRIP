@@ -55,7 +55,7 @@ export default function BuddyScreen() {
           {/* The safety reminder that used to sit here now lives on the plan
               detail screen instead, right before you request to join — a more
               relevant moment. */}
-          <TabTitle title="Travel Buddies" subtitle="Find someone for a 2-person dish or a day trip out of town." />
+          <TabTitle title="Travel Buddies" subtitle="Find someone for a 2-person dish or a day trip out of town" />
 
           <View style={{ paddingHorizontal: 18 }}>
             <OfflineBanner />
