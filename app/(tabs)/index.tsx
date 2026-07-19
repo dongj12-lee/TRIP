@@ -12,6 +12,7 @@ import { screen, SCREENER_EXAMPLES } from '@/lib/screener';
 import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
 import { ExploreMap } from '@/components/ExploreMap';
+import { Photo, Rating } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { FiltersSheet } from '@/components/FiltersSheet';
 import { SeoulWeather } from '@/components/SeoulWeather';
@@ -23,7 +24,7 @@ import { DayPlanSheet } from '@/components/DayPlanSheet';
 import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 
 export default function ExploreScreen() {
-  const { c } = useTheme();
+  const { c, shadow } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { places, posts, refreshAll, loading } = useRemoteContent();
@@ -43,7 +44,9 @@ export default function ExploreScreen() {
   const [selectedHoods, setSelectedHoods] = useState<Set<string>>(new Set());
   const [intent, setIntent] = useState<IntentKey | null>(null);
   const [sub, setSub] = useState<string | null>(null);
-  const [showMap, setShowMap] = useState(true);
+  const [mapMode, setMapMode] = useState(false); // list ⇄ full-screen map
+  const [pinnedSlug, setPinnedSlug] = useState<string | null>(null); // tapped pin → bottom card
+  const [mapH, setMapH] = useState(0); // measured full-map height
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
 
@@ -114,9 +117,9 @@ export default function ExploreScreen() {
     });
   const clearHoods = () => setSelectedHoods(new Set());
 
-  // Full filtered catalog goes to the map — the WebMap runtime clusters and
+  // The full filtered catalog goes to the map — the WebMap runtime clusters and
   // viewport-culls, so thousands of pins stay readable and cheap.
-  const mapPlaces = filtered;
+  const pinnedPlace = pinnedSlug ? filtered.find((p) => p.slug === pinnedSlug) ?? null : null;
 
   // "Recommended" only shows when the user hasn't narrowed the list themselves.
   const noFilters = !query && selectedHoods.size === 0 && !intent && activeTags.size === 0;
@@ -146,53 +149,73 @@ export default function ExploreScreen() {
     selectIntent(null);
   };
 
+  // Search bar + intent bar are shared between the list header and the
+  // full-screen map mode (so you can still search/filter with the map open).
+  const searchBar = (
+    <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
+      <View
+        style={{
+          flexDirection: 'row', alignItems: 'center', gap: 8,
+          backgroundColor: c.surface, borderWidth: 1, borderColor: c.line,
+          borderRadius: 14, paddingHorizontal: 13, height: 46,
+        }}
+      >
+        <Icon name="search" size={18} stroke={c.muted} sw={2} />
+        <TextInput
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search places, food, areas…"
+          placeholderTextColor={c.muted}
+          style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Pretendard' }}
+          autoCapitalize="none"
+          returnKeyType="search"
+        />
+        {query.length > 0 && (
+          <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
+            <Icon name="close" size={18} stroke={c.muted} sw={2} />
+          </Pressable>
+        )}
+      </View>
+      {/* Example prompts teach the natural-language screener */}
+      {noFilters && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 7, paddingTop: 9 }}>
+          <T style={{ fontSize: 12, color: c.muted, fontWeight: '700', alignSelf: 'center', marginRight: 1 }}>✨ Try</T>
+          {SCREENER_EXAMPLES.map((ex) => (
+            <Pressable
+              key={ex}
+              onPress={() => { haptic.tick(); setQuery(ex); }}
+              style={{ paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
+            >
+              <T style={{ fontSize: 12, color: c.inkSoft, fontWeight: '600' }}>{ex}</T>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
+    </View>
+  );
+
+  const intentBar = (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 6 }}>
+      <IntentItem emoji="✨" label="All" active={!intent} onPress={() => { haptic.tick(); selectIntent(null); }} />
+      {INTENTS.map((i) => (
+        <IntentItem
+          key={i.key}
+          emoji={i.emoji}
+          label={i.label}
+          active={intent === i.key}
+          onPress={() => { haptic.tick(); selectIntent(intent === i.key ? null : i.key); }}
+        />
+      ))}
+    </ScrollView>
+  );
+
   const header = (
     <>
       <TabTitle title="Explore Seoul" />
 
       <OfflineBanner />
 
-      {/* Search bar — primary discovery tool, kept at the top */}
-      <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
-        <View
-          style={{
-            flexDirection: 'row', alignItems: 'center', gap: 8,
-            backgroundColor: c.surface, borderWidth: 1, borderColor: c.line,
-            borderRadius: 14, paddingHorizontal: 13, height: 46,
-          }}
-        >
-          <Icon name="search" size={18} stroke={c.muted} sw={2} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search places, food, areas…"
-            placeholderTextColor={c.muted}
-            style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Pretendard' }}
-            autoCapitalize="none"
-            returnKeyType="search"
-          />
-          {query.length > 0 && (
-            <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
-              <Icon name="close" size={18} stroke={c.muted} sw={2} />
-            </Pressable>
-          )}
-        </View>
-        {/* Example prompts teach the natural-language screener */}
-        {noFilters && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 7, paddingTop: 9 }}>
-            <T style={{ fontSize: 12, color: c.muted, fontWeight: '700', alignSelf: 'center', marginRight: 1 }}>✨ Try</T>
-            {SCREENER_EXAMPLES.map((ex) => (
-              <Pressable
-                key={ex}
-                onPress={() => { haptic.tick(); setQuery(ex); }}
-                style={{ paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
-              >
-                <T style={{ fontSize: 12, color: c.inkSoft, fontWeight: '600' }}>{ex}</T>
-              </Pressable>
-            ))}
-          </ScrollView>
-        )}
-      </View>
+      {searchBar}
 
       {/* Live Seoul weather — shown at the top of the default Explore view */}
       {noFilters && <SeoulWeather />}
@@ -244,29 +267,10 @@ export default function ExploreScreen() {
         </View>
       )}
 
-      {/* Map (hidden while searching to keep results focused) */}
-      {showMap && !query && (
-        <View style={{ marginHorizontal: 18, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
-          {/* Pin tap goes straight to the place card — the map stays put. */}
-          <ExploreMap places={mapPlaces} selectedSlug={null} onSelect={(slug) => slug && router.push(`/place/${slug}`)} height={220} />
-        </View>
-      )}
-
       {/* Intent bar — traveler-first categories (Eat / Cafés / Sights / …),
           icon-forward so the buckets are scannable at a glance. This is the
           app's own taxonomy; Visit Seoul's raw L1/L2/L3 never reaches the UI. */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 6 }}>
-        <IntentItem emoji="✨" label="All" active={!intent} onPress={() => { haptic.tick(); selectIntent(null); }} />
-        {INTENTS.map((i) => (
-          <IntentItem
-            key={i.key}
-            emoji={i.emoji}
-            label={i.label}
-            active={intent === i.key}
-            onPress={() => { haptic.tick(); selectIntent(intent === i.key ? null : i.key); }}
-          />
-        ))}
-      </ScrollView>
+      {intentBar}
 
       {/* One refinement row, only where it genuinely helps (Eat → cuisines,
           Sights → historic/landmarks/…). Replaces the old L2+L3 double rail. */}
@@ -309,59 +313,112 @@ export default function ExploreScreen() {
         )}
       </View>
 
-      {/* List header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingBottom: 8 }}>
+      {/* List header — result count (the map now lives in its own mode) */}
+      <View style={{ paddingHorizontal: 18, paddingBottom: 8 }}>
         <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
           {screenerActive ? `✨ Best matches` : sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length.toLocaleString()}
         </T>
-        {!query && (
-          <Pressable onPress={() => setShowMap((v) => !v)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>{showMap ? 'Hide map' : 'Show map'}</T>
-            <Icon name="arrow" size={15} stroke={c.accent} sw={2} />
-          </Pressable>
-        )}
       </View>
     </>
   );
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
-      <TabBar title="Explore" scrollY={scrollY} />
-      <Animated.FlatList
-        data={filtered}
-        keyExtractor={(p: any) => p.slug}
-        renderItem={({ item }: { item: Place }) => (
-          <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
-            <PlaceCard place={item} reasons={reasonsBySlug[item.slug]} />
+      {mapMode ? (
+        // ── MAP MODE: full-screen map, search/intent kept on top to filter pins
+        <View style={{ flex: 1 }}>
+          <View style={{ paddingTop: insets.top + 8 }}>
+            {searchBar}
+            {intentBar}
           </View>
-        )}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        ListHeaderComponent={header}
-        ListEmptyComponent={
-          <View style={{ paddingVertical: 50, alignItems: 'center', paddingHorizontal: 40 }}>
-            <T style={{ fontSize: 28 }}>🔍</T>
-            <T style={{ color: c.muted, marginTop: 8, textAlign: 'center' }}>
-              {query ? `No spots match "${query}".` : 'No spots match those filters.'}
-            </T>
-            <Pressable
-              onPress={() => { haptic.tick(); clearAll(); }}
-              accessibilityRole="button"
-              style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}
-            >
-              <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Clear all filters</T>
-            </Pressable>
+          <View style={{ flex: 1 }} onLayout={(e) => setMapH(e.nativeEvent.layout.height)}>
+            {mapH > 0 && (
+              <ExploreMap places={filtered} selectedSlug={pinnedSlug} onSelect={(slug) => setPinnedSlug(slug)} height={mapH} />
+            )}
+            {/* Tapped-pin place card — the Airbnb/Beli "peek" before committing */}
+            {pinnedPlace && (
+              <Pressable
+                onPress={() => router.push(`/place/${pinnedPlace.slug}`)}
+                accessibilityRole="button"
+                style={{
+                  position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 116,
+                  flexDirection: 'row', gap: 12, alignItems: 'center',
+                  backgroundColor: c.surface, borderRadius: 16, borderWidth: 1, borderColor: c.line, padding: 10,
+                  ...(shadow as object),
+                }}
+              >
+                <Photo uri={pinnedPlace.photoUrl} swatch={pinnedPlace.swatch} height={64} radius={12} style={{ width: 64 }} />
+                <View style={{ flex: 1 }}>
+                  <T style={{ fontSize: 11.5, fontWeight: '800', color: c.accent }} numberOfLines={1}>
+                    {pinnedPlace.category}{pinnedPlace.neighborhood ? ` · ${guLabel(pinnedPlace.neighborhood)}` : ''}
+                  </T>
+                  <H style={{ fontSize: 16, lineHeight: 20, marginTop: 2 }} numberOfLines={1}>{pinnedPlace.name}</H>
+                  {pinnedPlace.rating != null && (
+                    <View style={{ marginTop: 3 }}><Rating value={pinnedPlace.rating} count={pinnedPlace.reviews} size={13} /></View>
+                  )}
+                </View>
+                <Pressable onPress={() => setPinnedSlug(null)} hitSlop={10} style={{ padding: 4 }} accessibilityLabel="Dismiss">
+                  <Icon name="close" size={18} stroke={c.muted} sw={2} />
+                </Pressable>
+              </Pressable>
+            )}
           </View>
-        }
-        contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        showsVerticalScrollIndicator={false}
-        initialNumToRender={8}
-        windowSize={9}
-        removeClippedSubviews
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
-      />
+        </View>
+      ) : (
+        // ── LIST MODE
+        <>
+          <TabBar title="Explore" scrollY={scrollY} />
+          <Animated.FlatList
+            data={filtered}
+            keyExtractor={(p: any) => p.slug}
+            renderItem={({ item }: { item: Place }) => (
+              <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
+                <PlaceCard place={item} reasons={reasonsBySlug[item.slug]} />
+              </View>
+            )}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            ListHeaderComponent={header}
+            ListEmptyComponent={
+              <View style={{ paddingVertical: 50, alignItems: 'center', paddingHorizontal: 40 }}>
+                <T style={{ fontSize: 28 }}>🔍</T>
+                <T style={{ color: c.muted, marginTop: 8, textAlign: 'center' }}>
+                  {query ? `No spots match "${query}".` : 'No spots match those filters.'}
+                </T>
+                <Pressable
+                  onPress={() => { haptic.tick(); clearAll(); }}
+                  accessibilityRole="button"
+                  style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}
+                >
+                  <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Clear all filters</T>
+                </Pressable>
+              </View>
+            }
+            contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            showsVerticalScrollIndicator={false}
+            initialNumToRender={8}
+            windowSize={9}
+            removeClippedSubviews
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.accent} colors={[c.accent]} />}
+          />
+        </>
+      )}
+
+      {/* Airbnb-style floating mode toggle — a confident List ⇄ Map switch */}
+      <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 66, alignItems: 'center' }}>
+        <Pressable
+          onPress={() => { haptic.tick(); setPinnedSlug(null); setMapMode((m) => !m); }}
+          accessibilityRole="button"
+          accessibilityLabel={mapMode ? 'Show list' : 'Show map'}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: c.ink, paddingVertical: 11, paddingHorizontal: 18, borderRadius: 999, ...(shadow as object) }}
+        >
+          <Icon name={mapMode ? 'feed' : 'pin'} size={16} stroke={c.paper} sw={2} />
+          <T style={{ fontSize: 14, fontWeight: '800', color: c.paper }}>{mapMode ? 'List' : 'Map'}</T>
+        </Pressable>
+      </View>
+
       <FiltersSheet
         visible={filtersOpen}
         onClose={() => setFiltersOpen(false)}
