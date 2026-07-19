@@ -32,52 +32,93 @@ type Phrase = { en: string; ko: string; ro: string; audience: string };
 
 const TAXI_PHRASE: Phrase = { en: 'Please take me to this address.', ko: '이 주소로 가주세요.', ro: 'I juso-ro gajuseyo.', audience: 'Taxi driver' };
 const CARD_PHRASE: Phrase = { en: 'Can I pay by card?', ko: '카드로 결제할 수 있어요?', ro: 'Kadeu-ro gyeoljehal su isseoyo?', audience: 'Cashier' };
+const RESTROOM_PHRASE: Phrase = { en: 'Where is the restroom?', ko: '화장실이 어디예요?', ro: 'Hwajangsil-i eodiyeyo?', audience: 'Staff' };
 
+// 7 category-specific phrases + the universal taxi phrase = 8 per place.
+// Picked for what a first-time-in-Korea traveler actually needs AT THAT KIND
+// of place — not generic hello/thank-you, but the thing you'd genuinely get
+// stuck on (shoes off at a temple, an outlet seat at a cafe, tasting before
+// buying at a market).
 const PHRASES_BY_CATEGORY: Record<string, Phrase[]> = {
   Cuisine: [
     { en: 'Table for one, please.', ko: '혼자 왔어요. 한 명이요.', ro: 'Honja wasseoyo. Han myeong-iyo.', audience: 'Server' },
     { en: 'Do you have an English menu?', ko: '영어 메뉴 있어요?', ro: 'Yeong-eo menyu isseoyo?', audience: 'Server' },
+    { en: 'What do you recommend?', ko: '뭐가 맛있어요?', ro: 'Mwo-ga masisseoyo?', audience: 'Server' },
     { en: 'Not spicy, please.', ko: '안 맵게 해주세요.', ro: 'An maepge haejuseyo.', audience: 'Server' },
+    { en: 'Is this dish for sharing?', ko: '이거 나눠 먹는 거예요?', ro: 'Igeo nanwo meokneun geoyeyo?', audience: 'Server' },
+    { en: 'Check, please.', ko: '계산해주세요.', ro: 'Gyesanhaejuseyo.', audience: 'Server' },
     CARD_PHRASE,
   ],
   'Cuisine:Bars & Clubs': [
     { en: 'One beer, please.', ko: '맥주 한 잔 주세요.', ro: 'Maekju han jan juseyo.', audience: 'Bartender' },
     { en: 'Is there a cover charge?', ko: '입장료 있어요?', ro: 'Ipjangnyo isseoyo?', audience: 'Staff' },
+    { en: 'What\'s popular here?', ko: '여기 뭐가 인기 많아요?', ro: 'Yeogi mwo-ga ingi manayo?', audience: 'Bartender' },
+    { en: 'Can I see the snack menu?', ko: '안주 메뉴 좀 보여주세요.', ro: 'Anju menyu jom boyeojuseyo.', audience: 'Bartender' },
+    { en: 'One more, please.', ko: '한 잔 더 주세요.', ro: 'Han jan deo juseyo.', audience: 'Bartender' },
+    { en: 'What time do you close?', ko: '몇 시에 문 닫아요?', ro: 'Myeot si-e mun dadayo?', audience: 'Staff' },
     CARD_PHRASE,
   ],
   'Cuisine:Cafes & Tea Shops': [
     { en: 'For here, please.', ko: '여기서 마실게요.', ro: 'Yeogiseo masilgeyo.', audience: 'Cashier' },
     { en: 'Iced, please.', ko: '아이스로 주세요.', ro: 'Aiseu-ro juseyo.', audience: 'Cashier' },
+    { en: 'Less sweet, please.', ko: '덜 달게 해주세요.', ro: 'Deol dalge haejuseyo.', audience: 'Cashier' },
     { en: 'Do you have Wi-Fi?', ko: '와이파이 있어요?', ro: 'Waipai isseoyo?', audience: 'Staff' },
+    { en: 'What\'s the Wi-Fi password?', ko: '와이파이 비밀번호가 뭐예요?', ro: 'Waipai bimilbeonho-ga mwoyeyo?', audience: 'Staff' },
+    { en: 'Is there a seat with an outlet?', ko: '콘센트 있는 자리 있어요?', ro: 'Konsenteu inneun jari isseoyo?', audience: 'Staff' },
     CARD_PHRASE,
   ],
   Shopping: [
     { en: 'Can I try this on?', ko: '이거 입어봐도 돼요?', ro: 'Igeo ibeobwado dwaeyo?', audience: 'Shop staff' },
     { en: 'Do you have this in a different size?', ko: '다른 사이즈 있어요?', ro: 'Dareun saijeu isseoyo?', audience: 'Shop staff' },
+    { en: 'Do you have this in a different color?', ko: '다른 색깔 있어요?', ro: 'Dareun saekkal isseoyo?', audience: 'Shop staff' },
+    { en: 'Where\'s the fitting room?', ko: '탈의실이 어디예요?', ro: 'Tarui-sil-i eodiyeyo?', audience: 'Shop staff' },
+    { en: 'Can I get a bag?', ko: '봉투 주세요.', ro: 'Bongtu juseyo.', audience: 'Cashier' },
     { en: 'Tax refund, please.', ko: '택스 리펀드 해주세요.', ro: 'Taekseu ripeondeu haejuseyo.', audience: 'Cashier' },
     CARD_PHRASE,
   ],
   'Shopping:Traditional Markets': [
     { en: 'How much is this?', ko: '이거 얼마예요?', ro: 'Igeo eolmayeyo?', audience: 'Vendor' },
+    { en: 'What is this?', ko: '이게 뭐예요?', ro: 'Ige mwoyeyo?', audience: 'Vendor' },
+    { en: 'Can I try a taste?', ko: '맛 좀 볼 수 있어요?', ro: 'Mat jom bol su isseoyo?', audience: 'Vendor' },
     { en: 'Can you make it a bit cheaper?', ko: '조금 깎아주세요.', ro: 'Jogeum kkakkajuseyo.', audience: 'Vendor' },
+    { en: 'Can I get two of these?', ko: '이거 두 개 주세요.', ro: 'Igeo du gae juseyo.', audience: 'Vendor' },
+    { en: 'Can you wrap this to go?', ko: '포장해 주세요.', ro: 'Pojanghae juseyo.', audience: 'Vendor' },
+    { en: 'Do you take cards?', ko: '카드 되나요?', ro: 'Kadeu doenayo?', audience: 'Vendor' },
   ],
   Culture: [
     { en: 'One adult ticket, please.', ko: '성인 한 장이요.', ro: 'Seong-in han jang-iyo.', audience: 'Ticket counter' },
     { en: 'Is there an English audio guide?', ko: '영어 오디오 가이드 있어요?', ro: 'Yeong-eo odio gaideu isseoyo?', audience: 'Staff' },
-    { en: 'What time does it close?', ko: '몇 시에 닫아요?', ro: 'Myeot si-e dadayo?', audience: 'Staff' },
+    { en: 'Where is the entrance?', ko: '입구가 어디예요?', ro: 'Ipgu-ga eodiyeyo?', audience: 'Staff' },
+    { en: 'Is there a locker?', ko: '짐 보관함 있어요?', ro: 'Jim bogwanham isseoyo?', audience: 'Staff' },
+    { en: 'Can I take photos here?', ko: '사진 찍어도 돼요?', ro: 'Sajin jjigeodo dwaeyo?', audience: 'Staff' },
+    { en: 'Is there a student discount?', ko: '학생 할인 있어요?', ro: 'Haksaeng harin isseoyo?', audience: 'Ticket counter' },
+    RESTROOM_PHRASE,
   ],
   History: [
     { en: 'One adult ticket, please.', ko: '성인 한 장이요.', ro: 'Seong-in han jang-iyo.', audience: 'Ticket counter' },
+    { en: 'Is there an English guided tour?', ko: '영어 가이드 투어 있어요?', ro: 'Yeong-eo gaideu tueo isseoyo?', audience: 'Staff' },
     { en: 'Is photography allowed here?', ko: '여기 사진 찍어도 돼요?', ro: 'Yeogi sajin jjigeodo dwaeyo?', audience: 'Staff' },
+    { en: 'Do I need to take off my shoes?', ko: '신발을 벗어야 해요?', ro: 'Sinbal-eul beoseoya haeyo?', audience: 'Staff' },
     { en: 'What time does it close?', ko: '몇 시에 닫아요?', ro: 'Myeot si-e dadayo?', audience: 'Staff' },
+    { en: 'Where is the entrance?', ko: '입구가 어디예요?', ro: 'Ipgu-ga eodiyeyo?', audience: 'Staff' },
+    RESTROOM_PHRASE,
   ],
   Nature: [
     { en: 'Where is the trail entrance?', ko: '등산로 입구가 어디예요?', ro: 'Deungsanno ipgu-ga eodiyeyo?', audience: 'Staff' },
+    { en: 'How long does this trail take?', ko: '이 코스 얼마나 걸려요?', ro: 'I koseu eolmana geollyeoyo?', audience: 'Staff' },
+    { en: 'Is this trail difficult?', ko: '이 코스 어려워요?', ro: 'I koseu eoryeowoyo?', audience: 'Staff' },
     { en: 'Is there a shuttle bus?', ko: '셔틀버스 있어요?', ro: 'Syeoteulbeoseu isseoyo?', audience: 'Staff' },
+    { en: 'Is there a map of this place?', ko: '여기 지도 있어요?', ro: 'Yeogi jido isseoyo?', audience: 'Staff' },
+    { en: 'Where can I get water?', ko: '물은 어디서 구할 수 있어요?', ro: 'Mul-eun eodiseo guhal su isseoyo?', audience: 'Staff' },
+    RESTROOM_PHRASE,
   ],
   'Experience Programs': [
     { en: 'Is there an English-speaking instructor?', ko: '영어 가능한 강사님 있어요?', ro: 'Yeong-eo ganeunghan gangsanim isseoyo?', audience: 'Staff' },
     { en: 'How long does this take?', ko: '얼마나 걸려요?', ro: 'Eolmana geollyeoyo?', audience: 'Staff' },
+    { en: 'Is this suitable for beginners?', ko: '초보자도 할 수 있어요?', ro: 'Chobojado hal su isseoyo?', audience: 'Staff' },
+    { en: 'Do I need to reserve in advance?', ko: '미리 예약해야 해요?', ro: 'Miri yeyakhaeya haeyo?', audience: 'Staff' },
+    { en: 'What should I bring?', ko: '뭘 가져가야 해요?', ro: 'Mwol gajyeogaya haeyo?', audience: 'Staff' },
+    { en: 'Where do I check in?', ko: '어디서 체크인해요?', ro: 'Eodiseo chekeuinhaeyo?', audience: 'Staff' },
     CARD_PHRASE,
   ],
 };
@@ -107,6 +148,7 @@ export default function PlaceDetail() {
   const [sheet, setSheet] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
+  const [showKoAddress, setShowKoAddress] = useState(false);
 
   const place = placeBySlug[slug!];
   // Optimistic like/dislike counts — seed from the server counts and re-sync
@@ -121,7 +163,7 @@ export default function PlaceDetail() {
   // Stop any in-progress phrase playback when the sheet closes (swipe-down,
   // backdrop tap, or Android back button all route through this).
   useEffect(() => {
-    if (!sheet) { Speech.stop(); setSpeakingIdx(null); }
+    if (!sheet) { Speech.stop(); setSpeakingIdx(null); setShowKoAddress(false); }
   }, [sheet]);
 
   // Optimistic Foreigner Fit yes/no counts — seeded once per place, then
@@ -484,6 +526,24 @@ export default function PlaceDetail() {
                     </View>
                     <T style={{ fontSize: 15, color: c.accent, marginTop: 3 }}>{p.ko}</T>
                     <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{p.ro}</T>
+                    {/* The address itself only ever appears romanized elsewhere
+                        on screen — genuinely hard for a taxi driver to read.
+                        This toggle reveals the real Hangul address right where
+                        you'd say the phrase. Hidden for places imported before
+                        migration-026 (no addressKo yet). */}
+                    {p === TAXI_PHRASE && !!place.addressKo && (
+                      <View style={{ marginTop: 6 }}>
+                        <Pressable onPress={() => setShowKoAddress((v) => !v)} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                          <View style={{ transform: [{ rotate: showKoAddress ? '90deg' : '0deg' }] }}>
+                            <Icon name="chevron" size={12} stroke={c.inkSoft} sw={2.4} />
+                          </View>
+                          <T style={{ fontSize: 11.5, fontWeight: '700', color: c.inkSoft }}>{showKoAddress ? 'Hide Korean address' : 'Show Korean address'}</T>
+                        </Pressable>
+                        {showKoAddress && (
+                          <T style={{ fontSize: 14, fontWeight: '700', color: c.ink, marginTop: 5 }}>{place.addressKo}</T>
+                        )}
+                      </View>
+                    )}
                   </View>
                   <Pressable
                     onPress={() => speak(i, p.ko)}

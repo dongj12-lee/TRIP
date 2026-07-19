@@ -233,6 +233,7 @@ function mapPlace(row: any): Place {
     neighborhood: row.neighborhood,
     city: row.city,
     address: row.address,
+    addressKo: row.address_ko ?? undefined,
     hours: row.hours,
     priceRange: row.price_range,
     rating: row.rating != null ? Number(row.rating) : undefined,
@@ -266,7 +267,7 @@ function mapPlace(row: any): Place {
 // the list query would add megabytes; the place detail screen lazy-loads the
 // full record instead (see fetchPlace).
 const BROWSE_COLS =
-  'slug,lat,lng,name,name_ko,category,category_l2,category_l3,neighborhood,city,address,hours,' +
+  'slug,lat,lng,name,name_ko,category,category_l2,category_l3,neighborhood,city,address,address_ko,hours,' +
   'price_range,rating,reviews,solo_ok,english_menu,price_transparent,card_ok,english_spoken,votes,' +
   'warn_tip,k_content_title,k_content_type,k_content_note,swatch,photo_url,subway,free_entry,' +
   // description is included so the natural-language screener (lib/screener.ts)

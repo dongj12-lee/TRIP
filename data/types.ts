@@ -33,6 +33,10 @@ export type Place = {
   neighborhood: string;
   city: string;
   address: string;
+  // Genuine Hangul road address (not romanized) — for the phrase sheet's
+  // "show this address" toggle. Absent for places imported before
+  // migration-026 or without a linked KO-locale record.
+  addressKo?: string;
   hours: string;
   priceRange: string;
   rating?: number;

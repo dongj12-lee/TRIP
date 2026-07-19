@@ -7,6 +7,13 @@
 // display AND the authentic Korean title for the "show to staff" card from one
 // source. (This solves the dead end that killed TourAPI English enrichment —
 // see import-tourapi.ts: TourAPI's KO and EN catalogs had non-overlapping IDs.)
+// Same mechanism now also fetches `address_ko` — a second contents/info call
+// on the item's KO-locale cid, genuine Hangul (not romanized; NCP's Reverse
+// Geocoding was considered for this but its documented example response is
+// romanized with no lang param, so this proven in-house path was used
+// instead) — for the phrase sheet's "show this address" toggle. This roughly
+// doubles the detail-fetch phase's API call count (one extra call per item
+// with a koCid), so the weekly full re-import runs longer.
 //
 // API shape (confirmed live against the OpenAPI spec at
 // https://api-call.visitseoul.net/api/v1/docs/json):
@@ -244,7 +251,20 @@ async function main() {
     const address = (tr.new_adres || tr.adres || '').trim();
     const homepageLang = (ex.cmmn_hmpg_lang || '').toLowerCase();
     const fee = (ex.trrsrt_use_chrge || '').toUpperCase(); // F free, C paid, N n/a
-    const koTitle = koName.get(koCidFrom(item.multi_lang_list) || '') || '';
+    const koCid = koCidFrom(item.multi_lang_list);
+    const koTitle = koName.get(koCid || '') || '';
+    // A second detail call on the KO-locale cid — same content, Korean
+    // record — for a genuine Hangul address to show a taxi driver/staff.
+    // (Confirmed this is real Korean text, not romanized: contents/list
+    // already proves lang_code_id='ko' returns Hangul for koTitle above; this
+    // reuses the identical mechanism for the KO record's own address field.)
+    let addressKo = '';
+    if (koCid) {
+      const koInfo = await getInfo(koCid).catch(() => null);
+      await sleep(60);
+      const koTr = koInfo?.data?.traffic ?? {};
+      addressKo = (koTr.new_adres || koTr.adres || '').trim();
+    }
     const name = (d.post_sj || item.post_sj || '').trim();
     const cat: CatNode = item._cat;
 
@@ -258,6 +278,7 @@ async function main() {
       neighborhood: neighborhoodFrom(address),
       city: 'Seoul',
       address,
+      address_ko: addressKo || null,
       hours: (ex.cmmn_use_time || '').trim(),
       price_range: fee === 'F' ? 'Free' : '',
       description: stripHtml(d.post_desc) || stripHtml(d.sumry || item.sumry),
