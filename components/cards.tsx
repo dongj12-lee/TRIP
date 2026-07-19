@@ -166,15 +166,46 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
     return <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.terra50 }}>{caption}</View>;
   }
 
+  // Crop the viewBox to the route's own bounding box (+ padding) instead of
+  // always showing the whole Seoul metro — most routes cluster in 1-2
+  // neighborhoods, so a fixed full-city viewBox draws them as a tiny squiggle
+  // lost in mostly-empty silhouette. Same "fit to content" idea as the
+  // Explore map. A floor keeps very tight clusters from zooming in absurdly.
+  const xs = allPts.map((p) => p.x);
+  const ys = allPts.map((p) => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys), maxY = Math.max(...ys);
+  const MIN_SPAN = 16; // ~6km — a reasonable "neighborhood" floor zoom
+  const padX = Math.max((maxX - minX) * 0.28, 3);
+  const padY = Math.max((maxY - minY) * 0.28, 3);
+  let cropMinX = minX - padX, cropMaxX = maxX + padX;
+  let cropMinY = minY - padY, cropMaxY = maxY + padY;
+  if (cropMaxX - cropMinX < MIN_SPAN) {
+    const cx = (cropMinX + cropMaxX) / 2;
+    cropMinX = cx - MIN_SPAN / 2;
+    cropMaxX = cx + MIN_SPAN / 2;
+  }
+  if (cropMaxY - cropMinY < MIN_SPAN) {
+    const cy = (cropMinY + cropMaxY) / 2;
+    cropMinY = cy - MIN_SPAN / 2;
+    cropMaxY = cy + MIN_SPAN / 2;
+  }
+  const cropW = cropMaxX - cropMinX;
+  const cropH = cropMaxY - cropMinY;
+  // Line/dot weights were tuned for the full 100-unit view — scale them down
+  // as the crop tightens so they stay proportionate, floored so a very tight
+  // cluster doesn't render hairline-thin.
+  const strokeScale = Math.max(0.35, Math.min(1, cropW / SEOUL_MAP_W));
+
   // The route drawn over a faint real Seoul silhouette (same projection as the
   // Seoul Passport) — a true "trip map", not an abstract line on blank space.
   return (
     <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.surface2, overflow: 'hidden' }}>
       <View style={{ height: 150 }}>
-        <Svg width="100%" height="100%" viewBox={`0 0 ${SEOUL_MAP_W} ${SEOUL_MAP_H}`} preserveAspectRatio="xMidYMid meet">
+        <Svg width="100%" height="100%" viewBox={`${cropMinX} ${cropMinY} ${cropW} ${cropH}`} preserveAspectRatio="xMidYMid meet">
           <G>
             {SEOUL_DISTRICTS.map((d) => (
-              <Path key={d.name} d={d.path} fill={c.paper} stroke={c.line} strokeWidth={0.4} />
+              <Path key={d.name} d={d.path} fill={c.paper} stroke={c.line} strokeWidth={0.4 * strokeScale} />
             ))}
           </G>
           {dayPts.map((pts, di) => {
@@ -183,12 +214,20 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
             return (
               <G key={di}>
                 {pts.length > 1 && (
-                  <Path d={path} stroke={terra.solid} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.95} />
+                  <Path d={path} stroke={terra.solid} strokeWidth={1 * strokeScale} strokeLinecap="round" strokeLinejoin="round" fill="none" opacity={0.95} />
                 )}
                 {pts.map((p, i) => {
                   const isStart = di === 0 && i === 0;
                   return (
-                    <Circle key={i} cx={p.x} cy={p.y} r={isStart ? 2 : 1.35} fill={isStart ? terra.solid : c.paper} stroke={terra.solid} strokeWidth={isStart ? 0 : 0.8} />
+                    <Circle
+                      key={i}
+                      cx={p.x}
+                      cy={p.y}
+                      r={(isStart ? 2 : 1.35) * strokeScale}
+                      fill={isStart ? terra.solid : c.paper}
+                      stroke={terra.solid}
+                      strokeWidth={(isStart ? 0 : 0.8) * strokeScale}
+                    />
                   );
                 })}
               </G>
