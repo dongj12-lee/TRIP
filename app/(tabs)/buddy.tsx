@@ -56,13 +56,13 @@ export default function BuddyScreen() {
 
           <View style={{ paddingHorizontal: 18 }}>
             <OfflineBanner />
-            {/* Safety notice — a meetup feature earns a standing reminder */}
-            <View style={{ backgroundColor: c.gold50, borderRadius: 14, padding: 12, flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
-              <T style={{ fontSize: 16 }}>🛟</T>
-              <T style={{ flex: 1, fontSize: 12.5, lineHeight: 18, color: c.gold700, fontWeight: '600' }}>
-                Meet in public, tell a friend your plans, and trust your gut. TRIP doesn't vet members.
-              </T>
-            </View>
+            {/* Purpose line — "Buddy" alone doesn't say what the tab is for
+                (unlike Feed/Explore, this is a novel concept), so it earns one.
+                The safety reminder lives on the plan detail screen instead,
+                right before you request to join — a more relevant moment. */}
+            <T style={{ fontSize: 13, color: c.inkSoft, fontWeight: '600', marginBottom: 4 }}>
+              Find someone for a 2-person dish or a day trip out of town.
+            </T>
           </View>
 
           {buddies.length === 0 ? (
