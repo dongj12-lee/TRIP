@@ -22,32 +22,42 @@ function pinEmoji(cat: string, sub?: string | null) {
   return '📍';
 }
 
+// Sentinel id for the one-off pin from a live Naver search result (not part
+// of the app's own catalog) — chosen to never collide with a real place slug.
+export const EXTERNAL_PIN_ID = '__external__';
+
 export function ExploreMap({
   places,
   selectedSlug,
   onSelect,
   savedSlugs,
+  externalPin,
   height = 220,
 }: {
   places: Place[];
   selectedSlug: string | null;
-  onSelect: (slug: string | null) => void;
+  onSelect: (id: string | null) => void;
   savedSlugs?: Set<string>;
+  externalPin?: { lat: number; lng: number } | null;
   height?: number;
 }) {
-  if (places.length === 0) return <FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />;
+  if (places.length === 0 && !externalPin) return <FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />;
+  const pins = places.map((p) => ({
+    id: p.slug,
+    lat: p.lat,
+    lng: p.lng,
+    color: categoryPinColor(p.category, p.categoryL2),
+    selected: p.slug === selectedSlug,
+    saved: savedSlugs?.has(p.slug) ?? false,
+  }));
+  if (externalPin) {
+    pins.push({ id: EXTERNAL_PIN_ID, lat: externalPin.lat, lng: externalPin.lng, external: true, selected: true } as any);
+  }
   return (
     <WebMap
       height={height}
       cluster
-      pins={places.map((p) => ({
-        id: p.slug,
-        lat: p.lat,
-        lng: p.lng,
-        color: categoryPinColor(p.category, p.categoryL2),
-        selected: p.slug === selectedSlug,
-        saved: savedSlugs?.has(p.slug) ?? false,
-      }))}
+      pins={pins}
       onPinPress={(id) => onSelect(id)}
       fallback={<FallbackExploreMap places={places} selectedSlug={selectedSlug} onSelect={onSelect} height={height} />}
     />

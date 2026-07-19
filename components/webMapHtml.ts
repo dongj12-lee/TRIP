@@ -14,6 +14,7 @@ export type MapPin = {
   number?: number; // numbered circle (route-stop style)
   selected?: boolean;
   saved?: boolean; // a place the traveler saved — drawn with a heart center
+  external?: boolean; // found via live Naver search, not in TRIP's own catalog
 };
 
 export type MapData = {
@@ -67,6 +68,13 @@ export const MAP_RUNTIME_JS = String.raw`
     if(p.number!=null){
       return '<div style="width:28px;height:28px;border-radius:999px;background:'+cs.accent+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font:800 13px system-ui;color:#fff">'+p.number+'</div>';
     }
+    // A live-search result outside TRIP's own catalog — a distinct ink pin
+    // with a magnifier center and a dashed ring, so it visually reads as
+    // "found, not curated" rather than one of the app's own places.
+    if(p.external){
+      var eh=36, ew=Math.round(eh*0.72);
+      return '<svg width="'+ew+'" height="'+eh+'" viewBox="0 0 24 33" style="filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))"><path d="M12 0C5.4 0 0 5.4 0 12c0 8.6 10 19.6 11.2 20.8a1.1 1.1 0 0 0 1.6 0C14 31.6 24 20.6 24 12 24 5.4 18.6 0 12 0z" fill="'+cs.ink+'"/><circle cx="12" cy="11.6" r="7.5" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-dasharray="2,2"/><circle cx="11" cy="10.6" r="3.1" fill="none" stroke="#fff" stroke-width="1.8"/><line x1="13.3" y1="12.9" x2="15.5" y2="15.1" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>';
+    }
     var fill=p.selected?cs.accent:(p.color||cs.accent);
     // Saved spots sit between normal and selected in size and carry a heart
     // center instead of a dot — so a traveler's shortlist stands out on the map.
@@ -89,7 +97,7 @@ export const MAP_RUNTIME_JS = String.raw`
     overlays.push(m); return m;
   }
   function pinAt(p,cs){
-    var ax=p.number!=null?14:(p.selected?12:(p.saved?11:9)), ay=p.number!=null?14:(p.selected?34:(p.saved?31:27));
+    var ax=p.number!=null?14:(p.external?13:(p.selected?12:(p.saved?11:9))), ay=p.number!=null?14:(p.external?36:(p.selected?34:(p.saved?31:27)));
     addMarker(new naver.maps.LatLng(p.lat,p.lng),pinHtml(p,cs),ax,ay,(function(pin){return function(){ if(window.__onPin){ window.__onPin(pin.id); } };})(p));
   }
   function build(){

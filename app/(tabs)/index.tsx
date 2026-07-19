@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, FlatList, Animated, ScrollView, Pressable, TextInput, RefreshControl } from 'react-native';
+import { View, FlatList, Animated, ScrollView, Pressable, TextInput, RefreshControl, Linking, ActivityIndicator, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -9,9 +9,10 @@ import { recommendedPlaces } from '@/lib/recommend';
 import { ForeignerTagKey, Place } from '@/data/types';
 import { INTENTS, intentByKey, IntentKey } from '@/data/intents';
 import { screen, SCREENER_EXAMPLES } from '@/lib/screener';
+import { searchNaverPlaces, NaverSearchResult } from '@/lib/naverSearch';
 import { T, H } from '@/components/base';
 import { PlaceCard, PlaceCardCompact } from '@/components/cards';
-import { ExploreMap } from '@/components/ExploreMap';
+import { ExploreMap, EXTERNAL_PIN_ID } from '@/components/ExploreMap';
 import { Photo, Rating } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { FiltersSheet } from '@/components/FiltersSheet';
@@ -47,6 +48,31 @@ export default function ExploreScreen() {
   const [mapMode, setMapMode] = useState(false); // list ⇄ full-screen map
   const [pinnedSlug, setPinnedSlug] = useState<string | null>(null); // tapped pin → bottom card
   const [mapH, setMapH] = useState(0); // measured full-map height
+
+  // Live search beyond TRIP's own catalog (map mode only) — for a specific
+  // address or business that isn't one of the curated spots.
+  const [extResults, setExtResults] = useState<NaverSearchResult[] | null>(null);
+  const [extLoading, setExtLoading] = useState(false);
+  const [extPin, setExtPin] = useState<NaverSearchResult | null>(null);
+  const runExternalSearch = async () => {
+    if (!query.trim()) return;
+    haptic.tick();
+    setExtLoading(true);
+    setExtResults(null);
+    try {
+      setExtResults(await searchNaverPlaces(query));
+    } catch {
+      setExtResults([]);
+    } finally {
+      setExtLoading(false);
+    }
+  };
+  const pickExternal = (r: NaverSearchResult) => {
+    haptic.tick();
+    setExtPin(r);
+    setExtResults(null);
+    setPinnedSlug(null);
+  };
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
 
@@ -330,10 +356,58 @@ export default function ExploreScreen() {
           <View style={{ paddingTop: insets.top + 8 }}>
             {searchBar}
             {intentBar}
+            {/* Beyond the curated catalog: a specific address or business the
+                natural-language screener won't have — search live Naver data. */}
+            {!!query.trim() && (
+              <View style={{ paddingHorizontal: 18, paddingBottom: 6 }}>
+                <Pressable
+                  onPress={runExternalSearch}
+                  accessibilityRole="button"
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}
+                >
+                  {extLoading ? (
+                    <ActivityIndicator size="small" color={c.accent} />
+                  ) : (
+                    <Icon name="search" size={13} stroke={c.accent} sw={2} />
+                  )}
+                  <T style={{ fontSize: 12.5, fontWeight: '700', color: c.accent }} numberOfLines={1}>
+                    Search all of Naver for "{query.trim()}"
+                  </T>
+                </Pressable>
+              </View>
+            )}
+            {extResults && (
+              <View style={{ marginHorizontal: 18, marginBottom: 6, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, overflow: 'hidden', ...(shadow as object) }}>
+                {extResults.length === 0 ? (
+                  <T style={{ fontSize: 13, color: c.muted, padding: 14 }}>No results — try a different search.</T>
+                ) : (
+                  extResults.map((r, i) => (
+                    <Pressable
+                      key={i}
+                      onPress={() => pickExternal(r)}
+                      style={({ pressed }) => [
+                        { padding: 12, borderTopWidth: i ? 1 : 0, borderTopColor: c.line },
+                        pressed && { backgroundColor: c.surface2 },
+                      ]}
+                    >
+                      <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>{r.name}</T>
+                      <T style={{ fontSize: 12, color: c.muted, marginTop: 2 }} numberOfLines={1}>{r.address}</T>
+                    </Pressable>
+                  ))
+                )}
+              </View>
+            )}
           </View>
           <View style={{ flex: 1 }} onLayout={(e) => setMapH(e.nativeEvent.layout.height)}>
             {mapH > 0 && (
-              <ExploreMap places={filtered} selectedSlug={pinnedSlug} onSelect={(slug) => setPinnedSlug(slug)} savedSlugs={saved} height={mapH} />
+              <ExploreMap
+                places={filtered}
+                selectedSlug={pinnedSlug}
+                onSelect={(id) => { if (id !== EXTERNAL_PIN_ID) { setPinnedSlug(id); setExtPin(null); } }}
+                savedSlugs={saved}
+                externalPin={extPin}
+                height={mapH}
+              />
             )}
             {/* Tapped-pin place card — the Airbnb/Beli "peek" before committing */}
             {pinnedPlace && (
@@ -371,6 +445,44 @@ export default function ExploreScreen() {
                   </Pressable>
                 </View>
               </Pressable>
+            )}
+            {/* A live-search result — not one of TRIP's own places, so it opens
+                the real Naver Map app instead of a place detail screen. */}
+            {extPin && (
+              <View
+                style={{
+                  position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 116,
+                  backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 12,
+                  ...(shadow as object),
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <T style={{ fontSize: 11.5, fontWeight: '800', color: c.muted }} numberOfLines={1}>{extPin.category || 'Found on Naver'}</T>
+                    <H style={{ fontSize: 16, lineHeight: 20, marginTop: 2 }} numberOfLines={1}>{extPin.name}</H>
+                    <T style={{ fontSize: 12.5, color: c.inkSoft, marginTop: 2 }} numberOfLines={1}>{extPin.address}</T>
+                  </View>
+                  <Pressable onPress={() => setExtPin(null)} hitSlop={8} style={{ padding: 5 }} accessibilityLabel="Dismiss">
+                    <Icon name="close" size={18} stroke={c.muted} sw={2} />
+                  </Pressable>
+                </View>
+                <Pressable
+                  onPress={() => {
+                    haptic.tick();
+                    const url = `nmap://place?lat=${extPin.lat}&lng=${extPin.lng}&name=${encodeURIComponent(extPin.name)}&appname=com.trip.korea`;
+                    // Naver Map app not installed — send to its store listing
+                    // (verified IDs: iOS App Store / Android Play Store).
+                    const storeUrl = Platform.OS === 'android'
+                      ? 'https://play.google.com/store/apps/details?id=com.nhn.android.nmap'
+                      : 'https://apps.apple.com/app/id311867728';
+                    Linking.openURL(url).catch(() => Linking.openURL(storeUrl).catch(() => {}));
+                  }}
+                  style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10, backgroundColor: c.ink, borderRadius: 10, paddingVertical: 9 }}
+                >
+                  <Icon name="pin" size={14} stroke={c.paper} sw={2} />
+                  <T style={{ fontSize: 13, fontWeight: '800', color: c.paper }}>Open in Naver Map</T>
+                </Pressable>
+              </View>
             )}
           </View>
         </View>
@@ -419,7 +531,7 @@ export default function ExploreScreen() {
       {/* Airbnb-style floating mode toggle — a confident List ⇄ Map switch */}
       <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 66, alignItems: 'center' }}>
         <Pressable
-          onPress={() => { haptic.tick(); setPinnedSlug(null); setMapMode((m) => !m); }}
+          onPress={() => { haptic.tick(); setPinnedSlug(null); setExtPin(null); setExtResults(null); setMapMode((m) => !m); }}
           accessibilityRole="button"
           accessibilityLabel={mapMode ? 'Show list' : 'Show map'}
           style={{ flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: c.ink, paddingVertical: 11, paddingHorizontal: 18, borderRadius: 999, ...(shadow as object) }}
