@@ -71,6 +71,30 @@ export function personalizedPlaces(places: Place[], interests: string[], limit =
     .map((x) => x.p);
 }
 
+// Learns which place categories a user tends to like/dislike from their real
+// 👍/👎 reactions (place detail screen), so the day-plan scorer can favor
+// categories they've shown they enjoy even for places they've never
+// individually reacted to — not just remembering the exact places reacted to.
+export function categoryAffinity(reactions: Record<string, 'like' | 'dislike'>, places: Place[]): Map<string, number> {
+  const bySlug = new Map(places.map((p) => [p.slug, p]));
+  const net = new Map<string, number>();
+  const count = new Map<string, number>();
+  for (const [slug, r] of Object.entries(reactions)) {
+    const p = bySlug.get(slug);
+    if (!p) continue;
+    const delta = r === 'like' ? 1 : -1;
+    net.set(p.category, (net.get(p.category) ?? 0) + delta);
+    count.set(p.category, (count.get(p.category) ?? 0) + 1);
+  }
+  const out = new Map<string, number>();
+  for (const [cat, sum] of net) {
+    // Average signed reaction, scaled and clamped — a couple of reactions
+    // nudge scoring without one category or one stray dislike dominating it.
+    out.set(cat, Math.max(-1.5, Math.min(1.5, (sum / (count.get(cat) ?? 1)) * 1.5)));
+  }
+  return out;
+}
+
 export function personalizedThemes(themes: Theme[], interests: string[], limit = 6): Theme[] {
   if (!interests.length) return themes.slice(0, limit);
   const ranked = themes

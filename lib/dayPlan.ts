@@ -5,7 +5,7 @@
 // spots and interests, avoids long cross-town hops, and goes indoor-heavy
 // when rain is likely.
 import { ItineraryDay, ItineraryStop, Place } from '@/data/types';
-import { scorePlace } from './personalize';
+import { categoryAffinity, scorePlace } from './personalize';
 import { haversineKm } from './routeHealth';
 
 export type VibeKey = 'classic' | 'foodie' | 'kcontent' | 'shopping' | 'nature';
@@ -101,6 +101,7 @@ export type DayPlanInput = {
   places: Place[];
   interests: string[];
   saved: Set<string>;
+  reactions: Record<string, 'like' | 'dislike'>; // real 👍/👎 from place detail
   vibe: VibeKey;
   area?: string | null; // bare gu name ("Jongno") or null for anywhere
   rainy?: boolean;
@@ -111,7 +112,7 @@ export type PlannedStop = { place: Place; time: string; role: string; saved: boo
 export type DayPlan = { stops: PlannedStop[]; vibe: VibeKey; area: string | null; usedSaved: number; rainy: boolean; totalKm: number };
 
 // Base desirability independent of slot: quality signals + personal signals.
-function baseScore(p: Place, input: DayPlanInput): number {
+function baseScore(p: Place, input: DayPlanInput, affinity: Map<string, number>): number {
   let s = 0;
   if (p.rating != null) s += Math.max(0, p.rating - 3.5) * 2; // 4.5★ → +2
   s += Math.min(p.likeCount ?? 0, 3) * 0.7;
@@ -120,6 +121,8 @@ function baseScore(p: Place, input: DayPlanInput): number {
   s += scorePlace(p, input.interests) * 0.7;
   s += vibeAffinity(p, input.vibe);
   if (input.saved.has(p.slug)) s += 3; // their own hearts come first
+  if (input.reactions[p.slug] === 'like') s += 1.5; // they already told us they liked this one
+  s += affinity.get(p.category) ?? 0; // learned from their likes/dislikes in this category
   if (input.area && p.neighborhood === input.area) s += 1.2;
   if (input.rainy) {
     if (isOutdoorish(p)) s -= 2;
@@ -129,7 +132,8 @@ function baseScore(p: Place, input: DayPlanInput): number {
 }
 
 export function generateDayPlan(input: DayPlanInput): DayPlan | null {
-  const { places, vibe, area, exclude } = input;
+  const { places, vibe, area, exclude, reactions } = input;
+  const affinity = categoryAffinity(reactions, places);
   const used = new Set<string>();
   const stops: PlannedStop[] = [];
   let prev: Place | null = null;
@@ -140,10 +144,11 @@ export function generateDayPlan(input: DayPlanInput): DayPlan | null {
       let bestScore = -Infinity;
       for (const p of places) {
         if (used.has(p.slug) || !pred(p)) continue;
+        if (reactions[p.slug] === 'dislike') continue; // never resurface a "Not for me"
         if (!allowExcluded && exclude?.has(p.slug)) continue;
         // Hard area filter for the anchor stop only; proximity chains the rest.
         if (!prev && area && p.neighborhood !== area) continue;
-        let s = baseScore(p, input);
+        let s = baseScore(p, input, affinity);
         if (prev) {
           const km = haversineKm(prev, p);
           if (km > 8) continue; // never generate a cross-town hop

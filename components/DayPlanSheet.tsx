@@ -29,7 +29,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   const router = useRouter();
   const { showToast } = useToast();
   const { places } = useRemoteContent();
-  const { profile, saved, itinerary, setItinerary } = useStore();
+  const { profile, saved, placeReactions, itinerary, setItinerary } = useStore();
 
   const [vibe, setVibe] = useState<VibeKey>('classic');
   const [area, setArea] = useState<string | null>(null);
@@ -63,8 +63,11 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   }, [places]);
 
   const plan: DayPlan | null = useMemo(
-    () => (visible ? generateDayPlan({ places, interests: profile.interests, saved, vibe, area, rainy, exclude }) : null),
-    [visible, places, profile.interests, saved, vibe, area, rainy, exclude],
+    () =>
+      visible
+        ? generateDayPlan({ places, interests: profile.interests, saved, reactions: placeReactions, vibe, area, rainy, exclude })
+        : null,
+    [visible, places, profile.interests, saved, placeReactions, vibe, area, rainy, exclude],
   );
 
   const shuffle = () => {
