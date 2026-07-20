@@ -30,6 +30,9 @@ export function WebMap({
   const { c } = useTheme();
   const ref = useRef<WebView>(null);
   const loaded = useRef(false);
+  // Naver rejected the WebView origin (ncpKeyId Service-URL check) — show the
+  // stylized fallback map instead of a permanently blank WebView.
+  const [authFailed, setAuthFailed] = React.useState(false);
 
   const shell = useMemo(() => buildNativeShell(NAVER_CLIENT_ID ?? ''), []);
   const data = useMemo(
@@ -45,7 +48,7 @@ export function WebMap({
   // Re-push whenever the data changes (WebView stays mounted).
   React.useEffect(push, [data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!NAVER_CLIENT_ID) return <>{fallback ?? <View style={{ height, backgroundColor: c.mapBg }} />}</>;
+  if (!NAVER_CLIENT_ID || authFailed) return <>{fallback ?? <View style={{ height, backgroundColor: c.mapBg }} />}</>;
   if (pins.length === 0) return <View style={{ height, backgroundColor: c.mapBg }} />;
 
   return (
@@ -66,8 +69,10 @@ export function WebMap({
           try {
             const msg = JSON.parse(e.nativeEvent.data);
             if (msg.type === 'pinPress') onPinPress?.(msg.id);
-            else if (msg.type === 'mapAuthFail')
-              console.warn('[naver-map] auth failed — the WebView origin (MAP_ORIGIN) is not a registered Service URL for this ncpKeyId.');
+            else if (msg.type === 'mapAuthFail') {
+              console.warn('[naver-map] auth failed — MAP_ORIGIN (' + MAP_ORIGIN + ') is not a registered Service URL for this ncpKeyId. Falling back to the stylized map.');
+              setAuthFailed(true);
+            }
           } catch {}
         }}
         style={{ backgroundColor: c.mapBg }}

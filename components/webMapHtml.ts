@@ -189,6 +189,11 @@ export function buildNativeShell(clientId: string) {
     '</head><body><div id="map"></div>' +
     '<script>' + MAP_RUNTIME_JS + '</script>' +
     '<script>window.__onPin=function(id){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"pinPress",id:id}));};</script>' +
+    // Catch-all: navermap_authFailure only fires if the SDK loaded but the key
+    // was rejected. If the script never loaded at all (network/ATS), no
+    // callback fires and the map is silently blank — so if `naver` is still
+    // undefined a few seconds in, report the same failure so RN can fall back.
+    '<script>setTimeout(function(){if(!window.naver||!window.naver.maps){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"mapAuthFail"}));}},3500);</script>' +
     '</body></html>'
   );
 }
