@@ -57,6 +57,7 @@
     "web": "expo start --web",
     "seed": "tsx scripts/seed.ts",
     "import:tourapi": "tsx scripts/import-tourapi.ts",
+    "import:tourapi-eng": "tsx scripts/import-tourapi-eng.ts",
     "import:visitseoul": "tsx scripts/import-visitseoul.ts",
     "predeploy": "expo export -p web",
     "deploy": "gh-pages --nojekyll -d dist",
