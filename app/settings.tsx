@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Pressable, Alert, Linking } from 'react-native';
+import { View, ScrollView, Pressable, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -9,10 +9,6 @@ import { isAdmin } from '@/data/remote';
 import { ACCENTS, AccentKey } from '@/theme/tokens';
 import { T, H, Screen, DetailHeader, Card } from '@/components/base';
 import { Icon } from '@/components/Icon';
-
-const PRIVACY_URL = 'https://claude.ai/code/artifact/cbfe9163-a8b9-4782-aa96-b03a3e1a5453';
-const TERMS_URL = 'https://claude.ai/code/artifact/014180b9-2f62-4334-9899-91935f62aa8c';
-const GUIDELINES_URL = 'https://claude.ai/code/artifact/4f0d2c5d-8eef-465b-a203-8df8abd06a6b';
 
 export default function Settings() {
   const { c, accent, setAccent, mode, setMode } = useTheme();
@@ -104,11 +100,11 @@ export default function Settings() {
         {/* Legal */}
         <SectionLabel>About</SectionLabel>
         <Card>
-          <LinkRow label="Privacy Policy" onPress={() => Linking.openURL(PRIVACY_URL)} />
+          <LinkRow label="Privacy Policy" onPress={() => router.push('/legal/privacy')} />
           <Divider />
-          <LinkRow label="Terms of Service" onPress={() => Linking.openURL(TERMS_URL)} />
+          <LinkRow label="Terms of Service" onPress={() => router.push('/legal/terms')} />
           <Divider />
-          <LinkRow label="Community Guidelines" onPress={() => Linking.openURL(GUIDELINES_URL)} />
+          <LinkRow label="Community Guidelines" onPress={() => router.push('/legal/guidelines')} />
         </Card>
 
         {/* Moderation — admins only */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, KeyboardAvoidingView, Platform, ScrollView, Pressable, Linking } from 'react-native';
+import { View, TextInput, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -122,14 +122,14 @@ export default function AuthScreen() {
           By continuing you agree to TRIP's{' '}
           <T
             style={{ color: c.accent, fontWeight: '700' }}
-            onPress={() => Linking.openURL('https://claude.ai/code/artifact/014180b9-2f62-4334-9899-91935f62aa8c')}
+            onPress={() => router.push('/legal/terms')}
           >
             Terms of Service
           </T>{' '}
           and{' '}
           <T
             style={{ color: c.accent, fontWeight: '700' }}
-            onPress={() => Linking.openURL('https://claude.ai/code/artifact/cbfe9163-a8b9-4782-aa96-b03a3e1a5453')}
+            onPress={() => router.push('/legal/privacy')}
           >
             Privacy Policy
           </T>
