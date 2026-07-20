@@ -66,6 +66,8 @@ export function WebMap({
           try {
             const msg = JSON.parse(e.nativeEvent.data);
             if (msg.type === 'pinPress') onPinPress?.(msg.id);
+            else if (msg.type === 'mapAuthFail')
+              console.warn('[naver-map] auth failed — the WebView origin (MAP_ORIGIN) is not a registered Service URL for this ncpKeyId.');
           } catch {}
         }}
         style={{ backgroundColor: c.mapBg }}

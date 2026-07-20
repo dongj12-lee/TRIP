@@ -25,9 +25,14 @@ export type MapData = {
 };
 
 export const NAVER_CLIENT_ID = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID;
-// Must match a Service URL registered for the Client ID in the NCP console.
-// Native WebView reports this as window.location via baseUrl.
-export const MAP_ORIGIN = 'http://localhost';
+// Must EXACTLY match a Service URL registered for the Client ID in the NCP
+// console — the native WebView reports this string as window.location (via
+// baseUrl) and Naver's SDK rejects any origin that isn't registered, leaving
+// the map blank. The dev Service URL registered for this key is
+// `http://127.0.0.1:8081` (host+port, per docs/OPERATIONS.md), so native must
+// use that same string — bare `http://localhost` is NOT registered and fails.
+// For a production build, register the app's real origin and set it here.
+export const MAP_ORIGIN = 'http://127.0.0.1:8081';
 
 // Category → pin color. Distinguishable but kept in the app's warm register,
 // so a colored pin still reads clearly even if the emoji glyph fails to
@@ -177,6 +182,9 @@ export function buildNativeShell(clientId: string) {
     '<!DOCTYPE html><html><head><meta charset="utf-8" />' +
     '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />' +
     '<style>html,body,#map{width:100%;height:100%;margin:0;padding:0}</style>' +
+    // Naver calls this global if the ncpKeyId or its registered Service URL
+    // check fails — surface it to RN instead of silently blank-mapping.
+    '<script>window.navermap_authFailure=function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"mapAuthFail"}));};</script>' +
     '<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + clientId + '&language=en"></script>' +
     '</head><body><div id="map"></div>' +
     '<script>' + MAP_RUNTIME_JS + '</script>' +
