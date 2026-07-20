@@ -22,7 +22,11 @@ export const ACCENTS: Record<
   '#5b6f9c': { name: 'Hanok Blue', main: '#4d5589', d600: '#2f376a', l50: '#ebecf5', d50: '#22253a' },
 };
 
-export const DEFAULT_ACCENT: AccentKey = '#c26b4a';
+// Hanok Blue by default — the warm terracotta read as a "made with Claude
+// Code" tell (Anthropic's brand is that same terracotta/orange family). Blue
+// is calm, cool, and reads clearly as a travel/map app while staying Korean
+// (hanok/dancheong blue). The other accents remain user-selectable in Settings.
+export const DEFAULT_ACCENT: AccentKey = '#5b6f9c';
 
 // Font family names as registered with expo-font in app/_layout.tsx.
 export const FONTS = {

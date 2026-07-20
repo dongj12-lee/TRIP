@@ -138,7 +138,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   };
 
   const v = VIBES[vibe];
-  const accent = tone('terra');
+  const accent = tone('blue');
 
   const shareStops: ShareStop[] = effectivePlan
     ? effectivePlan.stops.map((s) => ({ name: s.place.name, time: to12h(s.time), category: s.place.category, photoUrl: s.place.photoUrl, swatch: s.place.swatch }))

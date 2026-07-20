@@ -10,7 +10,7 @@ import {
 export const FOREIGNER_TAGS: ForeignerTag[] = [
   { key: 'soloOk', emoji: '🧍', label: 'Solo OK', hint: 'Order / be seated as one person', tone: 'sage' },
   { key: 'englishMenu', emoji: '📋', label: 'English menu', hint: 'An English menu is available', tone: 'gold' },
-  { key: 'priceTransparent', emoji: '💸', label: 'Fair price', hint: 'No tourist markup — prices clear', tone: 'terra' },
+  { key: 'priceTransparent', emoji: '💸', label: 'Fair price', hint: 'No tourist markup — prices clear', tone: 'blue' },
   { key: 'cardOk', emoji: '💳', label: 'Card OK', hint: 'Foreign cards accepted', tone: 'sage' },
   { key: 'englishSpoken', emoji: '💬', label: 'English spoken', hint: 'Staff can communicate in English', tone: 'gold' },
 ];
@@ -63,7 +63,7 @@ export function fitTagsFor(category: string, categoryL2?: string | null): Foreig
 // itinerary is attached); "question" is a distinct intent (expects answers).
 export const POST_TYPES: Record<string, { emoji: string; label: string; tone: 'terra' | 'sage' | 'gold' | 'rose' | 'blue' }> = {
   post: { emoji: '💬', label: 'Post', tone: 'blue' },
-  route: { emoji: '🧭', label: 'Route', tone: 'terra' },
+  route: { emoji: '🧭', label: 'Route', tone: 'blue' },
   question: { emoji: '❓', label: 'Question', tone: 'sage' },
 };
 

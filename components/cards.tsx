@@ -129,7 +129,7 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
 
 export function RoutePreview({ days }: { days: RouteDay[] }) {
   const { c, tone } = useTheme();
-  const terra = tone('terra');
+  const terra = tone('blue'); // route accent — blue to match the app's identity (was terracotta)
   // Prefer the live catalog (real posts reference live slugs); fall back to the
   // bundled seed map so a route still resolves offline / before fetch.
   const { placeBySlug: livePlaces } = useRemoteContent();
@@ -161,7 +161,7 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
   // Fewer than 2 geocoded stops (or the map image failed to load) — no
   // meaningful map to show, keep the text-only preview.
   if (!mapUrl || mapFailed) {
-    return <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.terra50 }}>{caption}</View>;
+    return <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.blue50 }}>{caption}</View>;
   }
 
   // A real map image with numbered pins in visit order — an abstract

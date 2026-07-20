@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
           accessibilityRole="button"
           style={({ pressed }) => ({
             marginTop: 22, paddingVertical: 13, paddingHorizontal: 28, borderRadius: 14,
-            backgroundColor: '#a36643', opacity: pressed ? 0.85 : 1,
+            backgroundColor: '#4d5589', opacity: pressed ? 0.85 : 1,
           })}
         >
           <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>Try again</Text>

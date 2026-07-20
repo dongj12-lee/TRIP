@@ -18,7 +18,11 @@ type ThemePrefs = {
   mode: 'system' | 'light' | 'dark';
 };
 
-const PREFS_KEY = 'trip_theme_prefs_v1';
+// v2: bumped when the default accent changed from Terracotta to Hanok Blue, so
+// an already-persisted terracotta pref (baked in the first time a user touched
+// accent or light/dark mode) doesn't override the new default. Old v1 prefs are
+// simply ignored — everyone re-defaults to Hanok Blue / system mode once.
+const PREFS_KEY = 'trip_theme_prefs_v2';
 
 type ThemeContextValue = {
   c: Palette;
