@@ -18,6 +18,7 @@
 - ✅ iOS 번들 빌드 검증 완료 (`expo export` 통과)
 - ⏳ 실제 장소 사진은 아직 플레이스홀더(스와치 그라디언트) — 실사진 소싱 필요
 - ⏳ EAS 빌드/제출은 사용자의 Apple Developer 계정 필요 (아래 참고)
+- ⏳ iOS 전용 "Plan my day" Foundation Models(Apple Intelligence, on-device) 개인화 — 코드는 완료, `@react-native-ai/apple` 첫 네이티브 의존성 추가로 **Expo Go 워크플로우가 깨짐** (아래 "네이티브 의존성 추가됨" 참고). 실기기 검증은 아직 안 됨
 
 ## 실행 (개발)
 
@@ -29,6 +30,30 @@ npm start                 # 터널 모드가 필요하면: npm start -- --tunnel
 
 QR/링크를 아이폰의 **Expo Go** 앱으로 열면 됩니다 (Expo Go는 SDK 54까지 지원).
 로컬 Xcode 없이 실기기 테스트 가능. 시뮬레이터로 열려면 `npm run ios` (Xcode 필요).
+
+### ⚠️ 네이티브 의존성 추가됨 (Expo Go 더 이상 안 됨)
+
+`@react-native-ai/apple` (iOS Foundation Models 브릿지, Plan-my-day 개인화용)가
+이 프로젝트의 **첫 네이티브 의존성**이에요. Expo Go는 고정된 SDK 모듈 세트만
+탑재하고 있어서 커스텀 네이티브 코드가 있는 프로젝트는 절대 못 엽니다 — iOS든
+Android든 상관없이요 (이 기능 자체는 iOS 전용이지만, Expo Go가 막히는 건
+플랫폼 무관). 위 "로컬 Xcode 없이 실기기 테스트 가능"은 이제 더 이상 사실이
+아니에요. 새 워크플로우:
+
+```bash
+npx expo prebuild        # ios/, android/ 네이티브 프로젝트 생성 (최초 1회, 또는 의존성 바뀔 때마다)
+npx expo start --dev-client
+```
+
+`npx expo prebuild`는 CocoaPods(`pod install`)가 필요해요 — 없으면
+`brew install cocoapods` 먼저. 실기기/시뮬레이터에서 돌리려면 EAS dev client
+빌드(`eas build --profile development --platform ios`)가 필요하고, 코드
+서명 때문에 Apple Developer 계정이 있어야 해요.
+
+`lib/foundationModels.ts`/`.ios.ts`/`.web.ts`는 플랫폼별로 분리돼 있어서
+(components/WebMap.tsx/.web.tsx와 같은 패턴) Android·웹 번들에는 이 네이티브
+패키지가 아예 포함되지 않고, 기존 동작 그대로예요 — 이 기능이 깨는 건 오직
+"Expo Go로 켜는 것" 자체입니다.
 
 ## Supabase 백엔드 세팅 (최초 1회)
 

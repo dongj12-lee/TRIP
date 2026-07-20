@@ -5,11 +5,14 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useRemoteContent } from '@/lib/remoteData';
-import { generateDayPlan, planToItineraryDay, DayPlan, VibeKey, VIBES } from '@/lib/dayPlan';
+import { generateDayPlan, planToItineraryDay, DayPlan, PlannedStop, VibeKey, VIBES } from '@/lib/dayPlan';
 import { fetchSeoulWeather, weatherDesc } from '@/lib/weather';
 import { guLabel } from '@/lib/format';
 import { to12h } from '@/lib/timeUtils';
 import { haptic } from '@/lib/haptics';
+import { haversineKm } from '@/lib/routeHealth';
+import { isFoundationModelsAvailable, refinePick } from '@/lib/foundationModels';
+import { Place } from '@/data/types';
 import { T, H, Button } from './base';
 import { Photo } from './ui';
 import { Icon } from './Icon';
@@ -70,17 +73,62 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
     [visible, places, profile.interests, saved, placeReactions, vibe, area, rainy, exclude],
   );
 
+  // Optional on-device upgrade for slots the heuristic itself flagged as
+  // close calls (DayPlan.stops[i].alternates) — iOS Apple Intelligence
+  // devices only, everywhere else this is permanently empty and the
+  // heuristic pick is exactly what's shown, no different from before this
+  // feature existed. Keyed by stop index; reset whenever the heuristic plan
+  // itself changes (new vibe/area/shuffle → old refinements no longer apply).
+  const [refinedSlots, setRefinedSlots] = useState<Record<number, Place>>({});
+  useEffect(() => {
+    setRefinedSlots({});
+    if (!plan || !isFoundationModelsAvailable()) return;
+    let cancelled = false;
+    plan.stops.forEach((stop, i) => {
+      if (!stop.alternates?.length) return;
+      const pool = [stop.place, ...stop.alternates];
+      const candidates = pool.map((p) => ({ slug: p.slug, name: p.name, category: p.category, rating: p.rating, note: stop.role }));
+      refinePick(candidates, { vibe, interests: profile.interests, rainy }).then((pickedSlug) => {
+        if (cancelled || !pickedSlug || pickedSlug === stop.place.slug) return;
+        const replacement = stop.alternates!.find((a) => a.slug === pickedSlug);
+        if (!replacement) return;
+        setRefinedSlots((prevMap) => ({ ...prevMap, [i]: replacement }));
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on plan identity only; vibe/interests/rainy are read at fire-time, re-running per keystroke isn't needed
+  }, [plan]);
+
+  // The plan actually shown/shared/saved — heuristic stops with any accepted
+  // refinements swapped in, and distances/total recomputed since a swapped
+  // stop changes its neighbors' walking distance.
+  const effectivePlan: DayPlan | null = useMemo(() => {
+    if (!plan) return null;
+    if (!Object.keys(refinedSlots).length) return plan;
+    let prevPlace: Place | null = null;
+    const stops: PlannedStop[] = plan.stops.map((s, i) => {
+      const place = refinedSlots[i] ?? s.place;
+      const kmFromPrev = prevPlace ? haversineKm(prevPlace, place) : null;
+      prevPlace = place;
+      return { ...s, place, kmFromPrev };
+    });
+    const totalKm = stops.reduce((sum, s) => sum + (s.kmFromPrev ?? 0), 0);
+    return { ...plan, stops, totalKm };
+  }, [plan, refinedSlots]);
+
   const shuffle = () => {
-    if (!plan) return;
+    if (!effectivePlan) return;
     haptic.tick();
-    setExclude((prev) => new Set([...prev, ...plan.stops.map((s) => s.place.slug)]));
+    setExclude((prev) => new Set([...prev, ...effectivePlan.stops.map((s) => s.place.slug)]));
   };
 
   const addToTrip = () => {
-    if (!plan) return;
+    if (!effectivePlan) return;
     haptic.success();
     const label = `Day ${itinerary.days.length + 1}`;
-    const day = planToItineraryDay(plan, label, area ? guLabel(area) : undefined);
+    const day = planToItineraryDay(effectivePlan, label, area ? guLabel(area) : undefined);
     setItinerary((prev) => ({ ...prev, days: [...prev.days, day] }));
     onClose();
     showToast(`Added as ${label} — tweak anything`, '✨');
@@ -92,11 +140,11 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   const v = VIBES[vibe];
   const accent = tone('terra');
 
-  const shareStops: ShareStop[] = plan
-    ? plan.stops.map((s) => ({ name: s.place.name, time: to12h(s.time), category: s.place.category, photoUrl: s.place.photoUrl, swatch: s.place.swatch }))
+  const shareStops: ShareStop[] = effectivePlan
+    ? effectivePlan.stops.map((s) => ({ name: s.place.name, time: to12h(s.time), category: s.place.category, photoUrl: s.place.photoUrl, swatch: s.place.swatch }))
     : [];
   const shareTitle = `${v.emoji} ${v.label}${area ? ` · ${guLabel(area)}` : ''}`;
-  const shareSubtitle = plan ? `${plan.stops.length} stops · ~${plan.totalKm.toFixed(1)}km on foot` : undefined;
+  const shareSubtitle = effectivePlan ? `${effectivePlan.stops.length} stops · ~${effectivePlan.totalKm.toFixed(1)}km on foot` : undefined;
 
   return (
     <>
@@ -146,23 +194,23 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
 
           {/* The plan */}
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
-            {plan ? (
+            {effectivePlan ? (
               <>
                 {/* At-a-glance metric strip — the day summed up before the
                     stops, echoing the reference's activity-summary grid. */}
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-                  <Metric value={String(plan.stops.length)} label="stops" />
-                  <Metric value={plan.totalKm.toFixed(1)} label="km on foot" />
+                  <Metric value={String(effectivePlan.stops.length)} label="stops" />
+                  <Metric value={effectivePlan.totalKm.toFixed(1)} label="km on foot" />
                   <Metric
-                    value={plan.usedSaved > 0 ? `♥ ${plan.usedSaved}` : v.emoji}
-                    label={plan.usedSaved > 0 ? 'your saves' : v.label}
+                    value={effectivePlan.usedSaved > 0 ? `♥ ${effectivePlan.usedSaved}` : v.emoji}
+                    label={effectivePlan.usedSaved > 0 ? 'your saves' : v.label}
                   />
                 </View>
                 <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line, marginBottom: 12 }}>
-                  <RouteMap stops={plan.stops.map((s) => ({ name: s.place.name, lat: s.place.lat, lng: s.place.lng }))} height={140} />
+                  <RouteMap stops={effectivePlan.stops.map((s) => ({ name: s.place.name, lat: s.place.lat, lng: s.place.lng }))} height={140} />
                 </View>
                 <View style={{ gap: 10 }}>
-                  {plan.stops.map((s, i) => (
+                  {effectivePlan.stops.map((s, i) => (
                     <Pressable
                       key={s.place.slug}
                       onPress={() => { onClose(); router.push(`/place/${s.place.slug}`); }}
@@ -183,6 +231,9 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                           <T style={{ fontSize: 14, fontWeight: '700', flexShrink: 1 }} numberOfLines={1}>{s.place.name}</T>
                           {s.saved && <Icon name="heart" size={12} fill={c.rose} stroke={c.rose} sw={1} />}
+                          {refinedSlots[i] && (
+                            <T style={{ fontSize: 10, fontWeight: '800', color: accent.fg }}>✨ Refined for you</T>
+                          )}
                         </View>
                         <T style={{ fontSize: 11.5, color: c.muted, fontWeight: '600' }} numberOfLines={1}>
                           {s.role} · {guLabel(s.place.neighborhood)}
@@ -207,9 +258,9 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
 
         {/* Actions */}
         <View style={{ flexDirection: 'row', gap: 9, paddingHorizontal: 20, paddingTop: 10, paddingBottom: insets.bottom + 14, borderTopWidth: 1, borderTopColor: c.line }}>
-          <Button label="Shuffle" icon="refresh" variant="soft" style={{ flex: 1 }} onPress={shuffle} disabled={!plan} />
-          <Button label="Share" icon="share" variant="soft" style={{ flex: 1 }} onPress={() => { haptic.tick(); setShareOpen(true); }} disabled={!plan} />
-          <Button label="Add to trip" style={{ flex: 1.3 }} onPress={addToTrip} disabled={!plan} />
+          <Button label="Shuffle" icon="refresh" variant="soft" style={{ flex: 1 }} onPress={shuffle} disabled={!effectivePlan} />
+          <Button label="Share" icon="share" variant="soft" style={{ flex: 1 }} onPress={() => { haptic.tick(); setShareOpen(true); }} disabled={!effectivePlan} />
+          <Button label="Add to trip" style={{ flex: 1.3 }} onPress={addToTrip} disabled={!effectivePlan} />
         </View>
       </View>
     </Modal>

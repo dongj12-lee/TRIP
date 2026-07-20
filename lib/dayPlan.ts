@@ -108,7 +108,19 @@ export type DayPlanInput = {
   exclude?: Set<string>; // slugs from the previous roll (powers "Shuffle")
 };
 
-export type PlannedStop = { place: Place; time: string; role: string; saved: boolean; kmFromPrev: number | null };
+export type PlannedStop = {
+  place: Place;
+  time: string;
+  role: string;
+  saved: boolean;
+  kmFromPrev: number | null;
+  // Other places that scored nearly as well for this slot — an "ambiguous
+  // pick" signal. Populated only when a close runner-up exists; consumed by
+  // an optional on-device refinement pass (see lib/foundationModels.ts),
+  // never required — the heuristic `place` above is always a complete,
+  // valid pick on its own.
+  alternates?: Place[];
+};
 export type DayPlan = { stops: PlannedStop[]; vibe: VibeKey; area: string | null; usedSaved: number; rainy: boolean; totalKm: number };
 
 // Base desirability independent of slot: quality signals + personal signals.
@@ -138,10 +150,17 @@ export function generateDayPlan(input: DayPlanInput): DayPlan | null {
   const stops: PlannedStop[] = [];
   let prev: Place | null = null;
 
+  // How close a runner-up's score needs to be to the winner's to count as a
+  // genuinely "ambiguous" pick worth offering to an optional refinement pass
+  // — an absolute score-point gap (not a % of the total, which gets skewed
+  // near zero/negative scores), roughly the size of the smaller signal terms
+  // in baseScore (e.g. a single interest match is +0.7).
+  const AMBIGUOUS_DELTA = 0.8;
+  const TOP_N = 3;
+
   for (const slot of slotsFor(vibe)) {
-    const pickFrom = (pred: (p: Place) => boolean, allowExcluded: boolean) => {
-      let best: Place | null = null;
-      let bestScore = -Infinity;
+    const pickFrom = (pred: (p: Place) => boolean, allowExcluded: boolean): { place: Place; alternates: Place[] } | null => {
+      const top: { place: Place; score: number }[] = []; // kept sorted desc, capped at TOP_N
       for (const p of places) {
         if (used.has(p.slug) || !pred(p)) continue;
         if (reactions[p.slug] === 'dislike') continue; // never resurface a "Not for me"
@@ -154,20 +173,25 @@ export function generateDayPlan(input: DayPlanInput): DayPlan | null {
           if (km > 8) continue; // never generate a cross-town hop
           s += Math.max(0, 2.5 - km * 1.1); // walkable beats a subway ride
         }
-        if (s > bestScore) {
-          bestScore = s;
-          best = p;
+        if (top.length < TOP_N || s > top[top.length - 1].score) {
+          top.push({ place: p, score: s });
+          top.sort((a, b) => b.score - a.score);
+          if (top.length > TOP_N) top.length = TOP_N;
         }
       }
-      return best;
+      if (!top.length) return null;
+      const bestScore = top[0].score;
+      const alternates = top.slice(1).filter((t) => bestScore - t.score < AMBIGUOUS_DELTA).map((t) => t.place);
+      return { place: top[0].place, alternates };
     };
 
     // Prefer un-excluded picks; relax exclusion, then the predicate, before giving up.
-    const place =
+    const picked =
       pickFrom(slot.pick, false) ??
       pickFrom(slot.pick, true) ??
       (slot.fallback ? pickFrom(slot.fallback, false) ?? pickFrom(slot.fallback, true) : null);
-    if (!place) continue;
+    if (!picked) continue;
+    const { place, alternates } = picked;
 
     used.add(place.slug);
     stops.push({
@@ -176,6 +200,7 @@ export function generateDayPlan(input: DayPlanInput): DayPlan | null {
       role: slot.role,
       saved: input.saved.has(place.slug),
       kmFromPrev: prev ? haversineKm(prev, place) : null,
+      alternates: alternates.length ? alternates : undefined,
     });
     prev = place;
   }
