@@ -250,7 +250,12 @@ function mapPlace(row: any): Place {
     kContentType: row.k_content_type ?? undefined,
     kContentNote: row.k_content_note ?? undefined,
     swatch: row.swatch,
-    photoUrl: row.photo_url ?? undefined,
+    // Upgrade http→https: iOS App Transport Security blocks plain http image
+    // loads, so TourAPI photos (tong.visitkorea.or.kr, served over http) would
+    // silently fail to render. That CDN serves the same asset over https, so a
+    // one-line scheme swap fixes it for every existing + future row without a
+    // DB backfill.
+    photoUrl: row.photo_url ? row.photo_url.replace(/^http:\/\//, 'https://') : undefined,
     subway: row.subway ?? undefined,
     freeEntry: row.free_entry ?? undefined,
     englishSite: row.english_site ?? undefined,

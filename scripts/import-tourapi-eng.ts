@@ -274,7 +274,9 @@ async function main() {
         priceTransparent: false,
         cardOk: false,
         englishSpoken: false,
-        photoUrl: item.firstimage || item.firstimage2 || undefined,
+        // TourAPI serves firstimage over http; store https so iOS ATS doesn't
+        // block it (the tong.visitkorea.or.kr CDN serves the same asset on https).
+        photoUrl: (item.firstimage || item.firstimage2 || '').replace(/^http:\/\//, 'https://') || undefined,
       } as unknown as Omit<Place, 'votes'>);
 
       // Keep dedup effective within this same run too (two rows across
