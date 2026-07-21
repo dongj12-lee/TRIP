@@ -64,7 +64,7 @@ export default function MyScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <TabBar
-        title="My BADA"
+        title="My TRIP"
         scrollY={scrollY}
         right={<IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} color={c.inkSoft} />}
       />
@@ -74,7 +74,7 @@ export default function MyScreen() {
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
         showsVerticalScrollIndicator={false}
       >
-        <TabTitle title="My BADA" />
+        <TabTitle title="My TRIP" />
 
         {/* Identity — tap to edit */}
         <Pressable onPress={() => setEditing(true)} style={{ paddingHorizontal: 18, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>

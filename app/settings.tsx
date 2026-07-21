@@ -143,7 +143,7 @@ export default function Settings() {
           )}
         </Card>
 
-        <T style={{ textAlign: 'center', color: c.muted, fontSize: 12, marginTop: 24 }}>BADA v1.0.0</T>
+        <T style={{ textAlign: 'center', color: c.muted, fontSize: 12, marginTop: 24 }}>TRIP v1.0.0</T>
       </ScrollView>
     </Screen>
   );

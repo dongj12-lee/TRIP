@@ -25,14 +25,15 @@ export type MapData = {
 };
 
 export const NAVER_CLIENT_ID = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID;
-// Must EXACTLY match a Service URL registered for the Client ID in the NCP
-// console — the native WebView reports this string as window.location (via
-// baseUrl) and Naver's SDK rejects any origin that isn't registered, leaving
-// the map blank. The dev Service URL registered for this key is
-// `http://127.0.0.1:8081` (host+port, per docs/OPERATIONS.md), so native must
-// use that same string — bare `http://localhost` is NOT registered and fails.
-// For a production build, register the app's real origin and set it here.
-export const MAP_ORIGIN = 'http://127.0.0.1:8081';
+// The native WebView reports this string as window.location (via baseUrl), and
+// it must match a Service URL registered for the Client ID in the NCP console
+// (127.0.0.1:8081 is registered; Naver ignores http-vs-https). Use **https**
+// here even though the registration is http: with an http baseUrl the WKWebView
+// page is a non-secure origin, and iOS then blocks it from loading the Naver
+// SDK/tiles (the map came up blank despite the origin being registered). An
+// https baseUrl makes the page a secure origin loading an https script — no
+// mixed-content/ATS block. For production, register+use the app's real origin.
+export const MAP_ORIGIN = 'https://127.0.0.1:8081';
 
 // Category → pin color. Distinguishable but kept in the app's warm register,
 // so a colored pin still reads clearly even if the emoji glyph fails to

@@ -119,7 +119,7 @@ export default function AuthScreen() {
         )}
 
         <T style={{ fontSize: 11.5, color: c.muted, textAlign: 'center', marginTop: 'auto', paddingTop: 30, lineHeight: 16 }}>
-          By continuing you agree to BADA's{' '}
+          By continuing you agree to TRIP's{' '}
           <T
             style={{ color: c.accent, fontWeight: '700' }}
             onPress={() => router.push('/legal/terms')}
