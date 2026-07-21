@@ -60,7 +60,7 @@ export function ShareCardSheet({
   }, [visible]);
 
   const share = async () => {
-    if (isWeb) { showToast('Sharing to Instagram works in the TRIP app', '📱'); return; }
+    if (isWeb) { showToast('Sharing to Instagram works in the BADA app', '📱'); return; }
     setBusy(true);
     try {
       await new Promise((r) => setTimeout(r, 350)); // let remote images settle
@@ -174,7 +174,7 @@ export function ShareCardSheet({
               <View style={{ backgroundColor: c.gold50, borderRadius: 10, padding: 12, flexDirection: 'row', gap: 8, alignItems: 'center' }}>
                 <T style={{ fontSize: 15 }}>📱</T>
                 <T style={{ flex: 1, fontSize: 12.5, color: c.gold700, fontWeight: '600', lineHeight: 17 }}>
-                  Open TRIP on your phone to share this straight to Instagram.
+                  Open BADA on your phone to share this straight to Instagram.
                 </T>
               </View>
             ) : (

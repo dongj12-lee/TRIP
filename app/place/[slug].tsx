@@ -430,7 +430,7 @@ export default function PlaceDetail() {
                       <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
                       {verified && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: c.sage50, paddingVertical: 1.5, paddingHorizontal: 6, borderRadius: 999 }}>
-                          <T style={{ fontSize: 10, color: c.sage700, fontWeight: '800' }}>✓ TRIP verified</T>
+                          <T style={{ fontSize: 10, color: c.sage700, fontWeight: '800' }}>✓ BADA verified</T>
                         </View>
                       )}
                     </View>

@@ -106,7 +106,7 @@ function BrandFooter({ handle }: { handle?: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
       <View style={{ flex: 1 }}>
-        <H style={{ fontSize: 26, color: CREAM, letterSpacing: 0.5 }}>TRIP</H>
+        <H style={{ fontSize: 26, color: CREAM, letterSpacing: 0.5 }}>BADA</H>
         <T style={{ fontSize: 11.5, fontWeight: '700', color: CREAM_DIM, marginTop: 1 }} numberOfLines={1}>
           {handle ? `@${handle} · ` : ''}Plan your Seoul trip
         </T>
@@ -157,7 +157,7 @@ export const FourCutsCard = forwardRef<View, { title: string; stops: ShareStop[]
             <T style={{ fontSize: 12.5, fontWeight: '700', color: CREAM, marginTop: 3 }} numberOfLines={1}>{title}</T>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <H style={{ fontSize: 21, color: CREAM, letterSpacing: 0.5 }}>TRIP</H>
+            <H style={{ fontSize: 21, color: CREAM, letterSpacing: 0.5 }}>BADA</H>
             <T style={{ fontSize: 9.5, fontWeight: '700', color: 'rgba(253,243,231,0.55)' }}>{handle ? `@${handle}` : 'plan your seoul trip'}</T>
           </View>
         </View>
@@ -212,7 +212,7 @@ export const TicketCard = forwardRef<View, { title: string; subtitle?: string; s
           {/* Stub */}
           <View style={{ paddingHorizontal: 20, paddingVertical: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View>
-              <H style={{ fontSize: 20, color: INK, letterSpacing: 0.5 }}>TRIP</H>
+              <H style={{ fontSize: 20, color: INK, letterSpacing: 0.5 }}>BADA</H>
               <T style={{ fontSize: 10, fontWeight: '700', color: INK_SOFT, marginTop: 1 }}>{handle ? `@${handle} · ` : ''}plan your seoul trip</T>
             </View>
             <Barcode seed={title + (handle ?? '')} />
@@ -284,7 +284,7 @@ export const MagazineCard = forwardRef<View, { place: PlaceShareData; handle?: s
 
         {/* Masthead */}
         <View style={{ position: 'absolute', top: 22, left: 0, right: 0, alignItems: 'center' }}>
-          <T style={{ fontSize: 9.5, fontWeight: '800', letterSpacing: 3.2, color: 'rgba(255,255,255,0.85)' }}>TRIP MAGAZINE · {today()}</T>
+          <T style={{ fontSize: 9.5, fontWeight: '800', letterSpacing: 3.2, color: 'rgba(255,255,255,0.85)' }}>BADA MAGAZINE · {today()}</T>
           <H style={{ fontSize: 58, lineHeight: 62, color: '#fff', letterSpacing: 4, marginTop: 2 }}>SEOUL</H>
         </View>
 
@@ -299,7 +299,7 @@ export const MagazineCard = forwardRef<View, { place: PlaceShareData; handle?: s
             “{coverline}”{place.rating != null ? `  ·  ⭐ ${place.rating}` : ''}
           </T>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
-            <T style={{ fontSize: 10.5, fontWeight: '700', color: 'rgba(255,255,255,0.6)' }}>{handle ? `found by @${handle}` : 'find yours on TRIP'}</T>
+            <T style={{ fontSize: 10.5, fontWeight: '700', color: 'rgba(255,255,255,0.6)' }}>{handle ? `found by @${handle}` : 'find yours on BADA'}</T>
             <View style={{ backgroundColor: 'rgba(255,255,255,0.92)', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 6 }}>
               <Barcode seed={place.name} height={16} color="#1c150e" />
             </View>
@@ -344,7 +344,7 @@ export const PolaroidCard = forwardRef<View, { place: PlaceShareData; handle?: s
 
           {/* Brand */}
           <View style={{ position: 'absolute', bottom: 26, alignItems: 'center' }}>
-            <H style={{ fontSize: 20, color: '#4a3826', letterSpacing: 0.5 }}>TRIP</H>
+            <H style={{ fontSize: 20, color: '#4a3826', letterSpacing: 0.5 }}>BADA</H>
             <T style={{ fontSize: 10, fontWeight: '700', color: 'rgba(74,56,38,0.65)' }}>{handle ? `@${handle} · ` : ''}plan your seoul trip</T>
           </View>
         </LinearGradient>
@@ -444,8 +444,8 @@ export const PassportShareCard = forwardRef<View, { data: PassportShareData; han
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View>
-              <H style={{ fontSize: 24, color: CREAM, letterSpacing: 0.5 }}>TRIP</H>
-              <T style={{ fontSize: 11, fontWeight: '700', color: CREAM_DIM }}>{handle ? `@${handle} · ` : ''}collect yours on TRIP</T>
+              <H style={{ fontSize: 24, color: CREAM, letterSpacing: 0.5 }}>BADA</H>
+              <T style={{ fontSize: 11, fontWeight: '700', color: CREAM_DIM }}>{handle ? `@${handle} · ` : ''}collect yours on BADA</T>
             </View>
             <View style={{ width: 44, height: 44, borderRadius: 10, backgroundColor: 'rgba(242,162,77,0.16)', alignItems: 'center', justifyContent: 'center' }}>
               <T style={{ fontSize: 22 }}>🎫</T>
