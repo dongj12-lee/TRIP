@@ -8,6 +8,8 @@ import { T, H, Button } from './base';
 import { TagPill } from './ui';
 import { SeoulMapPicker } from './SeoulMapPicker';
 import { haptic } from '@/lib/haptics';
+import { GlassView } from 'expo-glass-effect';
+import { GLASS_ON } from './glass';
 
 // Consolidates the foreigner-tag and neighborhood pickers — previously two
 // full-width horizontal scroll rows always on screen — into a single sheet
@@ -42,7 +44,8 @@ export function FiltersSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
-      <View style={{ maxHeight: '80%', backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22 }}>
+      <View style={{ maxHeight: '80%', backgroundColor: GLASS_ON ? 'transparent' : c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, overflow: 'hidden' }}>
+        {GLASS_ON && <GlassView glassEffectStyle="regular" pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />}
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 6, paddingBottom: 4 }}>
           <H style={{ fontSize: 20 }}>Filters</H>

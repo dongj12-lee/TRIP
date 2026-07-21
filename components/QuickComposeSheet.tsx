@@ -12,6 +12,8 @@ import { T, H } from './base';
 import { Avatar } from './Avatar';
 import { PhotoAttach } from './PhotoAttach';
 import { useToast } from './Toast';
+import { GlassView } from 'expo-glass-effect';
+import { GLASS_ON } from './glass';
 import { haptic } from '@/lib/haptics';
 
 // A frictionless, body-first composer — the fastest way to share something.
@@ -76,7 +78,8 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: insets.bottom + 12 }}>
+        <View style={{ backgroundColor: GLASS_ON ? 'transparent' : c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: insets.bottom + 12, overflow: 'hidden' }}>
+          {GLASS_ON && <GlassView glassEffectStyle="regular" pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />}
           {/* Top bar: cancel · avatar+name · Post */}
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10 }}>
             <Pressable onPress={onClose} hitSlop={8}>

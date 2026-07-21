@@ -3,7 +3,6 @@ import { View, Pressable, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
-import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { useTheme } from '@/theme/theme';
 import { haptic } from '@/lib/haptics';
 import { Icon, IconName } from '@/components/Icon';
@@ -28,23 +27,10 @@ type TabBarProps = {
 function TabBar({ state, navigation }: TabBarProps) {
   const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
-  // Material, best → fallback: iOS 26 Liquid Glass (GlassView) → frosted
-  // BlurView (older iOS) → solid View (web, whose blur lets content bleed).
-  const glass = Platform.OS !== 'web' && isLiquidGlassAvailable();
-  let Container: any = View;
-  let containerProps: any = {};
-  let bg: string = c.paper;
-  if (glass) {
-    Container = GlassView;
-    // A faint paper/ink tint keeps the tab labels legible over busy content
-    // while still reading as clear glass; "regular" is the frosted variant.
-    containerProps = { glassEffectStyle: 'regular', tintColor: dark ? 'rgba(23,21,18,0.28)' : 'rgba(255,255,255,0.28)' };
-    bg = 'transparent';
-  } else if (Platform.OS !== 'web') {
-    Container = BlurView;
-    containerProps = { intensity: 30, tint: dark ? 'dark' : 'light' };
-    bg = dark ? 'rgba(26,22,17,0.92)' : 'rgba(251,246,238,0.94)';
-  }
+  // Native gets a frosted BlurView; web's blur fallback lets content bleed
+  // through, so use a solid surface there for a clean edge.
+  const Container: any = Platform.OS === 'web' ? View : BlurView;
+  const containerProps = Platform.OS === 'web' ? {} : { intensity: 30, tint: dark ? 'dark' : 'light' };
   return (
     <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
       <Container
@@ -53,7 +39,7 @@ function TabBar({ state, navigation }: TabBarProps) {
           flexDirection: 'row',
           borderTopWidth: 1,
           borderTopColor: c.line,
-          backgroundColor: bg,
+          backgroundColor: Platform.OS === 'web' ? c.paper : dark ? 'rgba(26,22,17,0.92)' : 'rgba(251,246,238,0.94)',
           paddingTop: 8,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
         }}

@@ -20,6 +20,8 @@ import { RouteMap } from './RouteMap';
 import { ShareCardSheet } from './ShareCardSheet';
 import { ShareStop } from './ShareCard';
 import { useToast } from './Toast';
+import { GlassView } from 'expo-glass-effect';
+import { GLASS_ON } from './glass';
 
 // "Plan my day" — the one-tap bridge from browsing to a shareable route.
 // Pick a vibe (+ optionally an area), get a geographically coherent 5-stop
@@ -150,7 +152,8 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
     <>
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} accessibilityLabel="Close" />
-      <View style={{ maxHeight: '88%', backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22 }}>
+      <View style={{ maxHeight: '88%', backgroundColor: GLASS_ON ? 'transparent' : c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, overflow: 'hidden' }}>
+        {GLASS_ON && <GlassView glassEffectStyle="regular" pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />}
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
         <View style={{ paddingHorizontal: 20, paddingTop: 6, paddingBottom: 2 }}>
           <H style={{ fontSize: 22 }}>✨ Plan my day</H>

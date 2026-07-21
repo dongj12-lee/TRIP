@@ -49,6 +49,8 @@ export default function ExploreScreen() {
   const [mapMode, setMapMode] = useState(false); // list ⇄ full-screen map
   const [pinnedSlug, setPinnedSlug] = useState<string | null>(null); // tapped pin → bottom card
   const [mapH, setMapH] = useState(0); // measured full-map height
+  // iOS 26 Liquid Glass available? (false on web/Android/older iOS → solid fallbacks)
+  const glassOn = Platform.OS !== 'web' && isLiquidGlassAvailable();
 
   // Live search beyond TRIP's own catalog (map mode only) — for a specific
   // address or business that isn't one of the curated spots.
@@ -178,31 +180,37 @@ export default function ExploreScreen() {
 
   // Search bar + intent bar are shared between the list header and the
   // full-screen map mode (so you can still search/filter with the map open).
+  const searchInner = (
+    <>
+      <Icon name="search" size={18} stroke={c.muted} sw={2} />
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search places, food, areas…"
+        placeholderTextColor={c.muted}
+        style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Pretendard' }}
+        autoCapitalize="none"
+        returnKeyType="search"
+      />
+      {query.length > 0 && (
+        <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
+          <Icon name="close" size={18} stroke={c.muted} sw={2} />
+        </Pressable>
+      )}
+    </>
+  );
+  const searchRow = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 8, paddingHorizontal: 13, height: 46, borderRadius: 14 };
   const searchBar = (
     <View style={{ paddingHorizontal: 18, paddingBottom: 14 }}>
-      <View
-        style={{
-          flexDirection: 'row', alignItems: 'center', gap: 8,
-          backgroundColor: c.surface, borderWidth: 1, borderColor: c.line,
-          borderRadius: 14, paddingHorizontal: 13, height: 46,
-        }}
-      >
-        <Icon name="search" size={18} stroke={c.muted} sw={2} />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search places, food, areas…"
-          placeholderTextColor={c.muted}
-          style={{ flex: 1, fontSize: 15, color: c.ink, fontFamily: 'Pretendard' }}
-          autoCapitalize="none"
-          returnKeyType="search"
-        />
-        {query.length > 0 && (
-          <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
-            <Icon name="close" size={18} stroke={c.muted} sw={2} />
-          </Pressable>
-        )}
-      </View>
+      {glassOn ? (
+        <GlassView glassEffectStyle="regular" style={{ ...searchRow, borderWidth: 1, borderColor: c.line, overflow: 'hidden' }}>
+          {searchInner}
+        </GlassView>
+      ) : (
+        <View style={{ ...searchRow, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
+          {searchInner}
+        </View>
+      )}
       {/* Example prompts teach the natural-language screener */}
       {noFilters && (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 7, paddingTop: 9 }}>
@@ -538,7 +546,7 @@ export default function ExploreScreen() {
           accessibilityLabel={mapMode ? 'Show list' : 'Show map'}
           style={{ borderRadius: 999, ...(shadow as object) }}
         >
-          {Platform.OS !== 'web' && isLiquidGlassAvailable() ? (
+          {glassOn ? (
             <GlassView
               isInteractive
               glassEffectStyle="regular"

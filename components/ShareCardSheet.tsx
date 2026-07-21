@@ -15,6 +15,8 @@ import {
   SHARE_W, SHARE_H,
 } from './ShareCard';
 import { useToast } from './Toast';
+import { GlassView } from 'expo-glass-effect';
+import { GLASS_ON } from './glass';
 
 // Renders a shareable card, captures it at story resolution (1080×1920), and
 // hands it to the native share sheet (→ Instagram, Messages, etc.). Web can't
@@ -104,7 +106,8 @@ export function ShareCardSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: c.scrim }}>
         <Pressable style={{ flex: 1 }} onPress={onClose} accessibilityLabel="Close" />
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: insets.bottom + 16 }}>
+        <View style={{ backgroundColor: GLASS_ON ? 'transparent' : c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: insets.bottom + 16, overflow: 'hidden' }}>
+          {GLASS_ON && <GlassView glassEffectStyle="regular" pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />}
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 8 }}>
             <H style={{ fontSize: 20 }}>{isPassport ? 'Share your passport' : isPlace ? 'Share this spot' : 'Share your day'}</H>
