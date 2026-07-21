@@ -31,7 +31,7 @@ export function FiltersSheet({
   hoods: string[];
   resultCount: number;
 }) {
-  const { c } = useTheme();
+  const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
   const hasActive = activeTags.size > 0 || selectedHoods.size > 0;
 
@@ -45,7 +45,7 @@ export function FiltersSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
       <View style={{ maxHeight: '80%', backgroundColor: GLASS_ON ? 'transparent' : c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, overflow: 'hidden' }}>
-        {GLASS_ON && <GlassView glassEffectStyle="regular" pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />}
+        {GLASS_ON && <GlassView glassEffectStyle="regular" tintColor={dark ? 'rgba(23,22,20,0.6)' : 'rgba(250,249,247,0.62)'} pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />}
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 6 }} />
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 6, paddingBottom: 4 }}>
           <H style={{ fontSize: 20 }}>Filters</H>
