@@ -11,8 +11,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(__dirname, '..', 'assets');
 mkdirSync(OUT, { recursive: true });
 
-const TERRA = '#c26b4a';
-const PAPER = '#fbf6ee';
+// Brand icon colors — Hanok Blue (matches the app's default accent, was the
+// old terracotta #c26b4a). TERRA/PAPER names kept to minimize churn in this
+// one-off script; TERRA is now the blue background, PAPER the light pin.
+const TERRA = '#4d5589';
+const PAPER = '#f4f6fb';
 
 // The pin glyph path, from components/Icon.tsx `pin` (24x24 viewBox), scaled up.
 const PIN_PATH = 'M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z';
