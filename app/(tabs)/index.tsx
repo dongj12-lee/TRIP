@@ -22,6 +22,7 @@ import { guLabel } from '@/lib/format';
 import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { DayPlanSheet } from '@/components/DayPlanSheet';
+import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 
 export default function ExploreScreen() {
@@ -528,16 +529,31 @@ export default function ExploreScreen() {
         </>
       )}
 
-      {/* Airbnb-style floating mode toggle — a confident List ⇄ Map switch */}
+      {/* Airbnb-style floating mode toggle — a confident List ⇄ Map switch.
+          iOS 26 gets interactive Liquid Glass; elsewhere a solid ink pill. */}
       <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 66, alignItems: 'center' }}>
         <Pressable
           onPress={() => { haptic.tick(); setPinnedSlug(null); setExtPin(null); setExtResults(null); setMapMode((m) => !m); }}
           accessibilityRole="button"
           accessibilityLabel={mapMode ? 'Show list' : 'Show map'}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: c.ink, paddingVertical: 11, paddingHorizontal: 18, borderRadius: 999, ...(shadow as object) }}
+          style={{ borderRadius: 999, ...(shadow as object) }}
         >
-          <Icon name={mapMode ? 'feed' : 'pin'} size={16} stroke={c.paper} sw={2} />
-          <T style={{ fontSize: 14, fontWeight: '800', color: c.paper }}>{mapMode ? 'List' : 'Map'}</T>
+          {Platform.OS !== 'web' && isLiquidGlassAvailable() ? (
+            <GlassView
+              isInteractive
+              glassEffectStyle="regular"
+              tintColor="rgba(46,42,36,0.5)"
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 7, paddingVertical: 11, paddingHorizontal: 18, borderRadius: 999 }}
+            >
+              <Icon name={mapMode ? 'feed' : 'pin'} size={16} stroke="#fff" sw={2} />
+              <T style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>{mapMode ? 'List' : 'Map'}</T>
+            </GlassView>
+          ) : (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: c.ink, paddingVertical: 11, paddingHorizontal: 18, borderRadius: 999 }}>
+              <Icon name={mapMode ? 'feed' : 'pin'} size={16} stroke={c.paper} sw={2} />
+              <T style={{ fontSize: 14, fontWeight: '800', color: c.paper }}>{mapMode ? 'List' : 'Map'}</T>
+            </View>
+          )}
         </Pressable>
       </View>
 
