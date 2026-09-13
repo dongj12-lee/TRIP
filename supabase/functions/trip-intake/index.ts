@@ -84,8 +84,33 @@ Rules:
 - \`summary\` is a short human-readable echo of what you understood, written to the traveller.
 - If the message is empty or unrelated to trip taste, return empty vibe, empty arrays, pace "", and a summary like "Balanced trip across Seoul's highlights".`;
 
+// ─── Per-IP rate limit ──────────────────────────────────────────────────
+// This one is reachable from the app without a login (guests plan trips too),
+// so it cannot be locked to a caller — but every request spends real money at
+// OpenAI, and the endpoint is discoverable from the shipped binary. Input
+// sizes are already capped below; this caps how often.
+//
+// In-memory, so it resets when the instance goes cold and is enforced per
+// instance rather than globally. That makes it a speed bump, not a wall: the
+// hard ceiling has to be a spend limit on the OpenAI account itself.
+const WINDOW_MS = 60_000;
+const MAX_PER_WINDOW = 12;
+const HITS = new Map<string, number[]>();
+function rateLimited(req: Request): boolean {
+  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+  const now = Date.now();
+  const recent = (HITS.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  recent.push(now);
+  if (HITS.size > 5000) HITS.clear(); // bound memory on a long-lived instance
+  HITS.set(ip, recent);
+  return recent.length > MAX_PER_WINDOW;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
+  if (rateLimited(req)) {
+    return new Response(JSON.stringify({ error: 'Too many requests, give it a minute.' }), { status: 429, headers: CORS });
+  }
   try {
     if (!API_KEY) return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not set' }), { status: 500, headers: CORS });
     if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'POST only' }), { status: 405, headers: CORS });

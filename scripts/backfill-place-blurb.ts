@@ -46,7 +46,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function callBatch(places: { slug: string; name: string; category: string; description: string }[]) {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/place-blurb`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // The function now refuses callers that aren't internal: it is deployed
+    // --no-verify-jwt and spends OpenAI credit per call, and its URL is
+    // extractable from the shipped app. This script is the only caller.
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+    },
     body: JSON.stringify({ places }),
   });
   const json = await res.json().catch(() => ({}));
