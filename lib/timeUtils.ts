@@ -1,6 +1,6 @@
 // Time helpers for the planner. Stored canonical format is 24h "HH:MM"
 // (matches the seed data); everything user-facing is 12h. Part-of-day is
-// DERIVED from the time so the traveler never has to pick it — that redundant
+// DERIVED from the time so the traveler never has to pick it, that redundant
 // input was removed from the stop card.
 
 export function to12h(hhmm: string): string {

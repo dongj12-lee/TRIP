@@ -1,16 +1,38 @@
 // Supabase-backed reads/writes, mapped to the app's existing camelCase types
 // (see data/types.ts). Every function here is safe to call only when
-// isSupabaseConfigured — callers should check that first (see lib/remoteData.tsx).
+// isSupabaseConfigured, callers should check that first (see lib/remoteData.tsx).
+import { File } from 'expo-file-system';
 import { supabase } from '@/lib/supabase';
 import { Buddy, BuddyInterest, BuddyMessage, Comment, ForeignerTagKey, Place, Post, PostType, Profile, Theme } from './types';
 
 // Turn a raw Supabase/Postgres error into a short user-facing message. The
 // server-side rate-limit triggers (migration-015) raise a "rate limit: …"
 // message; surface that as a calm nudge rather than a scary error.
+// Bucket-allowed extension for a picked file. Anything the bucket doesn't
+// allow (HEIC straight off the camera roll) is treated as jpg, which is what
+// the picker re-encodes it to.
+function extOf(file: { extension?: string | null }): 'jpg' | 'png' | 'webp' {
+  const e = (file.extension || '').replace('.', '').toLowerCase();
+  return e === 'png' ? 'png' : e === 'webp' ? 'webp' : 'jpg';
+}
+
 export function friendlyError(error: unknown, fallback = 'Something went wrong. Please try again.'): string {
   const msg = (error as { message?: string })?.message ?? '';
-  if (/rate limit/i.test(msg)) return "You're doing that a bit too fast — take a breather and try again.";
+  if (/rate limit/i.test(msg)) return "You're doing that a bit too fast, take a breather and try again.";
+  // Storage's own wording for an over-cap upload, in case one slips past the
+  // client-side check below (a bucket limit can be lowered server-side).
+  if (/payload too large|maximum allowed size|exceeded.*size/i.test(msg)) {
+    return 'That photo is too large to upload. Try a smaller one.';
+  }
+  // Messages this module raises itself are already written for a person, so
+  // pass them through instead of replacing them with the generic fallback.
+  if ((error as { userFacing?: boolean })?.userFacing) return msg;
   return fallback;
+}
+
+// An error whose message is meant to be shown as-is (see friendlyError).
+function userError(message: string): Error {
+  return Object.assign(new Error(message), { userFacing: true });
 }
 
 // ─────────────────────────── Profile ───────────────────────────
@@ -168,14 +190,66 @@ async function uploadImageTo(bucket: string, localUri: string): Promise<string> 
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not signed in');
 
-  const res = await fetch(localUri);
-  const blob = await res.blob();
-  const contentType = blob.type || 'image/jpeg';
-  const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
+  // This used to be `fetch(localUri)` + `.blob()`, and it had never once
+  // worked: both Storage buckets were still completely empty in production,
+  // avatars included, despite the feature shipping. React Native's fetch does
+  // not serve `file://` URIs, so the picked image never actually got read.
+  // expo-file-system's File reads it directly and returns a real ArrayBuffer,
+  // which supabase-js does accept. No new native dependency — ExpoFileSystem
+  // is already linked through the `expo` package itself (see ios/Podfile.lock).
+  const file = new File(localUri);
+  const raw = await file.arrayBuffer();
+  if (!raw.byteLength) throw userError('That image came back empty, try another one.');
+
+  // Bucket caps, from migration-017 (avatars) and migration-018 (post-images).
+  // The picker only re-encodes — and so only honours `quality` — when it has to
+  // convert; a PNG screenshot passes straight through at full size, which is
+  // how a 6.3 MB file reached this call.
+  const capMb = bucket === 'avatars' ? 5 : 8;
+
+  // Downscale anything bigger than we'd ever display before uploading. A phone
+  // photo is routinely 3-4x the longest edge we render, so this is mostly free
+  // quality-wise and turns a multi-megabyte upload into a few hundred KB.
+  let bytes = raw;
+  let ext: 'jpg' | 'png' | 'webp' = extOf(file);
+  const MAX_EDGE = bucket === 'avatars' ? 1024 : 2000;
+  const shrinkOver = 1.5 * 1024 * 1024;
+  try {
+    // Lazy require: see note above the import block.
+    const { ImageManipulator, SaveFormat } = require('expo-image-manipulator');
+    const ref = await ImageManipulator.manipulate(localUri).renderAsync();
+    const longest = Math.max(ref.width, ref.height);
+    if (longest > MAX_EDGE || raw.byteLength > shrinkOver) {
+      const scale = Math.min(1, MAX_EDGE / longest);
+      const out = await ImageManipulator.manipulate(localUri)
+        .resize({ width: Math.round(ref.width * scale) })
+        .renderAsync();
+      const saved = await out.saveAsync({ compress: 0.8, format: SaveFormat.JPEG });
+      const shrunk = await new File(saved.uri).arrayBuffer();
+      // Only take the result if it actually helped — re-encoding a small PNG
+      // to JPEG can come out larger.
+      if (shrunk.byteLength > 0 && shrunk.byteLength < raw.byteLength) {
+        bytes = shrunk;
+        ext = 'jpg';
+      }
+    }
+  } catch (e) {
+    // Resizing is an optimisation, not a requirement: if the native module
+    // fails on some image we still try the original and let the cap check
+    // below give the user a straight answer.
+    console.warn('resize before upload failed, using original', e);
+  }
+
+  const sizeMb = bytes.byteLength / (1024 * 1024);
+  if (sizeMb > capMb) {
+    throw userError(`That photo is ${sizeMb.toFixed(1)} MB and the limit is ${capMb} MB. Pick a smaller one, or crop it first.`);
+  }
+
+  const contentType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
   // Timestamped filename busts CDN/Image caches so a new upload shows instantly.
   const path = `${user.id}/${Date.now()}.${ext}`;
 
-  const { error } = await supabase.storage.from(bucket).upload(path, blob, { contentType, upsert: true });
+  const { error } = await supabase.storage.from(bucket).upload(path, bytes, { contentType, upsert: true });
   if (error) throw error;
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
@@ -239,6 +313,7 @@ function mapPlace(row: any): Place {
     rating: row.rating != null ? Number(row.rating) : undefined,
     reviews: row.reviews ?? undefined,
     description: row.description,
+    blurbAi: row.blurb_ai ?? undefined,
     soloOk: row.solo_ok,
     englishMenu: row.english_menu,
     priceTransparent: row.price_transparent,
@@ -264,10 +339,15 @@ function mapPlace(row: any): Place {
     dislikeCount: row.dislike_count ?? 0,
     verifiedTags: row.verified_tags ?? [],
     websiteUrl: row.website_url ?? undefined,
+    // Import provenance. Not shown anywhere in the UI, it's the strongest
+    // prominence signal available to the day planner (Visit Seoul rows are a
+    // tourist-facing curated catalog; the TourAPI rows include local civic
+    // places), see lib/prominence.ts.
+    source: row.source ?? undefined,
   };
 }
 
-// Columns needed to browse/filter/map — everything EXCEPT the heavy
+// Columns needed to browse/filter/map, everything EXCEPT the heavy
 // `description` (avg ~1KB/place). At 2,300+ places, shipping descriptions in
 // the list query would add megabytes; the place detail screen lazy-loads the
 // full record instead (see fetchPlace).
@@ -276,8 +356,8 @@ const BROWSE_COLS =
   'price_range,rating,reviews,solo_ok,english_menu,price_transparent,card_ok,english_spoken,votes,' +
   'warn_tip,k_content_title,k_content_type,k_content_note,swatch,photo_url,subway,free_entry,' +
   // description is included so the natural-language screener (lib/screener.ts)
-  // can match on it — descriptions are its richest signal.
-  'english_site,wheelchair,like_count,dislike_count,verified_tags,description';
+  // can match on it, descriptions are its richest signal.
+  'english_site,wheelchair,like_count,dislike_count,verified_tags,description,blurb_ai,source';
 
 export async function fetchPlaces(): Promise<Place[]> {
   // PostgREST caps a single response at 1000 rows, so page through the whole
@@ -298,7 +378,7 @@ export async function fetchPlaces(): Promise<Place[]> {
   return all.map((row) => mapPlace(row));
 }
 
-// Full single place incl. description — for the detail screen, which loads it
+// Full single place incl. description, for the detail screen, which loads it
 // lazily since the browse query omits description for payload size.
 export async function fetchPlace(slug: string): Promise<Place | null> {
   const { data, error } = await supabase.from('places').select('*').eq('slug', slug).maybeSingle();
@@ -445,6 +525,37 @@ export async function toggleCommentLike(commentId: string, on: boolean) {
   else await supabase.from('comment_likes').delete().eq('user_id', userId).eq('comment_id', commentId);
 }
 
+// RLS ("edit own comments") already scopes this to auth.uid() = author_id.
+export async function updateComment(commentId: string, body: string): Promise<void> {
+  const { error } = await supabase.from('comments').update({ body }).eq('id', commentId);
+  if (error) throw error;
+}
+
+// RLS ("delete own comments") already scopes this to auth.uid() = author_id.
+// A hard delete, not the `removed` moderation flag (that's admin-only, via
+// admin_set_removed) — same end result for readers either way, since the
+// "comments readable" SELECT policy already filters out removed rows entirely.
+export async function deleteComment(commentId: string): Promise<void> {
+  const { error } = await supabase.from('comments').delete().eq('id', commentId);
+  if (error) throw error;
+}
+
+// Same shape as updateComment/deleteComment above, for a post's own author.
+// RLS ("edit own posts" / "delete own posts") already scopes both to
+// auth.uid() = author_id, so no ownership check is repeated here.
+export async function updatePost(postId: string, input: { title: string; body: string }): Promise<void> {
+  const { error } = await supabase
+    .from('posts')
+    .update({ title: input.title || null, body: input.body })
+    .eq('id', postId);
+  if (error) throw error;
+}
+
+export async function deletePost(postId: string): Promise<void> {
+  const { error } = await supabase.from('posts').delete().eq('id', postId);
+  if (error) throw error;
+}
+
 export async function createPost(input: {
   type: PostType;
   title: string;
@@ -460,7 +571,7 @@ export async function createPost(input: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not signed in');
-  // Untitled posts have no title — derive a slug from the body instead.
+  // Untitled posts have no title, derive a slug from the body instead.
   const slug = slugify(input.title || input.body.slice(0, 40) || 'post');
   const { data, error } = await supabase
     .from('posts')
@@ -533,7 +644,7 @@ export async function setInterestStatus(buddyId: string, userId: string, status:
   if (error) throw error;
 }
 
-// ── Buddy group chat — participants only (host + accepted), enforced by RLS ──
+// ── Buddy group chat, participants only (host + accepted), enforced by RLS ──
 function mapBuddyMessage(row: any): BuddyMessage {
   return {
     id: row.id,
@@ -667,7 +778,7 @@ export async function fetchPlaceReactions(userId: string): Promise<Record<string
 // Real per-user yes/no vote on a Foreigner Fit tag ("Solo OK", "English
 // spoken", …). Passing null clears the vote. A DB trigger keeps places.votes
 // ({ yes, no } per tag) and the matching boolean column (has = yes > no) in
-// sync (see migration-007/008) — this was previously a read-only display with
+// sync (see migration-007/008), this was previously a read-only display with
 // no way for a traveler to actually verify or dispute anything.
 export async function setPlaceTagVote(placeSlug: string, tagKey: ForeignerTagKey, vote: 'yes' | 'no' | null) {
   const userId = await currentUserId();
@@ -725,7 +836,7 @@ export async function setBlocked(blockedId: string, blocked: boolean) {
 
 // ─────────────────────────── Admin moderation ───────────────────────────
 // All gated server-side by is_admin() (migration-016); a non-admin just gets an
-// error. Safe to call from the client — the RPCs are the security boundary.
+// error. Safe to call from the client, the RPCs are the security boundary.
 export type ReportRow = {
   reportId: string;
   targetType: 'post' | 'comment' | 'buddy' | 'profile';

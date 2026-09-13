@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Pressable, Alert } from 'react-native';
+import { View, ScrollView, Pressable, Alert, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
@@ -15,7 +15,7 @@ export default function Settings() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { resetAll } = useStore();
-  const { configured, session, signOut, deleteAccount } = useAuth();
+  const { configured, session, signOut, deleteAccount, exitGuest } = useAuth();
   const [busy, setBusy] = useState(false);
   const [admin, setAdmin] = useState(false);
 
@@ -107,7 +107,7 @@ export default function Settings() {
           <LinkRow label="Community Guidelines" onPress={() => router.push('/legal/guidelines')} />
         </Card>
 
-        {/* Moderation — admins only */}
+        {/* Moderation, admins only */}
         {admin && (
           <>
             <SectionLabel>Moderation</SectionLabel>
@@ -120,6 +120,12 @@ export default function Settings() {
         {/* Account */}
         <SectionLabel>Account</SectionLabel>
         <Card>
+          {configured && !session && (
+            <>
+              <LinkRow label="Sign in or create an account" onPress={() => { exitGuest(); router.replace('/auth'); }} />
+              <Divider />
+            </>
+          )}
           {configured && session && (
             <>
               <LinkRow label="Sign out" onPress={handleSignOut} />
@@ -143,7 +149,19 @@ export default function Settings() {
           )}
         </Card>
 
-        <T style={{ textAlign: 'center', color: c.muted, fontSize: 12, marginTop: 24 }}>TRIP v1.0.0</T>
+        {/* CC BY-SA attribution for the Wikimedia Commons store/food photos.
+            The licence is satisfied by crediting the source and linking to the
+            file pages, which carry each photographer's name and the licence. */}
+        <Pressable
+          onPress={() => Linking.openURL('https://commons.wikimedia.org/wiki/Category:South_Korea')}
+          style={{ marginTop: 24, paddingHorizontal: 24 }}
+        >
+          <T style={{ textAlign: 'center', color: c.muted, fontSize: 11.5, lineHeight: 17 }}>
+            Some store, food and transit photos are by Wikimedia Commons contributors, used under CC BY-SA. Tap for sources.
+          </T>
+        </Pressable>
+
+        <T style={{ textAlign: 'center', color: c.muted, fontSize: 12, marginTop: 14 }}>BADA v1.0.0</T>
       </ScrollView>
     </Screen>
   );

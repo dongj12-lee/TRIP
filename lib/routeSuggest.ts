@@ -4,12 +4,12 @@
 // re-ranking these candidates) without changing how suggestions are sourced.
 //
 // Three signals, combined:
-//  1. Interest match (reuses lib/personalize.ts — same signal as "For you")
+//  1. Interest match (reuses lib/personalize.ts, same signal as "For you")
 //  2. Proximity to the day's other stops (haversine, real coordinates)
 //  3. Collaborative signal: places that co-occur with the day's stops in
 //     OTHER travelers' shared Route posts. This is naturally sparse pre-launch
 //     (few real shared routes exist yet) and silently contributes nothing
-//     until there's real data — no fake signal, no special-casing needed.
+//     until there's real data, no fake signal, no special-casing needed.
 import { ItineraryDay } from '@/data/types';
 import { Place, Post } from '@/data/types';
 import { scorePlace } from './personalize';

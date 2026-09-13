@@ -23,7 +23,7 @@ import { useToast } from './Toast';
 import { GlassView } from 'expo-glass-effect';
 import { GLASS_ON } from './glass';
 
-// "Plan my day" — the one-tap bridge from browsing to a shareable route.
+// "Plan my day", the one-tap bridge from browsing to a shareable route.
 // Pick a vibe (+ optionally an area), get a geographically coherent 5-stop
 // day built from real Visit Seoul places, weighted toward the user's saved
 // spots and interests, indoor-biased when rain is likely. One more tap adds
@@ -76,7 +76,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   );
 
   // Optional on-device upgrade for slots the heuristic itself flagged as
-  // close calls (DayPlan.stops[i].alternates) — iOS Apple Intelligence
+  // close calls (DayPlan.stops[i].alternates), iOS Apple Intelligence
   // devices only, everywhere else this is permanently empty and the
   // heuristic pick is exactly what's shown, no different from before this
   // feature existed. Keyed by stop index; reset whenever the heuristic plan
@@ -103,7 +103,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on plan identity only; vibe/interests/rainy are read at fire-time, re-running per keystroke isn't needed
   }, [plan]);
 
-  // The plan actually shown/shared/saved — heuristic stops with any accepted
+  // The plan actually shown/shared/saved, heuristic stops with any accepted
   // refinements swapped in, and distances/total recomputed since a swapped
   // stop changes its neighbors' walking distance.
   const effectivePlan: DayPlan | null = useMemo(() => {
@@ -133,7 +133,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
     const day = planToItineraryDay(effectivePlan, label, area ? guLabel(area) : undefined);
     setItinerary((prev) => ({ ...prev, days: [...prev.days, day] }));
     onClose();
-    showToast(`Added as ${label} — tweak anything`, '✨');
+    showToast(`Added as ${label}, tweak anything`, '✨');
     // navigate (not push): when opened from the planner itself this must not
     // stack a second planner screen.
     router.navigate('/planner');
@@ -158,7 +158,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
         <View style={{ paddingHorizontal: 20, paddingTop: 6, paddingBottom: 2 }}>
           <H style={{ fontSize: 22 }}>✨ Plan my day</H>
           <T style={{ fontSize: 12.5, color: c.muted, marginTop: 3 }}>
-            {rainy ? '☔️ Rain likely today — keeping it mostly indoor.' : 'A full day from real traveler favorites — then make it yours.'}
+            {rainy ? '☔️ Rain likely today, keeping it mostly indoor.' : 'A full day from real traveler favorites, then make it yours.'}
           </T>
         </View>
 
@@ -179,7 +179,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
                     borderWidth: 1, borderColor: on ? c.accent : c.line,
                   }}
                 >
-                  <T style={{ fontSize: 13, fontWeight: '700', color: on ? '#fff' : c.inkSoft }}>
+                  <T style={{ fontSize: 13, fontWeight: '700', color: on ? c.paper : c.inkSoft }}>
                     {VIBES[k].emoji} {VIBES[k].label}
                   </T>
                 </Pressable>
@@ -199,7 +199,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
           <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
             {effectivePlan ? (
               <>
-                {/* At-a-glance metric strip — the day summed up before the
+                {/* At-a-glance metric strip, the day summed up before the
                     stops, echoing the reference's activity-summary grid. */}
                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
                   <Metric value={String(effectivePlan.stops.length)} label="stops" />
@@ -252,7 +252,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
               <View style={{ alignItems: 'center', paddingVertical: 30 }}>
                 <T style={{ fontSize: 26 }}>🗺️</T>
                 <T style={{ color: c.muted, marginTop: 8, textAlign: 'center', fontSize: 13 }}>
-                  Not enough spots for that combination — try another area or vibe.
+                  Not enough spots for that combination, try another area or vibe.
                 </T>
               </View>
             )}
@@ -280,7 +280,7 @@ export function DayPlanSheet({ visible, onClose }: { visible: boolean; onClose: 
   );
 }
 
-// Compact metric cell — Fraunces value + muted label, echoing the reference's
+// Compact metric cell. Fraunces value + muted label, echoing the reference's
 // activity-summary grid but scaled to a sheet (restrained, not a hero metric).
 function Metric({ value, label }: { value: string; label: string }) {
   const { c } = useTheme();

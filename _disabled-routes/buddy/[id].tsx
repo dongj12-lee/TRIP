@@ -9,6 +9,7 @@ import { useRemoteContent } from '@/lib/remoteData';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { haptic } from '@/lib/haptics';
 import { useToast } from '@/components/Toast';
+import { useRequireAuth } from '@/lib/requireAuth';
 import { fetchBuddyInterests, setInterestStatus } from '@/data/remote';
 import { BuddyInterest } from '@/data/types';
 import { T, H, Screen, DetailHeader, Button } from '@/components/base';
@@ -31,6 +32,7 @@ export default function BuddyDetail() {
   const { user } = useAuth();
   const { buddies, placeBySlug } = useRemoteContent();
   const { showToast } = useToast();
+  const requireAuth = useRequireAuth();
   const [liveInterests, setLiveInterests] = useState<BuddyInterest[] | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [requestOpen, setRequestOpen] = useState(false);
@@ -42,7 +44,21 @@ export default function BuddyDetail() {
     fetchBuddyInterests(buddy.id).then(setLiveInterests).catch(() => {});
   }, [buddy?.id]);
 
-  if (!buddy) return <Screen><DetailHeader title="Plan" /></Screen>;
+  if (!buddy) {
+    return (
+      <Screen>
+        <DetailHeader title="Plan" />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 80 }}>
+          <T style={{ fontSize: 34 }}>🧭</T>
+          <H style={{ fontSize: 19, marginTop: 10, textAlign: 'center' }}>We couldn't find that meetup</H>
+          <T style={{ fontSize: 13.5, color: c.muted, textAlign: 'center', marginTop: 6, lineHeight: 19 }}>
+            It may have been removed, or the link is out of date.
+          </T>
+          <Button label="See other meetups" style={{ marginTop: 18 }} onPress={() => router.replace('/(tabs)/buddy')} />
+        </View>
+      </Screen>
+    );
+  }
 
   const place = buddy.placeSlug ? placeBySlug[buddy.placeSlug] : null;
   const interests = liveInterests ?? buddy.interestedList;
@@ -57,7 +73,14 @@ export default function BuddyDetail() {
   const isFull = accepted.length + 1 >= buddy.groupSize;
   const canChat = isHost || myStatus === 'accepted';
 
+  const openRequest = () => {
+    if (!requireAuth('ask to join a meetup')) return;
+    haptic.tick();
+    setRequestOpen(true);
+  };
+
   const sendRequest = (message: string) => {
+    if (!requireAuth('ask to join a meetup')) return;
     haptic.success();
     toggleJoin(buddy.id, message);
     setLiveInterests((prev) =>
@@ -66,7 +89,7 @@ export default function BuddyDetail() {
         : prev,
     );
     setRequestOpen(false);
-    showToast('Request sent — the host will review it', '🙋');
+    showToast('Request sent, the host will review it', '🙋');
   };
 
   const cancelRequest = () => {
@@ -81,7 +104,7 @@ export default function BuddyDetail() {
     haptic.tick();
     setLiveInterests((prev) => (prev ? prev.map((i) => (i.userId === target.userId ? { ...i, status } : i)) : prev));
     setInterestStatus(buddy.id, target.userId, status).catch((e) => console.warn('setInterestStatus failed', e));
-    if (status === 'accepted') showToast(`${target.name} is in — say hi in the chat`, '🎉');
+    if (status === 'accepted') showToast(`${target.name} is in, say hi in the chat`, '🎉');
   };
 
   return (
@@ -95,8 +118,8 @@ export default function BuddyDetail() {
         }
       />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
-        {/* Event cover — the place photo when it's a specific spot, else a warm
-            banner — with the emoji + activity set over it, party-invite style. */}
+        {/* Event cover, the place photo when it's a specific spot, else a warm
+            banner, with the emoji + activity set over it, party-invite style. */}
         <View style={{ borderRadius: 22, overflow: 'hidden', marginTop: 4 }}>
           {place?.photoUrl ? (
             <Photo uri={place.photoUrl} swatch={place.swatch} height={178} />
@@ -118,7 +141,15 @@ export default function BuddyDetail() {
         {/* When / Where */}
         <View style={{ marginTop: 18, gap: 13 }}>
           <InfoLine icon="clock" text={buddy.when} />
-          <InfoLine icon="pin" text={place ? `${place.name} · ${buddy.neighborhood}` : buddy.neighborhood} />
+          {/* place.name always exists; buddy.neighborhood can be null on
+              older rows posted before the composer required it — a template
+              literal would otherwise print the literal string "null". */}
+          {!!(place || buddy.neighborhood) && (
+            <InfoLine
+              icon="pin"
+              text={place && buddy.neighborhood ? `${place.name} · ${buddy.neighborhood}` : place ? place.name : buddy.neighborhood!}
+            />
+          )}
         </View>
 
         {/* Host */}
@@ -135,7 +166,7 @@ export default function BuddyDetail() {
 
         {!!buddy.note && <T style={{ fontSize: 14.5, lineHeight: 22, color: c.ink, marginTop: 16 }}>{buddy.note}</T>}
 
-        {/* Safety — contact stays in the app, host gates who gets in */}
+        {/* Safety, contact stays in the app, host gates who gets in */}
         <View style={{ backgroundColor: c.gold50, borderRadius: 14, padding: 12, flexDirection: 'row', gap: 10, alignItems: 'flex-start', marginTop: 18 }}>
           <T style={{ fontSize: 17 }}>🛟</T>
           <T style={{ flex: 1, fontSize: 12.5, lineHeight: 18, color: c.gold700, fontWeight: '600' }}>
@@ -161,12 +192,18 @@ export default function BuddyDetail() {
                   <Pressable
                     onPress={() => decide(p, 'accepted')}
                     disabled={isFull}
+                    hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Accept ${p.name}'s request to join`}
                     style={{ width: 36, height: 36, borderRadius: 999, backgroundColor: isFull ? c.surface2 : c.sage, alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <Icon name="check" size={17} stroke={isFull ? c.muted : '#fff'} sw={2.6} />
+                    <Icon name="check" size={17} stroke={isFull ? c.muted : c.paper} sw={2.6} />
                   </Pressable>
                   <Pressable
                     onPress={() => decide(p, 'declined')}
+                    hitSlop={6}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Decline ${p.name}'s request to join`}
                     style={{ width: 36, height: 36, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line, alignItems: 'center', justifyContent: 'center' }}
                   >
                     <Icon name="close" size={15} stroke={c.inkSoft} sw={2.4} />
@@ -177,7 +214,7 @@ export default function BuddyDetail() {
           </>
         )}
 
-        {/* Who's going — faces first, with the open spots shown (Partiful-style) */}
+        {/* Who's going, faces first, with the open spots shown (Partiful-style) */}
         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8, marginTop: 26, marginBottom: 14 }}>
           <T style={{ fontSize: 16, fontWeight: '800' }}>Who's going</T>
           <T style={{ fontSize: 13, color: c.muted, fontWeight: '700' }}>{accepted.length + 1}/{buddy.groupSize}</T>
@@ -198,18 +235,18 @@ export default function BuddyDetail() {
         )}
       </ScrollView>
 
-      {/* Bottom action — depends on who you are and where your request stands */}
+      {/* Bottom action, depends on who you are and where your request stands */}
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 18, paddingBottom: insets.bottom + 12, backgroundColor: c.paper, borderTopWidth: 1, borderTopColor: c.line, gap: 8 }}>
         {canChat ? (
           <Button label="Open group chat 💬" onPress={() => router.push(`/buddy/chat/${buddy.id}`)} />
         ) : myStatus === 'pending' ? (
-          <Button label="Requested — waiting for host · tap to cancel" variant="soft" onPress={cancelRequest} />
+          <Button label="Requested, waiting for host · tap to cancel" variant="soft" onPress={cancelRequest} />
         ) : myStatus === 'declined' ? (
           <Button label="The host went with someone else this time" variant="soft" disabled onPress={() => {}} />
         ) : isFull ? (
           <Button label="This plan is full" variant="soft" disabled onPress={() => {}} />
         ) : (
-          <Button label="Request to join 🙋" onPress={() => { haptic.tick(); setRequestOpen(true); }} />
+          <Button label="Request to join 🙋" onPress={openRequest} />
         )}
       </View>
 
@@ -231,7 +268,7 @@ function InfoLine({ icon, text }: { icon: string; text: string }) {
   );
 }
 
-// A single attendee, face first — Partiful's "who's going" grid.
+// A single attendee, face first. Partiful's "who's going" grid.
 function GoingAvatar({ name, country, host }: { name: string; country: string; host?: boolean }) {
   const { c } = useTheme();
   return (
@@ -240,7 +277,7 @@ function GoingAvatar({ name, country, host }: { name: string; country: string; h
         <Avatar name={name} size={52} />
         {host && (
           <View style={{ position: 'absolute', bottom: -4, alignSelf: 'center', backgroundColor: c.accent, paddingVertical: 1.5, paddingHorizontal: 7, borderRadius: 999, borderWidth: 2, borderColor: c.paper }}>
-            <T style={{ fontSize: 8.5, fontWeight: '800', color: '#fff' }}>Host</T>
+            <T style={{ fontSize: 8.5, fontWeight: '800', color: c.paper }}>Host</T>
           </View>
         )}
       </View>
@@ -250,7 +287,7 @@ function GoingAvatar({ name, country, host }: { name: string; country: string; h
   );
 }
 
-// An unfilled spot — shows the group still has room, invite-page style.
+// An unfilled spot, shows the group still has room, invite-page style.
 function OpenSlot() {
   const { c } = useTheme();
   return (
@@ -280,7 +317,7 @@ function RequestSheet({ visible, onClose, onSend, hostName }: { visible: boolean
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
           <H style={{ fontSize: 20 }}>Request to join</H>
           <T style={{ fontSize: 13, color: c.inkSoft, marginTop: 6, lineHeight: 19 }}>
-            {hostName} reviews requests. A quick intro helps them say yes — who you are, why you're keen.
+            {hostName} reviews requests. A quick intro helps them say yes, who you are, why you're keen.
           </T>
           <TextInput
             value={message}

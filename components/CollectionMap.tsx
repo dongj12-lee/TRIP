@@ -5,7 +5,7 @@ import { useTheme } from '@/theme/theme';
 import { SEOUL_DISTRICTS, SEOUL_MAP_W, SEOUL_MAP_H } from '@/data/seoulDistricts';
 import { T } from './base';
 
-// Read-only Seoul silhouette that "fills in" as districts are collected — the
+// Read-only Seoul silhouette that "fills in" as districts are collected, the
 // hero visual of the passport. Earned gu glow in the accent; locked gu stay
 // faint. Watching the map light up is the core dopamine of the collection.
 const bare = (n: string) => n.replace(/-gu$/, '');

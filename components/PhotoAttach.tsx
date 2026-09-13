@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Pressable, ActivityIndicator } from 'react-native';
+import { View, Pressable, ActivityIndicator, InteractionManager } from 'react-native';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '@/theme/theme';
-import { uploadPostImage } from '@/data/remote';
+import { uploadPostImage, friendlyError } from '@/data/remote';
 import { haptic } from '@/lib/haptics';
 import { T } from './base';
 import { Icon } from './Icon';
@@ -31,7 +31,25 @@ export function PhotoAttach({
     if (!canUpload) { showToast('Sign in to add a photo', '🔒'); return; }
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) { showToast('Photo access is needed to attach an image'); return; }
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.85 });
+    // QuickComposeSheet presents this from inside an already-open RN Modal —
+    // launching a second native modal (the system picker) synchronously in
+    // that context can silently no-op on iOS, since the previous Modal's own
+    // presentation animation hasn't settled yet. Deferring to after the
+    // current interaction queue drains fixes it there and costs nothing
+    // where PhotoAttach isn't inside a Modal (app/compose.tsx): with no
+    // pending interactions, runAfterInteractions fires on the next tick.
+    await new Promise<void>((resolve) => InteractionManager.runAfterInteractions(() => resolve()));
+    // FULL_SCREEN, not the default (Automatic → pageSheet on iOS). Presented as
+    // a page sheet from inside QuickComposeSheet's own RN Modal, the picker's
+    // promise never resolves: the sheet stays on screen, the upload below never
+    // runs, and the post saves with image_url null — all three symptoms of one
+    // stuck await (expo/expo#15185). A full-screen presentation isn't stacked
+    // as a sheet-over-sheet, so its delegate callbacks fire normally.
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.85,
+      presentationStyle: ImagePicker.UIImagePickerPresentationStyle.FULL_SCREEN,
+    });
     if (result.canceled || !result.assets[0]) return;
     setUploading(true);
     try {
@@ -39,7 +57,10 @@ export function PhotoAttach({
       onChange(url);
       haptic.success();
     } catch (e) {
-      showToast("Couldn't upload that photo — try again");
+      // Show what actually failed. The generic message here hid a total
+      // upload outage for months: every attempt looked like "try again"
+      // while nothing had ever reached Storage.
+      showToast(friendlyError(e, "Couldn't upload that photo, try again"), '⚠️');
       console.warn('uploadPostImage failed', e);
     } finally {
       setUploading(false);

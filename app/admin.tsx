@@ -11,7 +11,7 @@ const TYPE_EMOJI: Record<string, string> = { post: '📝', comment: '💬', budd
 // In-app moderation queue. Only reachable by admins (the row in Settings is
 // gated on is_admin(); the RPCs re-check server-side, so a deep link buys
 // nothing). Actions: remove/restore the reported content, or dismiss a report
-// as a false alarm — both clear it from the queue.
+// as a false alarm, both clear it from the queue.
 export default function AdminScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();

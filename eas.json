@@ -7,23 +7,37 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": { "simulator": true }
+      "channel": "development",
+      "ios": {
+        "simulator": true
+      }
     },
     "preview": {
       "distribution": "internal",
-      "ios": { "simulator": false }
+      "channel": "preview",
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://dwajyyyimwpspdvxeflp.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3YWp5eXlpbXdwc3BkdnhlZmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTc2NzAsImV4cCI6MjA5ODc3MzY3MH0.eOYhd4meUGDIDauwHC5oRWMm69MMkXOm5ETuZtv6YeY",
+        "EXPO_PUBLIC_NAVER_MAP_CLIENT_ID": "jzlw0ejfyf"
+      }
     },
     "production": {
       "autoIncrement": true,
-      "env": {}
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://dwajyyyimwpspdvxeflp.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3YWp5eXlpbXdwc3BkdnhlZmxwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTc2NzAsImV4cCI6MjA5ODc3MzY3MH0.eOYhd4meUGDIDauwHC5oRWMm69MMkXOm5ETuZtv6YeY",
+        "EXPO_PUBLIC_NAVER_MAP_CLIENT_ID": "jzlw0ejfyf"
+      }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "REPLACE_WITH_APPLE_ID_EMAIL",
-        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
-        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+        "ascAppId": "6797165977"
       }
     }
   }

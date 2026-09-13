@@ -1,37 +1,37 @@
 import React, { useMemo, useState } from 'react';
-import { View, FlatList, Animated, ScrollView, Pressable, TextInput, RefreshControl, Linking, ActivityIndicator, Platform } from 'react-native';
+import { View, FlatList, Animated, ScrollView, Pressable, TextInput, RefreshControl, ActivityIndicator, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useRemoteContent } from '@/lib/remoteData';
 import { useStore } from '@/lib/store';
-import { recommendedPlaces } from '@/lib/recommend';
 import { ForeignerTagKey, Place } from '@/data/types';
 import { INTENTS, intentByKey, IntentKey } from '@/data/intents';
-import { screen, SCREENER_EXAMPLES } from '@/lib/screener';
+import { screen } from '@/lib/screener';
 import { searchNaverPlaces, NaverSearchResult } from '@/lib/naverSearch';
 import { T, H } from '@/components/base';
-import { PlaceCard, PlaceCardCompact } from '@/components/cards';
+import { PlaceCard } from '@/components/cards';
 import { ExploreMap, EXTERNAL_PIN_ID } from '@/components/ExploreMap';
 import { Photo, Rating } from '@/components/ui';
 import { Icon } from '@/components/Icon';
 import { FiltersSheet } from '@/components/FiltersSheet';
 import { SeoulWeather } from '@/components/SeoulWeather';
+import { HolidaysCard } from '@/components/HolidaysCard';
 import { haptic } from '@/lib/haptics';
 import { guLabel } from '@/lib/format';
 import { SkeletonList, SkeletonPlaceCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
-import { DayPlanSheet } from '@/components/DayPlanSheet';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
+import { openInNaverMap } from '@/lib/transit';
 import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 
 export default function ExploreScreen() {
   const { c, shadow } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { places, posts, refreshAll, loading } = useRemoteContent();
+  const { places, refreshAll, loading } = useRemoteContent();
   const { profile, saved, toggleSave } = useStore();
-  const { scrollY, onScroll } = useTabScroll();
+  const { scrollY, onScroll, scrollRef } = useTabScroll();
   const topPad = useContentTopPadding();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -52,7 +52,7 @@ export default function ExploreScreen() {
   // iOS 26 Liquid Glass available? (false on web/Android/older iOS → solid fallbacks)
   const glassOn = Platform.OS !== 'web' && isLiquidGlassAvailable();
 
-  // Live search beyond TRIP's own catalog (map mode only) — for a specific
+  // Live search beyond BADA's own catalog (map mode only), for a specific
   // address or business that isn't one of the curated spots.
   const [extResults, setExtResults] = useState<NaverSearchResult[] | null>(null);
   const [extLoading, setExtLoading] = useState(false);
@@ -77,7 +77,6 @@ export default function ExploreScreen() {
     setPinnedSlug(null);
   };
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [planOpen, setPlanOpen] = useState(false);
 
   const hoods = useMemo(() => Array.from(new Set(places.map((p) => p.neighborhood))).sort(), [places]);
 
@@ -102,7 +101,7 @@ export default function ExploreScreen() {
   };
 
   // Places narrowed by the structured filters (intent / sub / tags / hoods),
-  // BEFORE the search query — the screener ranks within this set.
+  // BEFORE the search query, the screener ranks within this set.
   const baseFiltered = useMemo(() => {
     const ai = intent ? intentByKey[intent] : null;
     return places.filter((p) => {
@@ -146,18 +145,14 @@ export default function ExploreScreen() {
     });
   const clearHoods = () => setSelectedHoods(new Set());
 
-  // The full filtered catalog goes to the map — the WebMap runtime clusters and
+  // The full filtered catalog goes to the map, the WebMap runtime clusters and
   // viewport-culls, so thousands of pins stay readable and cheap.
   const pinnedPlace = pinnedSlug ? filtered.find((p) => p.slug === pinnedSlug) ?? null : null;
 
-  // "Recommended" only shows when the user hasn't narrowed the list themselves.
+  // Several header blocks only show when the user hasn't narrowed the list themselves.
   const noFilters = !query && selectedHoods.size === 0 && !intent && activeTags.size === 0;
-  const recommended = useMemo(
-    () => (noFilters ? recommendedPlaces(places, posts, 12) : []),
-    [noFilters, places, posts],
-  );
 
-  // Initial live fetch — show breathing placeholders instead of flashing the
+  // Initial live fetch, show breathing placeholders instead of flashing the
   // bundled seed list that would then swap to real content.
   if (loading) {
     return (
@@ -211,37 +206,50 @@ export default function ExploreScreen() {
           {searchInner}
         </View>
       )}
-      {/* Example prompts teach the natural-language screener */}
-      {noFilters && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 7, paddingTop: 9 }}>
-          <T style={{ fontSize: 12, color: c.muted, fontWeight: '700', alignSelf: 'center', marginRight: 1 }}>✨ Try</T>
-          {SCREENER_EXAMPLES.map((ex) => (
-            <Pressable
-              key={ex}
-              onPress={() => { haptic.tick(); setQuery(ex); }}
-              style={{ paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}
-            >
-              <T style={{ fontSize: 12, color: c.inkSoft, fontWeight: '600' }}>{ex}</T>
-            </Pressable>
-          ))}
-        </ScrollView>
-      )}
     </View>
   );
 
+  // Geometry of the floating List⇄Map pill, kept in one place because the
+  // list's bottom padding has to clear it. It used to be a hand-tuned 90,
+  // which was less than the pill's own reach, so the last row of the list
+  // sat underneath it and could never be scrolled into view.
+  const MODE_PILL_GAP = 66; // distance from the safe-area bottom
+  const MODE_PILL_HEIGHT = 42; // paddingVertical 11×2 + icon/label line
+  const listBottomInset = insets.bottom + MODE_PILL_GAP + MODE_PILL_HEIGHT + 12;
+
+  // Segmented-control style, matching Feed's All/Posts/Routes/Questions bar —
+  // text pills on a shared gray track instead of icon tiles. The emoji icons
+  // (and the 🏯 Japanese-castle stand-in for Sights in particular) read as
+  // low-quality/off-culture; plain labels sidestep that entirely. Feed's bar
+  // is a fixed 4 items at flex:1; this one has 10, so it keeps the same
+  // shared-track look but scrolls instead of dividing the width evenly.
   const intentBar = (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 6 }}>
-      <IntentItem emoji="✨" label="All" active={!intent} onPress={() => { haptic.tick(); selectIntent(null); }} />
-      {INTENTS.map((i) => (
-        <IntentItem
-          key={i.key}
-          emoji={i.emoji}
-          label={i.label}
-          active={intent === i.key}
-          onPress={() => { haptic.tick(); selectIntent(intent === i.key ? null : i.key); }}
-        />
-      ))}
-    </ScrollView>
+    <View style={{ paddingHorizontal: 18, paddingBottom: 12 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View style={{ flexDirection: 'row', backgroundColor: c.surface2, borderRadius: 14, padding: 3, gap: 2 }}>
+          {[{ key: null as IntentKey | null, label: 'All' }, ...INTENTS.map((i) => ({ key: i.key as IntentKey | null, label: i.label }))].map((item) => {
+            const on = item.key === intent;
+            return (
+              <Pressable
+                key={item.key ?? 'all'}
+                onPress={() => { haptic.tick(); selectIntent(on ? null : item.key); }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                style={{
+                  paddingVertical: 8, paddingHorizontal: 16, borderRadius: 10,
+                  backgroundColor: on ? c.surface : 'transparent',
+                  ...(on ? { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 1 } : null),
+                }}
+              >
+                <T style={{ fontSize: 13, fontWeight: on ? '800' : '600', color: on ? c.ink : c.muted }} numberOfLines={1}>
+                  {item.label}
+                </T>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ScrollView>
+    </View>
   );
 
   const header = (
@@ -252,59 +260,6 @@ export default function ExploreScreen() {
 
       {searchBar}
 
-      {/* Live Seoul weather — shown at the top of the default Explore view */}
-      {noFilters && <SeoulWeather />}
-
-      {/* "Plan my day" — the one-tap route generator, the app's magic moment */}
-      {noFilters && (
-        <View style={{ paddingHorizontal: 18, paddingBottom: 16 }}>
-          <Pressable
-            onPress={() => { haptic.tick(); setPlanOpen(true); }}
-            accessibilityRole="button"
-            accessibilityLabel="Plan my day"
-            style={({ pressed }) => [
-              {
-                borderRadius: 18, padding: 16, backgroundColor: c.ink,
-                flexDirection: 'row', alignItems: 'center', gap: 13,
-              },
-              pressed && { opacity: 0.92, transform: [{ scale: 0.99 }] },
-            ]}
-          >
-            <View style={{ width: 44, height: 44, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="sparkle" size={22} stroke={c.paper} sw={1.8} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <T style={{ fontSize: 16.5, fontWeight: '800', color: c.paper }}>Plan my day</T>
-              <T style={{ fontSize: 12.5, color: c.paper, opacity: 0.75, marginTop: 2, fontWeight: '600' }}>
-                A full day route in one tap — from {places.length.toLocaleString()} real spots
-              </T>
-            </View>
-            <Icon name="chevron" size={20} stroke={c.paper} sw={2.2} />
-          </Pressable>
-        </View>
-      )}
-
-      {/* Recommended (only when nothing is filtered/searched) — driven by what
-          other travelers liked and put in their routes. */}
-      {recommended.length > 0 && (
-        <View style={{ paddingBottom: 16 }}>
-          <View style={{ paddingHorizontal: 18, marginBottom: 12 }}>
-            <H style={{ fontSize: 19 }}>Recommended</H>
-            <T style={{ fontSize: 12.5, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
-              Liked by travelers & in their routes
-            </T>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 18 }}>
-            {recommended.map((p) => (
-              <PlaceCardCompact key={p.slug} place={p} />
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Intent bar — traveler-first categories (Eat / Cafés / Sights / …),
-          icon-forward so the buckets are scannable at a glance. This is the
-          app's own taxonomy; Visit Seoul's raw L1/L2/L3 never reaches the UI. */}
       {intentBar}
 
       {/* One refinement row, only where it genuinely helps (Eat → cuisines,
@@ -318,41 +273,90 @@ export default function ExploreScreen() {
         </ScrollView>
       )}
 
-      {/* Everything else (foreigner-fit tags, neighborhood) lives behind one
-          Filters button, so the default view never shows more than one row
-          of pills at a time. */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 18, paddingBottom: 12 }}>
-        <Pressable
-          onPress={() => { haptic.tick(); setFiltersOpen(true); }}
-          style={{
-            flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
-            backgroundColor: activeFilterCount > 0 ? c.ink : c.surface,
-            borderWidth: 1, borderColor: activeFilterCount > 0 ? c.ink : c.line,
-          }}
-        >
-          <Icon name="filter" size={14} stroke={activeFilterCount > 0 ? c.paper : c.inkSoft} sw={2} />
-          <T style={{ fontSize: 13, fontWeight: '700', color: activeFilterCount > 0 ? c.paper : c.inkSoft }}>
-            {activeFilterCount > 0 ? `Filters · ${activeFilterCount}` : 'Filters'}
-          </T>
-        </Pressable>
-        {selectedHoods.size > 0 && (
-          <Pressable
-            onPress={clearHoods}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.accent50 }}
-          >
-            <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>
-              📍 {selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : `${selectedHoods.size} areas`}
-            </T>
-            <Icon name="close" size={12} stroke={c.accent} sw={2.4} />
-          </Pressable>
-        )}
-      </View>
+      {/* Live Seoul weather + upcoming Korean public holiday, shown at the top
+          of the default Explore view. Both are ambient "what should I know
+          before I go out today" info, so they share one row, half-width each. */}
+      {noFilters && (
+        <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingBottom: 14 }}>
+          <SeoulWeather />
+          <HolidaysCard />
+        </View>
+      )}
 
-      {/* List header — result count (the map now lives in its own mode) */}
-      <View style={{ paddingHorizontal: 18, paddingBottom: 8 }}>
-        <T style={{ fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
-          {screenerActive ? `✨ Best matches` : sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All spots')} · {filtered.length.toLocaleString()}
+      {/* The route generator, the app's magic moment, and the thing that has
+          to carry it before there's a community. Opens the whole-trip planner,
+          where the traveller picks their own trip length. (The single-day
+          "Plan my day" sheet lives on the Planner tab.) */}
+      {noFilters && (
+        <View style={{ paddingHorizontal: 18, paddingBottom: 16 }}>
+          <Pressable
+            onPress={() => { haptic.tick(); router.push('/trip'); }}
+            accessibilityRole="button"
+            accessibilityLabel="Plan my trip"
+            style={({ pressed }) => [
+              {
+                borderRadius: 18, padding: 15, backgroundColor: c.accent50,
+                borderWidth: 1, borderColor: c.accent,
+                flexDirection: 'row', alignItems: 'center', gap: 13,
+              },
+              pressed && { opacity: 0.85 },
+            ]}
+          >
+            <View style={{ width: 44, height: 44, borderRadius: 999, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="sparkle" size={22} stroke={c.paper} sw={1.8} />
+            </View>
+            <View style={{ flex: 1 }}>
+              {/* "…around the must-sees, in one tap" ran to 53 chars and broke
+                  the column mid-word ("must-" / "sees"). Both lines rewritten
+                  to actually fit this ~250pt column at 12.5px semibold instead
+                  of wrapping wherever they happened to land. */}
+              <T style={{ fontSize: 16.5, fontWeight: '800', color: c.accent }}>Design your K-itinerary</T>
+              <T style={{ fontSize: 12.5, color: c.inkSoft, marginTop: 2, fontWeight: '600' }}>
+                Every must-see, mapped in one tap
+              </T>
+            </View>
+            <Icon name="chevron" size={20} stroke={c.accent} sw={2.2} />
+          </Pressable>
+        </View>
+      )}
+
+      {/* Intent bar, traveler-first categories (Eat / Cafes / Sights / …),
+          icon-forward so the buckets are scannable at a glance. This is the
+          app's own taxonomy; Visit Seoul's raw L1/L2/L3 never reaches the UI. */}
+
+      {/* List header: result count on the left, Filters (+ the neighborhood
+          clear pill, when one's active) on the right — was two separate rows,
+          the Filters-only row wasted a full line for one small pill. */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingHorizontal: 18, paddingBottom: 8 }}>
+        <T style={{ flex: 1, fontSize: 13.5, fontWeight: '700', color: c.ink }} numberOfLines={1}>
+          {screenerActive ? `✨ Best matches` : sub || activeIntent?.label || (selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : selectedHoods.size > 1 ? `${selectedHoods.size} areas` : 'All places')} · {filtered.length}
         </T>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {selectedHoods.size > 0 && (
+            <Pressable
+              onPress={clearHoods}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 999, backgroundColor: c.accent50 }}
+            >
+              <T style={{ fontSize: 13, fontWeight: '700', color: c.accent }}>
+                📍 {selectedHoods.size === 1 ? guLabel([...selectedHoods][0]) : `${selectedHoods.size} areas`}
+              </T>
+              <Icon name="close" size={12} stroke={c.accent} sw={2.4} />
+            </Pressable>
+          )}
+          <Pressable
+            onPress={() => { haptic.tick(); setFiltersOpen(true); }}
+            style={{
+              flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 14, borderRadius: 999,
+              backgroundColor: activeFilterCount > 0 ? c.ink : c.surface,
+              borderWidth: 1, borderColor: activeFilterCount > 0 ? c.ink : c.line,
+            }}
+          >
+            <Icon name="filter" size={14} stroke={activeFilterCount > 0 ? c.paper : c.inkSoft} sw={2} />
+            <T style={{ fontSize: 13, fontWeight: '700', color: activeFilterCount > 0 ? c.paper : c.inkSoft }}>
+              {activeFilterCount > 0 ? `Filters · ${activeFilterCount}` : 'Filters'}
+            </T>
+          </Pressable>
+        </View>
       </View>
     </>
   );
@@ -366,7 +370,7 @@ export default function ExploreScreen() {
             {searchBar}
             {intentBar}
             {/* Beyond the curated catalog: a specific address or business the
-                natural-language screener won't have — search live Naver data. */}
+                natural-language screener won't have, search live Naver data. */}
             {!!query.trim() && (
               <View style={{ paddingHorizontal: 18, paddingBottom: 6 }}>
                 <Pressable
@@ -388,7 +392,7 @@ export default function ExploreScreen() {
             {extResults && (
               <View style={{ marginHorizontal: 18, marginBottom: 6, backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, overflow: 'hidden', ...(shadow as object) }}>
                 {extResults.length === 0 ? (
-                  <T style={{ fontSize: 13, color: c.muted, padding: 14 }}>No results — try a different search.</T>
+                  <T style={{ fontSize: 13, color: c.muted, padding: 14 }}>No results, try a different search.</T>
                 ) : (
                   extResults.map((r, i) => (
                     <Pressable
@@ -418,7 +422,7 @@ export default function ExploreScreen() {
                 height={mapH}
               />
             )}
-            {/* Tapped-pin place card — the Airbnb/Beli "peek" before committing */}
+            {/* Tapped-pin place card, the Airbnb/Beli "peek" before committing */}
             {pinnedPlace && (
               <Pressable
                 onPress={() => router.push(`/place/${pinnedPlace.slug}`)}
@@ -455,7 +459,7 @@ export default function ExploreScreen() {
                 </View>
               </Pressable>
             )}
-            {/* A live-search result — not one of TRIP's own places, so it opens
+            {/* A live-search result, not one of BADA's own places, so it opens
                 the real Naver Map app instead of a place detail screen. */}
             {extPin && (
               <View
@@ -476,16 +480,7 @@ export default function ExploreScreen() {
                   </Pressable>
                 </View>
                 <Pressable
-                  onPress={() => {
-                    haptic.tick();
-                    const url = `nmap://place?lat=${extPin.lat}&lng=${extPin.lng}&name=${encodeURIComponent(extPin.name)}&appname=com.trip.korea`;
-                    // Naver Map app not installed — send to its store listing
-                    // (verified IDs: iOS App Store / Android Play Store).
-                    const storeUrl = Platform.OS === 'android'
-                      ? 'https://play.google.com/store/apps/details?id=com.nhn.android.nmap'
-                      : 'https://apps.apple.com/app/id311867728';
-                    Linking.openURL(url).catch(() => Linking.openURL(storeUrl).catch(() => {}));
-                  }}
+                  onPress={() => { haptic.tick(); openInNaverMap(extPin.lat, extPin.lng, extPin.name); }}
                   style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10, backgroundColor: c.ink, borderRadius: 10, paddingVertical: 9 }}
                 >
                   <Icon name="pin" size={14} stroke={c.paper} sw={2} />
@@ -500,6 +495,7 @@ export default function ExploreScreen() {
         <>
           <TabBar title="Explore" scrollY={scrollY} />
           <Animated.FlatList
+            ref={scrollRef}
             data={filtered}
             keyExtractor={(p: any) => p.slug}
             renderItem={({ item }: { item: Place }) => (
@@ -521,11 +517,11 @@ export default function ExploreScreen() {
                   accessibilityRole="button"
                   style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}
                 >
-                  <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Clear all filters</T>
+                  <T style={{ fontSize: 13.5, fontWeight: '700', color: c.paper }}>Clear all filters</T>
                 </Pressable>
               </View>
             }
-            contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
+            contentContainerStyle={{ paddingTop: topPad, paddingBottom: listBottomInset }}
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             showsVerticalScrollIndicator={false}
@@ -537,9 +533,9 @@ export default function ExploreScreen() {
         </>
       )}
 
-      {/* Airbnb-style floating mode toggle — a confident List ⇄ Map switch.
+      {/* Airbnb-style floating mode toggle, a confident List ⇄ Map switch.
           iOS 26 gets interactive Liquid Glass; elsewhere a solid ink pill. */}
-      <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 66, alignItems: 'center' }}>
+      <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + MODE_PILL_GAP, alignItems: 'center' }}>
         <Pressable
           onPress={() => { haptic.tick(); setPinnedSlug(null); setExtPin(null); setExtResults(null); setMapMode((m) => !m); }}
           accessibilityRole="button"
@@ -576,35 +572,7 @@ export default function ExploreScreen() {
         hoods={hoods}
         resultCount={filtered.length}
       />
-      <DayPlanSheet visible={planOpen} onClose={() => setPlanOpen(false)} />
     </View>
-  );
-}
-
-// Icon-forward category item (emoji tile + label), Airbnb-category-bar style —
-// far more scannable than a row of same-looking text pills.
-function IntentItem({ emoji, label, active, onPress }: { emoji: string; label: string; active: boolean; onPress: () => void }) {
-  const { c } = useTheme();
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
-      style={({ pressed }) => [{ alignItems: 'center', width: 66, paddingVertical: 4, gap: 5 }, pressed && { opacity: 0.7 }]}
-    >
-      <View
-        style={{
-          width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
-          backgroundColor: active ? c.ink : c.surface,
-          borderWidth: 1.5, borderColor: active ? c.ink : c.line,
-        }}
-      >
-        <T style={{ fontSize: 22 }}>{emoji}</T>
-      </View>
-      <T numberOfLines={1} style={{ fontSize: 11, fontWeight: active ? '800' : '600', color: active ? c.ink : c.muted }}>
-        {label}
-      </T>
-    </Pressable>
   );
 }
 
@@ -629,7 +597,7 @@ function Chip({
         borderWidth: 1, borderColor: active ? c.accent : c.line,
       }}
     >
-      <T style={{ fontSize: 13, fontWeight: '700', color: active ? '#fff' : c.inkSoft }}>{label}</T>
+      <T style={{ fontSize: 13, fontWeight: '700', color: active ? c.paper : c.inkSoft }}>{label}</T>
     </Pressable>
   );
 }

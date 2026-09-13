@@ -28,7 +28,7 @@ export function OfflineBanner() {
     >
       <T style={{ fontSize: 13 }}>📡</T>
       <T style={{ flex: 1, fontSize: 12.5, lineHeight: 17, color: c.gold700, fontWeight: '600' }}>
-        Can't reach the server — showing offline content.
+        Can't reach the server, showing offline content.
       </T>
       <Pressable
         onPress={busy ? undefined : retry}
@@ -37,10 +37,13 @@ export function OfflineBanner() {
         hitSlop={8}
         style={{ paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999, backgroundColor: c.gold700 }}
       >
+        {/* `c.paper`, not '#fff': gold700 is a dark gold in light mode but a
+            light gold in dark mode, so fixed white text dropped to ~1.3:1 and
+            all but disappeared on the one button an offline traveller needs. */}
         {busy ? (
-          <ActivityIndicator size="small" color="#fff" />
+          <ActivityIndicator size="small" color={c.paper} />
         ) : (
-          <T style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>Retry</T>
+          <T style={{ fontSize: 12, fontWeight: '700', color: c.paper }}>Retry</T>
         )}
       </Pressable>
     </View>

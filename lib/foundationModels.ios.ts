@@ -1,5 +1,5 @@
 // Real Apple Foundation Models implementation (iOS 26+, Apple Intelligence
-// devices only — @react-native-ai/apple's isAvailable() returns false on
+// devices only, @react-native-ai/apple's isAvailable() returns false on
 // anything older/ineligible, which we treat identically to "not on iOS" at
 // the call site). Native module, so this file only ever loads on iOS —
 // Metro resolves the .ios suffix before this bare-name import is reached on
@@ -7,16 +7,16 @@
 //
 // IMPORTANT: @react-native-ai/apple's own modules call
 // TurboModuleRegistry.getEnforcing(...) at import time, which THROWS
-// synchronously if the native module isn't linked — true both in Expo Go
+// synchronously if the native module isn't linked, true both in Expo Go
 // (which can never load it at all) and in a dev-client build that hasn't
 // been rebuilt yet after this dependency was added. A static top-level
 // `import { apple } from '@react-native-ai/apple'` would therefore crash
-// the whole app on load, not just gracefully no-op — this file is reachable
+// the whole app on load, not just gracefully no-op, this file is reachable
 // from DayPlanSheet.tsx, which is part of the main bundle. So the package is
 // loaded lazily via require(), inside try/catch, only when actually called.
 //
 // PCC (Private Cloud Compute) involvement, if any, is entirely automatic and
-// invisible at this API surface — Apple's SystemLanguageModel decides
+// invisible at this API surface. Apple's SystemLanguageModel decides
 // on-device vs PCC internally; there is no parameter here to request or
 // detect it (confirmed against Apple's docs, not assumed).
 import { generateObject } from 'ai';
@@ -45,7 +45,7 @@ export function isFoundationModelsAvailable(): boolean {
 }
 
 // Picks among a SHORT list of already-heuristically-strong candidates for one
-// ambiguous day-plan slot — never an open-ended search over the whole
+// ambiguous day-plan slot, never an open-ended search over the whole
 // catalog. Returns null (never throws) on unavailability, an invalid model
 // response, or any error, so a refinement failure always just leaves
 // lib/dayPlan.ts's heuristic pick untouched.

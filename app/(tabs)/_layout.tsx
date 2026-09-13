@@ -8,11 +8,17 @@ import { haptic } from '@/lib/haptics';
 import { Icon, IconName } from '@/components/Icon';
 import { T } from '@/components/base';
 
+// Buddy is deliberately not shipped yet — a private meetup-chat feature
+// between strangers is the single highest-moderation-risk surface in the
+// app, and with ~0 users at launch it wouldn't have anyone to match with
+// anyway. The screens still exist (moved to /_disabled-routes, outside
+// app/'s file-based routing) to bring back once there's a user base to
+// actually support it. See lib/store.tsx joined/interestedList — that state
+// is untouched, so re-adding the tab needs no data migration.
 const TABS: { name: string; label: string; icon: IconName }[] = [
   { name: 'index', label: 'Explore', icon: 'explore' },
   { name: 'themes', label: 'Themes', icon: 'themes' },
   { name: 'feed', label: 'Feed', icon: 'feed' },
-  { name: 'buddy', label: 'Buddy', icon: 'buddy' },
   { name: 'my', label: 'My', icon: 'user' },
 ];
 
@@ -82,7 +88,6 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="themes" />
       <Tabs.Screen name="feed" />
-      <Tabs.Screen name="buddy" />
       <Tabs.Screen name="my" />
     </Tabs>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Modal, Pressable, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
@@ -11,22 +12,24 @@ import { PostType } from '@/data/types';
 import { T, H } from './base';
 import { Avatar } from './Avatar';
 import { PhotoAttach } from './PhotoAttach';
+import { Icon } from './Icon';
 import { useToast } from './Toast';
 import { GlassView } from 'expo-glass-effect';
 import { GLASS_ON } from './glass';
 import { haptic } from '@/lib/haptics';
 
-// A frictionless, body-first composer — the fastest way to share something.
+// A frictionless, body-first composer, the fastest way to share something.
 // No forced title, no forced category: just type and post. It's a plain post by
 // default; flip to Question only if you're actually asking the community.
-const TYPES: { key: PostType; emoji: string; label: string }[] = [
-  { key: 'post', emoji: '💬', label: 'Post' },
-  { key: 'question', emoji: '❓', label: 'Question' },
+const TYPES: { key: PostType; label: string }[] = [
+  { key: 'post', label: 'Post' },
+  { key: 'question', label: 'Question' },
 ];
 
 export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { profile } = useStore();
   const { session } = useAuth();
   const { addLocalPost } = useRemoteContent();
@@ -66,7 +69,7 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
       showToast('Shared to the community', '🎉');
       onClose();
     } catch (e) {
-      showToast(friendlyError(e, 'Could not post — try again'), '⚠️');
+      showToast(friendlyError(e, 'Could not post, try again'), '⚠️');
     } finally {
       setBusy(false);
     }
@@ -94,20 +97,44 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
               disabled={!canPost}
               style={{ backgroundColor: canPost ? c.accent : c.surface2, paddingVertical: 8, paddingHorizontal: 18, borderRadius: 999 }}
             >
-              <T style={{ fontSize: 14, fontWeight: '800', color: canPost ? '#fff' : c.muted }}>{busy ? '…' : 'Post'}</T>
+              <T style={{ fontSize: 14, fontWeight: '800', color: canPost ? c.paper : c.muted }}>{busy ? '…' : 'Post'}</T>
             </Pressable>
           </View>
 
           <ScrollView keyboardShouldPersistTaps="handled" style={{ maxHeight: 320 }} contentContainerStyle={{ paddingHorizontal: 18 }}>
-            {showTitle && (
-              <TextInput
-                value={title}
-                onChangeText={setTitle}
-                placeholder="Add a title (optional)"
-                placeholderTextColor={c.muted}
-                style={{ fontSize: 17, fontWeight: '700', color: c.ink, fontFamily: 'Pretendard-Bold', paddingVertical: 8 }}
-                maxLength={100}
-              />
+            {/* Was a footer chip, competing for space with Post/Question/
+                Route/Photo in a horizontally scrolling row narrow enough
+                that it could end up scrolled out of view with no visible
+                edge to hint it was still there. A plain link right above the
+                fields it controls doesn't have that problem — always fully
+                on-screen, no scrolling involved. */}
+            {showTitle ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <TextInput
+                  value={title}
+                  onChangeText={setTitle}
+                  placeholder="Add a title (optional)"
+                  placeholderTextColor={c.muted}
+                  autoFocus
+                  style={{ flex: 1, fontSize: 17, fontWeight: '700', color: c.ink, fontFamily: 'Pretendard-Bold', paddingVertical: 8 }}
+                  maxLength={100}
+                />
+                <Pressable
+                  onPress={() => { haptic.tick(); setShowTitle(false); setTitle(''); }}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Remove title"
+                >
+                  <Icon name="close" size={16} stroke={c.muted} sw={2.2} />
+                </Pressable>
+              </View>
+            ) : (
+              <Pressable
+                onPress={() => { haptic.tick(); setShowTitle(true); }}
+                style={{ alignSelf: 'flex-start', paddingVertical: 8 }}
+              >
+                <T style={{ fontSize: 13, fontWeight: '700', color: c.muted }}>+ Add a title</T>
+              </Pressable>
             )}
             <TextInput
               value={body}
@@ -125,30 +152,55 @@ export function QuickComposeSheet({ visible, onClose }: { visible: boolean; onCl
             )}
           </ScrollView>
 
-          {/* Footer: type pills + add-title toggle */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 8, borderTopWidth: 1, borderTopColor: c.line }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, alignItems: 'center', paddingVertical: 10 }} style={{ flex: 1 }}>
+          {/* Footer: just Post/Question/Route (the segmented-control look of
+              the Feed tab's All/Posts/Routes/Questions filter, text-only —
+              no icons, matching that reference exactly) and Photo. Title
+              moved above, next to the fields it actually controls; with it
+              gone this whole row comfortably fits without needing to scroll,
+              so there's no more "off the edge, out of reach" risk for
+              anything here — the bug Photo itself used to have when it lived
+              in a horizontally-scrolling row. */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 10, borderTopWidth: 1, borderTopColor: c.line }}>
+            {/* flex:1 on the track and on each segment — same as the Feed
+                filter it's copying — so the three share the row evenly
+                instead of sitting at their own text width with the rest of
+                the row left as dead space next to Photo. */}
+            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: c.surface2, borderRadius: 999, padding: 3 }}>
               {TYPES.map((t) => {
                 const on = type === t.key;
                 return (
                   <Pressable
                     key={t.key}
                     onPress={() => { haptic.tick(); setType(t.key); }}
-                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 11, borderRadius: 999, backgroundColor: on ? c.accent50 : c.surface, borderWidth: 1, borderColor: on ? c.accent : c.line }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: on }}
+                    style={{
+                      flex: 1, alignItems: 'center',
+                      paddingVertical: 6, borderRadius: 999,
+                      backgroundColor: on ? c.surface : 'transparent',
+                      ...(on ? { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 1 } : null),
+                    }}
                   >
-                    <T style={{ fontSize: 13 }}>{t.emoji}</T>
-                    <T style={{ fontSize: 12.5, fontWeight: '700', color: on ? c.accent : c.inkSoft }}>{t.label}</T>
+                    <T style={{ fontSize: 12.5, fontWeight: '700', color: on ? c.ink : c.muted }}>{t.label}</T>
                   </Pressable>
                 );
               })}
+              {/* Route posts aren't written here — they need real day-by-day
+                  stops, which this free-text composer has no picker for. The
+                  Routes tab and feed cards show them right alongside Post/
+                  Question, so without this a traveller who wants to share
+                  one has no clue this box can't do it and no idea where to
+                  go instead. Tapping it hands off to the trip planner's own
+                  "Share for feedback" (lib/store.tsx shareTrip), the actual
+                  place Route posts come from. */}
               <Pressable
-                onPress={() => { haptic.tick(); setShowTitle((v) => !v); }}
-                style={{ paddingVertical: 6, paddingHorizontal: 11, borderRadius: 999, backgroundColor: showTitle ? c.accent50 : c.surface, borderWidth: 1, borderColor: showTitle ? c.accent : c.line }}
+                onPress={() => { haptic.tick(); onClose(); router.push('/trip'); }}
+                style={{ flex: 1, alignItems: 'center', paddingVertical: 6, borderRadius: 999 }}
               >
-                <T style={{ fontSize: 12.5, fontWeight: '700', color: showTitle ? c.accent : c.inkSoft }}>{showTitle ? '– Title' : '+ Title'}</T>
+                <T style={{ fontSize: 12.5, fontWeight: '700', color: c.muted }}>Route</T>
               </Pressable>
-              {!imageUrl && <PhotoAttach value={imageUrl} onChange={setImageUrl} canUpload={canWrite} compact />}
-            </ScrollView>
+            </View>
+            {!imageUrl && <PhotoAttach value={imageUrl} onChange={setImageUrl} canUpload={canWrite} compact />}
           </View>
         </View>
       </KeyboardAvoidingView>

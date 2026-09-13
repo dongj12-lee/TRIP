@@ -2,7 +2,7 @@
 // token, and saves it to the signed-in user's profile so the backend can
 // target them (see supabase/migration-003-push.sql + functions/send-push).
 //
-// IMPORTANT: remote push tokens are NOT available in Expo Go on SDK 53+ — this
+// IMPORTANT: remote push tokens are NOT available in Expo Go on SDK 53+, this
 // silently no-ops there and only does real work in a development/production
 // build. That's expected; everything is wired so it "just works" once a dev
 // build exists, with no further code changes.

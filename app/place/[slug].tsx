@@ -11,7 +11,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 import { fetchPlace } from '@/data/remote';
 import { FIT_TAGS, fitTagsFor } from '@/data';
 import { ForeignerTagKey } from '@/data/types';
-import { T, H, Button } from '@/components/base';
+import { T, H, Button, Screen, DetailHeader } from '@/components/base';
 import { Icon } from '@/components/Icon';
 import { Photo, Chip, Rating } from '@/components/ui';
 import { PostCardMini } from '@/components/cards';
@@ -21,8 +21,9 @@ import { useToast } from '@/components/Toast';
 import { guLabel } from '@/lib/format';
 import { normalizeDistrict } from '@/lib/stamps';
 import { haptic } from '@/lib/haptics';
+import { openInNaverMap } from '@/lib/transit';
 
-// Handy phrases are specific to the kind of place — a temple and a bar call
+// Handy phrases are specific to the kind of place, a temple and a bar call
 // for different lines, and knowing WHO to say it to (the "audience" tag)
 // matters as much as the phrase itself. Keyed by `category`, with a couple of
 // `category:categoryL2` overrides where the L1 bucket is too broad (e.g.
@@ -36,7 +37,7 @@ const RESTROOM_PHRASE: Phrase = { en: 'Where is the restroom?', ko: '화장실�
 
 // 7 category-specific phrases + the universal taxi phrase = 8 per place.
 // Picked for what a first-time-in-Korea traveler actually needs AT THAT KIND
-// of place — not generic hello/thank-you, but the thing you'd genuinely get
+// of place, not generic hello/thank-you, but the thing you'd genuinely get
 // stuck on (shoes off at a temple, an outlet seat at a cafe, tasting before
 // buying at a market).
 const PHRASES_BY_CATEGORY: Record<string, Phrase[]> = {
@@ -123,14 +124,14 @@ const PHRASES_BY_CATEGORY: Record<string, Phrase[]> = {
   ],
 };
 
-// Taxi phrase always appears last — every place needs "take me here" regardless
+// Taxi phrase always appears last, every place needs "take me here" regardless
 // of what kind of place it is.
 function phrasesFor(category: string, categoryL2?: string | null): Phrase[] {
   const specific = (categoryL2 && PHRASES_BY_CATEGORY[`${category}:${categoryL2}`]) || PHRASES_BY_CATEGORY[category] || [];
   return [...specific, TAXI_PHRASE];
 }
 
-// Over-photo hero controls — a dark scrim circle so they read on any cover
+// Over-photo hero controls, a dark scrim circle so they read on any cover
 // (a light button vanished on bright photos).
 const heroBtn = {
   width: 38, height: 38, borderRadius: 999, alignItems: 'center', justifyContent: 'center',
@@ -151,7 +152,7 @@ export default function PlaceDetail() {
   const [showKoAddress, setShowKoAddress] = useState(false);
 
   const place = placeBySlug[slug!];
-  // Optimistic like/dislike counts — seed from the server counts and re-sync
+  // Optimistic like/dislike counts, seed from the server counts and re-sync
   // whenever they change (fires once when the place data loads).
   const [likeN, setLikeN] = useState(0);
   const [dislikeN, setDislikeN] = useState(0);
@@ -166,7 +167,7 @@ export default function PlaceDetail() {
     if (!sheet) { Speech.stop(); setSpeakingIdx(null); setShowKoAddress(false); }
   }, [sheet]);
 
-  // Optimistic Foreigner Fit yes/no counts — seeded once per place, then
+  // Optimistic Foreigner Fit yes/no counts, seeded once per place, then
   // nudged locally on each tap (the server trigger keeps the real counts in
   // sync).
   const [tagCounts, setTagCounts] = useState<Partial<Record<string, { yes: number; no: number }>>>({});
@@ -186,7 +187,24 @@ export default function PlaceDetail() {
     return () => { alive = false; };
   }, [place?.slug]);
 
-  if (!place) return <View style={{ flex: 1, backgroundColor: c.paper }} />;
+  // A slug can go stale: shared links outlive the catalog, and the import
+  // pipeline re-keys rows. A blank screen with no header traps the traveller
+  // with no way back, so always give them a header and a way out.
+  if (!place) {
+    return (
+      <Screen>
+        <DetailHeader title="Place" />
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32, paddingBottom: 80 }}>
+          <T style={{ fontSize: 34 }}>🧭</T>
+          <H style={{ fontSize: 19, marginTop: 10, textAlign: 'center' }}>We couldn't find that spot</H>
+          <T style={{ fontSize: 13.5, color: c.muted, textAlign: 'center', marginTop: 6, lineHeight: 19 }}>
+            It may have been removed, or the link is out of date.
+          </T>
+          <Button label="Explore other spots" style={{ marginTop: 18 }} onPress={() => router.replace('/(tabs)')} />
+        </View>
+      </Screen>
+    );
+  }
 
   const fitKeys = fitTagsFor(place.category, place.categoryL2);
   const phrases = phrasesFor(place.category, place.categoryL2);
@@ -246,12 +264,19 @@ export default function PlaceDetail() {
   const relatedPosts = posts.filter((p) => p.placeSlug === place.slug);
   const hasFacts = place.subway || place.freeEntry || place.englishSite || place.wheelchair;
 
-  // One-tap browse→plan: drop this place into the last itinerary day.
+  // One-tap browse→plan: drop this place into the last itinerary day. A
+  // second tap pulls it back out, from whichever day it landed in — not
+  // necessarily still the last one, since the itinerary editor lets days be
+  // reordered or a stop moved after it was added here.
   const inTrip = itinerary.days.some((d) => d.stops.some((s) => s.slug === place.slug));
   const addToTrip = () => {
     haptic.tick();
     if (inTrip) {
-      showToast('Already in your trip', '🗓');
+      setItinerary((prev) => ({
+        ...prev,
+        days: prev.days.map((d) => ({ ...d, stops: d.stops.filter((s) => s.slug !== place.slug) })),
+      }));
+      showToast('Removed from your trip', '🗑️');
       return;
     }
     setItinerary((prev) => {
@@ -275,7 +300,7 @@ export default function PlaceDetail() {
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 30 }} showsVerticalScrollIndicator={false}>
-        {/* Hero photo — a clean band. The headline lives below on paper,
+        {/* Hero photo, a clean band. The headline lives below on paper,
             editorial-style, instead of trapped over a busy image. */}
         <View style={{ height: 240 }}>
           <Photo uri={place.photoUrl} swatch={place.swatch} height={240} />
@@ -311,7 +336,7 @@ export default function PlaceDetail() {
               {!!place.priceRange && <T style={{ fontSize: 13.5, color: c.inkSoft, fontWeight: '700' }}>{place.priceRange}</T>}
             </View>
           )}
-          {/* The business's own official website, when they have one — not a
+          {/* The business's own official website, when they have one, not a
               review source (see migration-025 for why there's no such link). */}
           {!!place.websiteUrl && (
             <Pressable
@@ -339,7 +364,7 @@ export default function PlaceDetail() {
           <Icon name="chevron" size={18} stroke={c.muted} sw={2} />
         </Pressable>
 
-        {/* Like / dislike — the community satisfaction signal */}
+        {/* Like / dislike, the community satisfaction signal */}
         <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 16 }}>
           <ReactionButton
             active={myReaction === 'like'}
@@ -367,7 +392,7 @@ export default function PlaceDetail() {
           />
         </View>
 
-        {/* About — the place's editorial "read", surfaced up top (was buried
+        {/* About, the place's editorial "read", surfaced up top (was buried
             at the very bottom) with the opening line set large as a lead. */}
         {!!description && (
           <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
@@ -378,11 +403,25 @@ export default function PlaceDetail() {
             <View style={{ marginTop: 20, gap: 10 }}>
               {!!place.hours && <InfoRow icon="clock" text={place.hours} />}
               {!!place.address && <InfoRow icon="pin" text={place.address} />}
+              {/* The one thing missing from this screen for a traveller
+                  actually standing nearby: how to get here. The chosen map app
+                  handles "from my location", so this needs no location
+                  permission of ours — see lib/transit.ts openInNaverMap, which
+                  offers Naver Map or Apple Maps. */}
+              <Pressable
+                onPress={() => { haptic.tick(); openInNaverMap(place.lat, place.lng, place.name); }}
+                accessibilityRole="button"
+                accessibilityLabel="Get directions, choose Naver Map or Apple Maps"
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+              >
+                <Icon name="route" size={17} stroke={c.accent} sw={1.9} />
+                <T style={{ fontSize: 13.5, fontWeight: '700', color: c.accent }}>Get directions</T>
+              </Pressable>
             </View>
           </View>
         )}
 
-        {/* Good to know — objective facts from Visit Seoul (distinct from the
+        {/* Good to know, objective facts from Visit Seoul (distinct from the
             community-voted Foreigner Fit below) */}
         {hasFacts && (
           <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
@@ -404,14 +443,14 @@ export default function PlaceDetail() {
           </View>
         )}
 
-        {/* Foreigner Fit — tags tailored to this place's category */}
+        {/* Foreigner Fit, tags tailored to this place's category */}
         <View style={{ paddingHorizontal: 18, paddingTop: 28 }}>
           <H style={{ fontSize: 19, marginBottom: 4 }}>Foreigner Fit</H>
-          <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm — traveler-verified, tag by tag</T>
+          <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12 }}>Tap to confirm, traveler-verified, tag by tag</T>
           {fitKeys.every((key) => !place.verifiedTags?.includes(key) && (tagCounts[key]?.yes ?? 0) === 0 && (tagCounts[key]?.no ?? 0) === 0) && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: c.accent50, borderRadius: 10, padding: 11, marginBottom: 10 }}>
               <T style={{ fontSize: 16 }}>👋</T>
-              <T style={{ flex: 1, fontSize: 12.5, color: c.accent, fontWeight: '600', lineHeight: 17 }}>No one's confirmed this yet — be the first, it helps every traveler after you.</T>
+              <T style={{ flex: 1, fontSize: 12.5, color: c.accent, fontWeight: '600', lineHeight: 17 }}>No one's confirmed this yet, be the first, it helps every traveler after you.</T>
             </View>
           )}
           <View style={{ gap: 2 }}>
@@ -430,7 +469,7 @@ export default function PlaceDetail() {
                       <T style={{ fontSize: 14, fontWeight: '700', color: has ? c.ink : c.muted }}>{tag.label}</T>
                       {verified && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: c.sage50, paddingVertical: 1.5, paddingHorizontal: 6, borderRadius: 999 }}>
-                          <T style={{ fontSize: 10, color: c.sage700, fontWeight: '800' }}>✓ TRIP verified</T>
+                          <T style={{ fontSize: 10, color: c.sage700, fontWeight: '800' }}>✓ BADA verified</T>
                         </View>
                       )}
                     </View>
@@ -527,7 +566,7 @@ export default function PlaceDetail() {
                     <T style={{ fontSize: 15, color: c.accent, marginTop: 3 }}>{p.ko}</T>
                     <T style={{ fontSize: 12, color: c.muted, marginTop: 1 }}>{p.ro}</T>
                     {/* The address itself only ever appears romanized elsewhere
-                        on screen — genuinely hard for a taxi driver to read.
+                        on screen, genuinely hard for a taxi driver to read.
                         This toggle reveals the real Hangul address right where
                         you'd say the phrase. Hidden for places imported before
                         migration-026 (no addressKo yet). */}
@@ -555,7 +594,7 @@ export default function PlaceDetail() {
                       backgroundColor: speaking ? c.accent : c.surface2,
                     }}
                   >
-                    <Icon name="speaker" size={16} stroke={speaking ? '#fff' : c.inkSoft} sw={2} />
+                    <Icon name="speaker" size={16} stroke={speaking ? c.paper : c.inkSoft} sw={2} />
                   </Pressable>
                 </View>
               );

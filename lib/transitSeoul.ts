@@ -14,7 +14,7 @@ import { Leg } from './transit';
 // the hook is a no-op and legs stay on the heuristic estimate.
 const ENABLED = process.env.EXPO_PUBLIC_SEOUL_TRANSIT_ENABLED === '1';
 
-// Rough Seoul metro bounding box — the API only covers the Seoul area, so
+// Rough Seoul metro bounding box, the API only covers the Seoul area, so
 // don't even try for a Busan/Jeju leg (it would just fall back anyway).
 function inSeoul(p: { lat: number; lng: number }): boolean {
   return p.lat >= 37.41 && p.lat <= 37.71 && p.lng >= 126.76 && p.lng <= 127.19;

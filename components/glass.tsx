@@ -2,14 +2,14 @@ import React from 'react';
 import { Platform, View, StyleProp, ViewStyle } from 'react-native';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 
-// iOS 26 Liquid Glass available on this device? Constant per session — it's a
+// iOS 26 Liquid Glass available on this device? Constant per session, it's a
 // hardware/OS capability. False on web, Android, and pre-26 iOS, where callers
 // fall back to a solid surface. Import this instead of re-checking everywhere.
 export const GLASS_ON = Platform.OS !== 'web' && isLiquidGlassAvailable();
 
 // A bottom-sheet panel surface: real Liquid Glass on iOS 26, a solid
 // `fallbackColor` panel everywhere else. Pass the panel's shape (radius,
-// maxHeight, padding) via `style` — do NOT put a backgroundColor there; this
+// maxHeight, padding) via `style`, do NOT put a backgroundColor there; this
 // adds it only on the fallback path (glass provides its own material).
 export function SheetSurface({
   style,

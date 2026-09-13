@@ -129,7 +129,7 @@ export function PlaceCard({ place, compact = false, reasons }: { place: Place; c
 
 export function RoutePreview({ days }: { days: RouteDay[] }) {
   const { c, tone } = useTheme();
-  const terra = tone('blue'); // route accent — blue to match the app's identity (was terracotta)
+  const terra = tone('blue'); // route accent, blue to match the app's identity (was terracotta)
   // Prefer the live catalog (real posts reference live slugs); fall back to the
   // bundled seed map so a route still resolves offline / before fetch.
   const { placeBySlug: livePlaces } = useRemoteContent();
@@ -158,17 +158,17 @@ export function RoutePreview({ days }: { days: RouteDay[] }) {
     .filter((p): p is NonNullable<typeof p> => !!p && typeof p.lat === 'number' && typeof p.lng === 'number');
   const mapUrl = staticRouteMapUrl(geoStops);
 
-  // Fewer than 2 geocoded stops (or the map image failed to load) — no
+  // Fewer than 2 geocoded stops (or the map image failed to load), no
   // meaningful map to show, keep the text-only preview.
   if (!mapUrl || mapFailed) {
     return <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.blue50 }}>{caption}</View>;
   }
 
-  // A real map image with numbered pins in visit order — an abstract
+  // A real map image with numbered pins in visit order, an abstract
   // district-boundary silhouette read as unrecognizable scribbles even when
   // cropped and labeled; only actual street/landmass cartography reads as
   // "a real place" at a glance. No connecting line (NCP's Static Map API has
-  // no polyline parameter) — the numbering + caption above carry the order.
+  // no polyline parameter), the numbering + caption above carry the order.
   return (
     <View style={{ marginTop: 10, borderRadius: 14, backgroundColor: c.surface2, overflow: 'hidden' }}>
       <View style={{ height: 150 }}>
@@ -193,7 +193,7 @@ export function PostCard({ post }: { post: Post }) {
   const voted = votes.has(voteKey);
   const open = () => router.push(`/post/${post.slug}`);
   // Untitled posts lead with their body (tweet-like); titled posts lead with the
-  // title. A plain "post" carries no type tag (Threads-style) — only the
+  // title. A plain "post" carries no type tag (Threads-style), only the
   // meaningful kinds, route & question, get a marker.
   const nt = normalizePostType(post.type);
   const leadWithBody = !post.title;
@@ -203,7 +203,7 @@ export function PostCard({ post }: { post: Post }) {
   const likeN = post.votes + (voted ? 1 : 0);
   return (
     <Card onPress={open} style={{ padding: 16 }}>
-      {/* Author row — clean: avatar, name, then one muted meta line. No
+      {/* Author row, clean: avatar, name, then one muted meta line. No
           per-type card tint, no emoji soup (real feeds keep the surface neutral). */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 11 }}>
         <Avatar name={post.author.name} size={40} />
@@ -237,7 +237,7 @@ export function PostCard({ post }: { post: Post }) {
       )}
       {post.routeDays && <RoutePreview days={post.routeDays} />}
 
-      {/* Action row — minimal icon + count, no bordered pills (Threads-style). */}
+      {/* Action row, minimal icon + count, no bordered pills (Threads-style). */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 22, marginTop: 14 }}>
         <Pressable
           onPress={() => { haptic.tick(); toggleVote(post); }}

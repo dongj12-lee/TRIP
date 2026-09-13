@@ -6,7 +6,7 @@ import { TIME_OPTIONS, to12h, partOfDay } from '@/lib/timeUtils';
 import { T, Button } from './base';
 import { Icon } from './Icon';
 
-// Tap-to-pick time sheet — no keyboard, no typing. One tap sets the time and
+// Tap-to-pick time sheet, no keyboard, no typing. One tap sets the time and
 // closes. Auto-scrolls to the current value.
 export function TimePickerSheet({
   visible,

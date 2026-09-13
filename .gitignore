@@ -50,3 +50,6 @@ supabase/_dev-setup.generated.sql
 
 # supabase CLI temp
 supabase/.temp/
+
+# Generated legal site (scripts/build-legal-site.ts) — published separately
+site/

@@ -12,7 +12,7 @@ const LABEL_NUDGE: Record<string, [number, number]> = {
 };
 
 // A real map of Seoul's 25 자치구, drawn from official boundary geometry (see
-// data/seoulDistricts.ts) — unmistakably Seoul, unlike floating name chips.
+// data/seoulDistricts.ts), unmistakably Seoul, unlike floating name chips.
 // Tap a district to filter; districts with no imported places are dimmed.
 export function SeoulMapPicker({
   selected,
@@ -54,7 +54,7 @@ export function SeoulMapPicker({
             );
           })}
         </G>
-        {/* The Han River — the single most recognizable feature of Seoul —
+        {/* The Han River, the single most recognizable feature of Seoul —
             traced through the seams between the north-bank (Gangbuk) and
             south-bank (Gangnam) districts. */}
         <Path

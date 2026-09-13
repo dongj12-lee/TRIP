@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Modal, Pressable, Alert } from 'react-native';
+import { View, Modal, Pressable, Alert, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { useAuth } from '@/lib/auth';
@@ -15,6 +15,7 @@ type Target = { type: 'post' | 'comment' | 'buddy' | 'profile'; id: string; auth
 export function ReportSheet({ visible, onClose, target }: { visible: boolean; onClose: () => void; target: Target }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: winH } = useWindowDimensions();
   const { configured, session } = useAuth();
   const [busy, setBusy] = useState(false);
 
@@ -32,7 +33,7 @@ export function ReportSheet({ visible, onClose, target }: { visible: boolean; on
     try {
       await fileReport(target.type, target.id, reason);
       onClose();
-      Alert.alert('Report submitted', "Thanks — we'll review this.");
+      Alert.alert('Report submitted', "Thanks, we'll review this.");
     } catch (e) {
       Alert.alert('Could not submit report', friendlyError(e, (e as Error).message));
     } finally {
@@ -58,7 +59,8 @@ export function ReportSheet({ visible, onClose, target }: { visible: boolean; on
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
-      <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20 }}>
+      {/* Capped so the scrim above always keeps a tappable strip. */}
+      <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20, maxHeight: winH * 0.9 }}>
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
         <T style={{ fontSize: 16, fontWeight: '800', marginBottom: 4 }}>Report this content</T>
         <T style={{ fontSize: 13, color: c.muted, marginBottom: 16 }}>Your report is anonymous to other users.</T>

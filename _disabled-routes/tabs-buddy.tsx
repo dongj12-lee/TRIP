@@ -20,7 +20,7 @@ export default function BuddyScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { buddies, refreshBuddies, loading } = useRemoteContent();
-  const { scrollY, onScroll } = useTabScroll();
+  const { scrollY, onScroll, scrollRef } = useTabScroll();
   const topPad = useContentTopPadding();
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = async () => {
@@ -44,6 +44,7 @@ export default function BuddyScreen() {
         </View>
       ) : (
         <Animated.ScrollView
+          ref={scrollRef}
           onScroll={onScroll}
           scrollEventThrottle={16}
           contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
@@ -53,7 +54,7 @@ export default function BuddyScreen() {
           }
         >
           {/* The safety reminder that used to sit here now lives on the plan
-              detail screen instead, right before you request to join — a more
+              detail screen instead, right before you request to join, a more
               relevant moment. */}
           <TabTitle title="Travel Buddies" subtitle="Find someone for a 2-person dish or a day trip out of town" />
 
@@ -70,10 +71,10 @@ export default function BuddyScreen() {
               <T style={{ fontSize: 30 }}>👋</T>
               <T style={{ fontSize: 15, fontWeight: '700', color: c.ink, marginTop: 10 }}>No plans yet</T>
               <T style={{ fontSize: 13, color: c.muted, marginTop: 4, textAlign: 'center', lineHeight: 19 }}>
-                Post the first one — dinner tonight, a palace walk tomorrow, anything.
+                Post the first one, dinner tonight, a palace walk tomorrow, anything.
               </T>
               <View style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}>
-                <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Post a plan</T>
+                <T style={{ fontSize: 13.5, fontWeight: '700', color: c.paper }}>Post a plan</T>
               </View>
             </Pressable>
           ) : (
@@ -95,7 +96,7 @@ function BuddyRow({ buddy }: { buddy: Buddy }) {
   const { c } = useTheme();
   const router = useRouter();
   const { joined } = useStore();
-  const requested = joined.has(buddy.id); // asked to join — host still approves
+  const requested = joined.has(buddy.id); // asked to join, host still approves
   const count = buddy.interested + (requested ? 1 : 0);
   const spotsLeft = Math.max(0, buddy.groupSize - 1 - count); // host takes one seat
   const open = () => router.push(`/buddy/${buddy.id}`);
@@ -111,14 +112,14 @@ function BuddyRow({ buddy }: { buddy: Buddy }) {
       <Avatar name={buddy.author.name} size={44} />
 
       <View style={{ flex: 1 }}>
-        {/* Host · when — inline, tweet-header style */}
+        {/* Host · when, inline, tweet-header style */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
           <T style={{ fontSize: 14.5, fontWeight: '800', color: c.ink }} numberOfLines={1}>{buddy.author.name}</T>
           <Flag country={buddy.author.country} size={15} />
           <T style={{ fontSize: 13, color: c.muted, fontWeight: '600' }} numberOfLines={1}>· {buddy.when}</T>
         </View>
 
-        {/* The plan itself — the "post" */}
+        {/* The plan itself, the "post" */}
         <T style={{ fontSize: 15.5, lineHeight: 21, color: c.ink, fontWeight: '700', marginTop: 3 }} numberOfLines={2}>{buddy.activity}</T>
         {!!buddy.note && (
           <T style={{ fontSize: 14, lineHeight: 20, color: c.inkSoft, marginTop: 3 }} numberOfLines={2}>{buddy.note}</T>
@@ -126,10 +127,10 @@ function BuddyRow({ buddy }: { buddy: Buddy }) {
 
         {/* Meta + a single Join action */}
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 11, gap: 12 }}>
-          <MetaBit icon="pin" text={buddy.neighborhood} />
+          {!!buddy.neighborhood && <MetaBit icon="pin" text={buddy.neighborhood} />}
           <View style={{ flex: 1 }} />
           {requested ? (
-            // Already asked — host approves before it's confirmed
+            // Already asked, host approves before it's confirmed
             <View style={{ paddingVertical: 6, paddingHorizontal: 14, borderRadius: 999, backgroundColor: c.surface, borderWidth: 1, borderColor: c.line }}>
               <T style={{ fontSize: 12.5, fontWeight: '800', color: c.inkSoft }}>Requested</T>
             </View>

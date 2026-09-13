@@ -7,7 +7,7 @@ import { Screen, DetailHeader } from '@/components/base';
 import { legalDocHtml, LEGAL_TITLES, LegalDocKey } from '@/data/legalDocs';
 
 // In-app legal docs (Privacy / Terms / Community Guidelines), rendered from
-// bundled self-contained HTML (data/legalDocs.ts) — replaces the old
+// bundled self-contained HTML (data/legalDocs.ts), replaces the old
 // claude.ai artifact links. Fully offline, no external dependency.
 export default function LegalDoc() {
   const { c } = useTheme();

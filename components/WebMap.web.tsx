@@ -10,7 +10,7 @@ export type { MapPin };
 // always rejects. So the iframe points at a REAL same-origin static shell
 // (public/naver-map.html, copied into dist/ on export) whose location matches
 // a registered Service URL. The shared runtime (MAP_RUNTIME_JS) is injected
-// into that same-origin frame from here, then driven via direct calls — same
+// into that same-origin frame from here, then driven via direct calls, same
 // clustering/rendering as native. See docs/OPERATIONS.md.
 
 export function WebMap({

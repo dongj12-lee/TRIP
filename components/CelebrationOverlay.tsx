@@ -8,7 +8,7 @@ import { useReducedMotion } from '@/lib/reducedMotion';
 import { T, H, Button } from './base';
 
 // A reward moment shown when a district-conquest tier is newly reached. Simple
-// confetti (falling emoji) + the unlocked title + a share CTA — the payoff that
+// confetti (falling emoji) + the unlocked title + a share CTA, the payoff that
 // makes filling the passport feel worth it.
 const CONFETTI = ['🎉', '✨', '🎊', '⭐', '🏙️', '🎫'];
 
@@ -56,7 +56,7 @@ export function CelebrationOverlay({
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: 'rgba(15,11,20,0.72)', alignItems: 'center', justifyContent: 'center', padding: 28 }} onPress={onClose}>
-        {/* Confetti — suppressed under Reduce Motion */}
+        {/* Confetti, suppressed under Reduce Motion */}
         {!reduced && pieces.map((p, i) => (
           <Animated.Text
             key={i}

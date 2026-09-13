@@ -19,7 +19,7 @@ export default function FeedScreen() {
   const insets = useSafeAreaInsets();
   const { sharedPost, profile } = useStore();
   const { posts, refreshPosts, loading } = useRemoteContent();
-  const { scrollY, onScroll } = useTabScroll();
+  const { scrollY, onScroll, scrollRef } = useTabScroll();
   const topPad = useContentTopPadding();
   const [type, setType] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -36,7 +36,7 @@ export default function FeedScreen() {
   const all = sharedPost && !posts.some((p) => p.slug === sharedPost.slug) ? [sharedPost, ...posts] : posts;
   const list = all.filter((p) => !type || normalizePostType(p.type) === type);
 
-  // A segmented control instead of chips — three meaningful kinds, so the whole
+  // A segmented control instead of chips, three meaningful kinds, so the whole
   // filter reads at a glance rather than as a scrolling row of pills.
   const segments: [string | null, string][] = [
     [null, 'All'],
@@ -66,7 +66,7 @@ export default function FeedScreen() {
         <OfflineBanner />
       </View>
 
-      {/* Inline composer prompt — one tap to share */}
+      {/* Inline composer prompt, one tap to share */}
       <View style={{ paddingHorizontal: 18, paddingBottom: 10 }}>
         <Pressable
           onPress={openCompose}
@@ -80,7 +80,7 @@ export default function FeedScreen() {
           <Avatar name={profile.displayName || 'You'} uri={profile.avatarUrl} size={34} />
           <T style={{ flex: 1, fontSize: 14.5, color: c.muted }}>What's on your mind?</T>
           <View style={{ backgroundColor: c.accent, width: 30, height: 30, borderRadius: 999, alignItems: 'center', justifyContent: 'center' }}>
-            <T style={{ fontSize: 17, color: '#fff', fontWeight: '700', marginTop: -1 }}>✎</T>
+            <T style={{ fontSize: 17, color: c.paper, fontWeight: '700', marginTop: -1 }}>✎</T>
           </View>
         </Pressable>
       </View>
@@ -117,6 +117,7 @@ export default function FeedScreen() {
       <TabBar title="Feed" scrollY={scrollY} />
 
       <Animated.FlatList
+        ref={scrollRef}
         data={list}
         keyExtractor={(p: any) => p.slug}
         renderItem={({ item }: any) => (

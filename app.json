@@ -5,25 +5,31 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "trip",
+    "scheme": "bada",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.trip.korea",
+      "bundleIdentifier": "com.bada.korea",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationQueriesSchemes": [
+          "nmap"
+        ]
       }
     },
     "android": {
-      "package": "com.trip.korea",
+      "package": "com.bada.korea",
       "adaptiveIcon": {
         "backgroundColor": "#faf9f7",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -42,7 +48,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "TRIP uses your photos so you can set a profile picture."
+          "photosPermission": "BADA needs access to your photos so you can attach one to a community post or set your profile picture."
         }
       ],
       [
@@ -60,6 +66,19 @@
     "experiments": {
       "typedRoutes": true,
       "baseUrl": "/TRIP"
-    }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/422e09a0-6fa7-458b-9f31-74ce10384e68"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "422e09a0-6fa7-458b-9f31-74ce10384e68"
+      }
+    },
+    "owner": "dongj1210"
   }
 }

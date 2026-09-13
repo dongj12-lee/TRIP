@@ -77,7 +77,7 @@ export function analyzeTrip(itinerary: Itinerary): TripHealth {
   const positives: string[] = [];
 
   for (const d of days) {
-    if (d.packed) warnings.push(`${d.label} looks packed — ${d.stopCount} stops. Consider trimming one.`);
+    if (d.packed) warnings.push(`${d.label} looks packed, ${d.stopCount} stops. Consider trimming one.`);
     if (d.longHop) {
       warnings.push(
         `${d.label} has a long hop: ${d.longHop.from} → ${d.longHop.to} (~${Math.round(d.longHop.km)}km). Group nearby spots or plan transit time.`,
@@ -86,8 +86,8 @@ export function analyzeTrip(itinerary: Itinerary): TripHealth {
   }
 
   const emptyDays = days.filter((d) => d.stopCount === 0);
-  if (emptyDays.length) positives.push(`${emptyDays.length} day(s) still open — room to add a spot or keep it relaxed.`);
-  if (!warnings.length && totalStops > 0) positives.push('Nicely balanced — no packed days or big detours.');
+  if (emptyDays.length) positives.push(`${emptyDays.length} day(s) still open, room to add a spot or keep it relaxed.`);
+  if (!warnings.length && totalStops > 0) positives.push('Nicely balanced, no packed days or big detours.');
 
   return { days, totalStops, dayCount: days.length, warnings, positives };
 }

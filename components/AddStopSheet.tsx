@@ -15,7 +15,7 @@ import { guLabel } from '@/lib/format';
 // thumbnails work), while "Add a custom stop" keeps free-text flexibility for
 // things the DB doesn't have (transit legs, a friend's recommendation, etc.).
 // `suggestions` (from lib/routeSuggest.ts) surface a "for this day" rail above
-// search — proximity/interest/co-occurrence picks, each with a plain-language reason.
+// search, proximity/interest/co-occurrence picks, each with a plain-language reason.
 export function AddStopSheet({
   visible,
   onClose,
@@ -99,7 +99,7 @@ export function AddStopSheet({
               autoCapitalize="none"
             />
             {query.length > 0 && (
-              <Pressable onPress={() => setQuery('')} hitSlop={8}>
+              <Pressable onPress={() => setQuery('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
                 <Icon name="close" size={18} stroke={c.muted} sw={2} />
               </Pressable>
             )}

@@ -8,7 +8,7 @@ import { Buddy, Place, Post, Theme } from '@/data/types';
 type RemoteContentValue = {
   live: boolean; // true once real Supabase data has loaded (vs. seed fallback)
   loading: boolean;
-  error: boolean; // initial live fetch failed — screens may offer a retry
+  error: boolean; // initial live fetch failed, screens may offer a retry
   places: Place[];
   themes: Theme[];
   posts: Post[];
@@ -28,10 +28,18 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [error, setError] = useState(false);
-  const [places, setPlaces] = useState<Place[]>(SEED_PLACES);
+  // Full catalog, including the small set of non-Seoul day-trip-city places
+  // (Busan/Gyeongju/Jeonju/Gangneung/Chuncheon, imported for the
+  // city-day-trips theme's places rail). `placeBySlug` resolves from this.
+  const [allPlaces, setAllPlaces] = useState<Place[]>(SEED_PLACES);
   const [themes, setThemes] = useState<Theme[]>(SEED_THEMES);
   const [posts, setPosts] = useState<Post[]>(SEED_POSTS);
   const [buddies, setBuddies] = useState<Buddy[]>(SEED_BUDDIES);
+  // Everything else (Explore's list/map/filters, the day-plan generator,
+  // manually adding a stop) is still a Seoul trip app end to end, so the
+  // general `places` feed stays Seoul-only rather than surfacing a Busan
+  // cafe in a Seoul itinerary.
+  const places = useMemo(() => allPlaces.filter((p) => p.city === 'Seoul'), [allPlaces]);
 
   const loadAll = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -45,9 +53,9 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
         remote.fetchPosts(),
         remote.fetchBuddies(),
       ]);
-      // Only switch over once the DB has actually been seeded — otherwise keep
+      // Only switch over once the DB has actually been seeded, otherwise keep
       // showing local demo content instead of an empty app.
-      if (p.length) setPlaces(p);
+      if (p.length) setAllPlaces(p);
       if (t.length) setThemes(t);
       if (po.length) setPosts(po);
       if (b.length) setBuddies(b);
@@ -90,7 +98,7 @@ export function RemoteContentProvider({ children }: { children: React.ReactNode 
   const addLocalPost = useCallback((p: Post) => setPosts((prev) => [p, ...prev]), []);
   const addLocalBuddy = useCallback((b: Buddy) => setBuddies((prev) => [b, ...prev]), []);
 
-  const placeBySlug = useMemo(() => Object.fromEntries(places.map((p) => [p.slug, p])), [places]);
+  const placeBySlug = useMemo(() => Object.fromEntries(allPlaces.map((p) => [p.slug, p])), [allPlaces]);
   const themeBySlug = useMemo(() => Object.fromEntries(themes.map((t) => [t.slug, t])), [themes]);
 
   const value = useMemo<RemoteContentValue>(

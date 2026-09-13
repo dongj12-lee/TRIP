@@ -7,7 +7,7 @@ import { buildNativeShell, buildMapData, MapPin, NAVER_CLIENT_ID, MAP_ORIGIN } f
 export type { MapPin };
 
 // Native map: the Naver Maps JS SDK v3 in a WebView (keeps the app on Expo Go
-// — no native module / dev client). The shell HTML + runtime load once with a
+//, no native module / dev client). The shell HTML + runtime load once with a
 // baseUrl that fakes window.location so Naver's domain check passes; pin data
 // is pushed in (and updated) via injectJavaScript. Web uses WebMap.web.tsx.
 // See docs/OPERATIONS.md.
@@ -30,7 +30,7 @@ export function WebMap({
   const { c } = useTheme();
   const ref = useRef<WebView>(null);
   const loaded = useRef(false);
-  // Naver rejected the WebView origin (ncpKeyId Service-URL check) — show the
+  // Naver rejected the WebView origin (ncpKeyId Service-URL check), show the
   // stylized fallback map instead of a permanently blank WebView.
   const [authFailed, setAuthFailed] = React.useState(false);
 
@@ -70,7 +70,7 @@ export function WebMap({
             const msg = JSON.parse(e.nativeEvent.data);
             if (msg.type === 'pinPress') onPinPress?.(msg.id);
             else if (msg.type === 'mapAuthFail') {
-              console.warn('[naver-map] auth failed — MAP_ORIGIN (' + MAP_ORIGIN + ') is not a registered Service URL for this ncpKeyId. Falling back to the stylized map.');
+              console.warn('[naver-map] auth failed. MAP_ORIGIN (' + MAP_ORIGIN + ') is not a registered Service URL for this ncpKeyId. Falling back to the stylized map.');
               setAuthFailed(true);
             }
           } catch {}

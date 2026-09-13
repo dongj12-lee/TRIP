@@ -8,11 +8,6 @@ import { Stack, useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
-import {
-  Fraunces_600SemiBold,
-  Fraunces_600SemiBold_Italic,
-  Fraunces_400Regular,
-} from '@expo-google-fonts/fraunces';
 import { ThemeProvider, useTheme } from '@/theme/theme';
 import { StoreProvider, useStore } from '@/lib/store';
 import { AuthProvider, useAuth } from '@/lib/auth';
@@ -36,8 +31,7 @@ function usePushNotifications() {
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data as { type?: string; id?: string };
-      if (data?.type === 'buddy' && data.id) router.push(`/buddy/${data.id}`);
-      else if (data?.type === 'post' && data.id) router.push(`/post/${data.id}`);
+      if (data?.type === 'post' && data.id) router.push(`/post/${data.id}`);
     });
     return () => sub.remove();
   }, [router]);
@@ -72,7 +66,6 @@ function RootStack() {
         <Stack.Screen name="place/[slug]" />
         <Stack.Screen name="theme/[slug]" />
         <Stack.Screen name="post/[slug]" />
-        <Stack.Screen name="buddy/[id]" />
         <Stack.Screen name="creator/[id]" />
         <Stack.Screen name="planner" />
         <Stack.Screen name="compose" options={{ presentation: 'modal' }} />
@@ -88,10 +81,7 @@ function RootStack() {
 
 export default function RootLayout() {
   const [loaded] = useFonts({
-    Fraunces: Fraunces_600SemiBold,
-    'Fraunces-Italic': Fraunces_600SemiBold_Italic,
-    'Fraunces-Regular': Fraunces_400Regular,
-    // Body/UI: Pretendard — one family covering Latin + Hangul, so Korean
+    // Body/UI + headings: Pretendard, one family covering Latin + Hangul, so Korean
     // place names render intentionally instead of falling back to a system
     // font (Jakarta was Latin-only). Local static TTFs in assets/fonts.
     Pretendard: require('../assets/fonts/Pretendard-Regular.ttf'),

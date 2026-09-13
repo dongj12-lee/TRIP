@@ -132,9 +132,25 @@ async function seedBuddies() {
 }
 
 async function main() {
-  console.log('Seeding Supabase from mobile/data …\n');
-  await seedPlaces();
-  await seedThemes();
+  // --posts-only: re-sync posts.title/body/etc. from data/content.ts without
+  // touching places. seedPlaces() upserts solo_ok/english_menu/price_
+  // transparent/card_ok/english_spoken straight from data/seed.ts's PLACES
+  // array, which — unlike the live DB — was never updated by the foreigner-fit
+  // backfill (scripts/backfill-foreigner-fit.ts writes to Supabase directly,
+  // not back into the source file). A full re-seed would silently reset every
+  // one of those columns to their stale false default and undo that backfill.
+  const postsOnly = process.argv.includes('--posts-only');
+  const themesOnly = process.argv.includes('--themes-only');
+  console.log(`Seeding Supabase from mobile/data${postsOnly ? ' (posts only)' : themesOnly ? ' (themes only)' : ''} …\n`);
+  if (themesOnly) {
+    await seedThemes();
+    console.log('\nDone.');
+    return;
+  }
+  if (!postsOnly) {
+    await seedPlaces();
+    await seedThemes();
+  }
   await seedPosts();
   await seedBuddies();
   console.log('\nDone. Restart the app — Explore/Themes/Feed/Buddy will now load live data.');

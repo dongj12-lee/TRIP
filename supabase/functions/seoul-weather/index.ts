@@ -162,14 +162,32 @@ async function build() {
   }
   const ta = items(taJ)[0], land = items(landJ)[0];
   if (ta && land) {
-    const lastShort = daily.length ? daily[daily.length - 1].date : ymd(nn);
-    for (let d = 4; d <= 7; d++) {
-      const dd = new Date(nn.getTime() + d * 86400000);
+    // taMaxN / wfNAm are indexed from the ANNOUNCEMENT date (tmFc), not from
+    // today. Between 00:00 and 06:00 KST midTmFc() returns *yesterday's* 18:00
+    // bulletin, so anchoring N to today shifted every mid-term day by one and
+    // asked KMA for an index it had not published — day+3 is never published
+    // (short-term still covers it), and day+4 is absent from the 18:00
+    // bulletin. Those misses fell through `?? 0` and rendered as a real 0 °C
+    // (the "Thu 0° / 0°" row), which also collapsed the week's bar scale.
+    const tmBase = Date.UTC(Number(tmFc.slice(0, 4)), Number(tmFc.slice(4, 6)) - 1, Number(tmFc.slice(6, 8)));
+    const lastShort = daily.length
+      ? daily[daily.length - 1].date
+      : `${ymd(nn).slice(0, 4)}-${ymd(nn).slice(4, 6)}-${ymd(nn).slice(6, 8)}`;
+    const num = (v: unknown) => {
+      const n = Number(v);
+      // KMA uses -999 (and similar) as its missing-value sentinel.
+      return v == null || v === '' || !Number.isFinite(n) || n < -90 ? null : n;
+    };
+    for (let d = 3; d <= 10 && daily.length < 7; d++) {
+      const dd = new Date(tmBase + d * 86400000);
       const iso = `${dd.getUTCFullYear()}-${String(dd.getUTCMonth() + 1).padStart(2, '0')}-${String(dd.getUTCDate()).padStart(2, '0')}`;
       if (iso <= lastShort) continue;
+      const hi = num(ta[`taMax${d}`]), lo = num(ta[`taMin${d}`]);
+      // No temperatures for this day yet: skip it rather than invent one.
+      if (hi == null && lo == null) continue;
       const wf = land[`wf${d}Am`] ?? land[`wf${d}`] ?? land[`wf${d}Pm`];
       const rn = Math.max(Number(land[`rnSt${d}Am`] ?? 0), Number(land[`rnSt${d}Pm`] ?? land[`rnSt${d}`] ?? 0));
-      daily.push({ date: iso, code: wfToCode(wf), hi: Number(ta[`taMax${d}`] ?? 0), lo: Number(ta[`taMin${d}`] ?? 0), rain: rn });
+      daily.push({ date: iso, code: wfToCode(wf), hi: hi ?? lo, lo: lo ?? hi, rain: rn });
     }
   }
 

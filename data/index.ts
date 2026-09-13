@@ -1,4 +1,4 @@
-// Public data API — mirrors window.TRIP_DATA from source/data.jsx.
+// Public data API, mirrors window.TRIP_DATA from source/data.jsx.
 import { PLACES, THEMES, TIERS } from './seed';
 import { CREATORS, POSTS } from './content';
 import { Itinerary, Place, Post, Tier } from './types';
@@ -22,7 +22,7 @@ export function buildRoutePost(itinerary: Itinerary, message: string, country?: 
   return {
     slug: 'my-shared-itinerary',
     type: 'route',
-    title: `${itinerary.title} — feedback welcome 🙏`,
+    title: `${itinerary.title}, feedback welcome 🙏`,
     body:
       message && message.trim()
         ? message.trim()

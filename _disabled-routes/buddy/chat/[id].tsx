@@ -18,7 +18,7 @@ import { haptic } from '@/lib/haptics';
 
 const POLL_MS = 4000;
 
-// Private group chat for a buddy plan — host + accepted members only (RLS
+// Private group chat for a buddy plan, host + accepted members only (RLS
 // enforces this server-side; anyone else gets an empty, read-proof room).
 // This is the safety story: you can coordinate a meetup without ever handing
 // a stranger your phone number, and the conversation stays reportable.
@@ -67,7 +67,7 @@ export default function BuddyChat() {
     } catch (e) {
       setDraft(body); // give the text back rather than losing it
       console.warn('sendBuddyMessage failed', e);
-      showToast(friendlyError(e, "Couldn't send — try again."));
+      showToast(friendlyError(e, "Couldn't send, try again."));
     } finally {
       setSending(false);
     }
@@ -102,7 +102,7 @@ export default function BuddyChat() {
             <View style={{ alignItems: 'center', paddingVertical: 30 }}>
               <T style={{ fontSize: 26 }}>👋</T>
               <T style={{ fontSize: 13.5, color: c.muted, marginTop: 8, textAlign: 'center', lineHeight: 19 }}>
-                Say hi and pin down the details —{'\n'}exact spot, time, how to spot each other.
+                Say hi and pin down the details:{'\n'}exact spot, time, how to spot each other.
               </T>
             </View>
           )}
@@ -137,7 +137,7 @@ export default function BuddyChat() {
                       paddingVertical: 9,
                     }}
                   >
-                    <T style={{ fontSize: 14.5, lineHeight: 20, color: mine ? '#fff' : c.ink }}>{m.body}</T>
+                    <T style={{ fontSize: 14.5, lineHeight: 20, color: mine ? c.paper : c.ink }}>{m.body}</T>
                   </View>
                   <T style={{ fontSize: 10.5, color: c.muted, marginTop: 3, alignSelf: mine ? 'flex-end' : 'flex-start', marginHorizontal: 4 }}>{m.when}</T>
                 </View>
@@ -159,9 +159,12 @@ export default function BuddyChat() {
           <Pressable
             onPress={send}
             disabled={!draft.trim() || sending}
+            hitSlop={4}
+            accessibilityRole="button"
+            accessibilityLabel="Send message"
             style={{ width: 40, height: 40, borderRadius: 999, backgroundColor: draft.trim() ? c.accent : c.surface2, alignItems: 'center', justifyContent: 'center' }}
           >
-            <Icon name="arrow" size={19} stroke={draft.trim() ? '#fff' : c.muted} sw={2.4} />
+            <Icon name="arrow" size={19} stroke={draft.trim() ? c.paper : c.muted} sw={2.4} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>

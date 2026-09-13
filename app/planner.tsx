@@ -22,6 +22,7 @@ import { ShareStop } from '@/components/ShareCard';
 import { TimePickerSheet } from '@/components/TimePickerSheet';
 import { useToast } from '@/components/Toast';
 import { haptic } from '@/lib/haptics';
+import { useRequireAuth } from '@/lib/requireAuth';
 
 const EMPTY_STOP: ItineraryStop = { time: '', part: '', name: '', note: '', slug: null, swatch: ['#7a4a2a', '#e0a05a'] };
 
@@ -32,6 +33,7 @@ export default function TripPlanner() {
   const { itinerary, setItinerary, shareTrip, profile } = useStore();
   const { places, posts } = useRemoteContent();
   const { showToast } = useToast();
+  const requireAuth = useRequireAuth();
 
   const [sheetDay, setSheetDay] = useState<number | null>(null);
   const [timeTarget, setTimeTarget] = useState<{ di: number; si: number } | null>(null);
@@ -131,7 +133,7 @@ export default function TripPlanner() {
                 </View>
                 <TextInput value={day.theme} onChangeText={(v) => setDay(di, 'theme', v)} placeholder="Day theme (e.g. Palaces & old Seoul)" style={[field, { marginTop: 8 }]} placeholderTextColor={c.muted} />
 
-                {/* Route preview — appears once two placed stops give it a shape */}
+                {/* Route preview, appears once two placed stops give it a shape */}
                 {day.stops.filter((s) => s.lat != null).length >= 2 && (
                   <View style={{ marginTop: 12, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: c.line }}>
                     <RouteMap stops={day.stops} height={130} />
@@ -182,6 +184,23 @@ export default function TripPlanner() {
             );
           })}
 
+          {/* Nothing planned yet: point at the whole-trip generator rather than
+              leaving a blank screen with two secondary buttons under it. */}
+          {itinerary.days.length === 0 && (
+            <View style={{ marginTop: 20, alignItems: 'center', paddingHorizontal: 10 }}>
+              <T style={{ fontSize: 34 }}>🗺️</T>
+              <H style={{ fontSize: 19, marginTop: 10, textAlign: 'center' }}>No days yet</H>
+              <T style={{ fontSize: 13.5, color: c.muted, textAlign: 'center', marginTop: 6, lineHeight: 19 }}>
+                Let BADA build the whole trip around your taste, or start a day yourself and add stops as you go.
+              </T>
+              <Button
+                label="✨ Plan my whole trip"
+                style={{ marginTop: 16, alignSelf: 'stretch' }}
+                onPress={() => { haptic.tick(); router.push('/trip'); }}
+              />
+            </View>
+          )}
+
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 18 }}>
             <Button label="+ Add a day" variant="soft" style={{ flex: 1 }} onPress={addDay} />
             <Button label="✨ Generate a day" variant="soft" style={{ flex: 1.2 }} onPress={() => setGenOpen(true)} />
@@ -211,9 +230,11 @@ export default function TripPlanner() {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      {canShare && (
       <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 18, paddingBottom: insets.bottom + 12, backgroundColor: c.paper, borderTopWidth: 1, borderTopColor: c.line }}>
-        <Button label="Share for feedback" icon="share" onPress={async () => { haptic.success(); await shareTrip(''); showToast('Shared — feedback incoming', '🙏'); router.replace('/(tabs)/feed'); }} />
+        <Button label="Share for feedback" icon="share" onPress={async () => { if (!requireAuth('share your route for feedback')) return; haptic.success(); await shareTrip(''); showToast('Shared, feedback incoming', '🙏'); router.replace('/(tabs)/feed'); }} />
       </View>
+      )}
 
       <AddStopSheet
         visible={sheetDay !== null}
@@ -245,7 +266,7 @@ export default function TripPlanner() {
   );
 }
 
-// "How to get there" connector between two consecutive stops — suggested mode
+// "How to get there" connector between two consecutive stops, suggested mode
 // + rough time from the coordinates we already have, upgraded to a real Seoul
 // transit route when that layer is live. Tapping opens real turn-by-turn
 // directions (Naver Map app → Google Maps fallback). Silent when either stop
@@ -260,7 +281,7 @@ function LegConnector({ from, to }: { from: ItineraryStop; to: ItineraryStop }) 
   if (!leg || !a || !b) return null;
   const meta = MODE_META[leg.mode];
   // Per-mode tint so the three modes read at a glance (walk=sage,
-  // transit=accent, taxi=gold) — same tones the app uses elsewhere.
+  // transit=accent, taxi=gold), same tones the app uses elsewhere.
   const tone =
     leg.mode === 'walk'
       ? { bg: c.sage50, fg: c.sage700 }
@@ -338,11 +359,11 @@ function StopCard({
           )}
         </View>
         <View style={{ alignItems: 'center', gap: 2 }}>
-          <Pressable onPress={onUp} disabled={first} hitSlop={6} style={{ opacity: first ? 0.25 : 1, padding: 2, transform: [{ rotate: '-90deg' }] }}>
+          <Pressable onPress={onUp} disabled={first} hitSlop={6} accessibilityRole="button" accessibilityLabel="Move stop earlier" style={{ opacity: first ? 0.25 : 1, padding: 2, transform: [{ rotate: '-90deg' }] }}>
             <Icon name="chevron" size={16} stroke={c.muted} sw={2.4} />
           </Pressable>
           <View style={{ transform: [{ rotate: '90deg' }] }}>
-            <Pressable onPress={onDown} disabled={last} hitSlop={6} style={{ opacity: last ? 0.25 : 1, padding: 2 }}>
+            <Pressable onPress={onDown} disabled={last} hitSlop={6} accessibilityRole="button" accessibilityLabel="Move stop later" style={{ opacity: last ? 0.25 : 1, padding: 2 }}>
               <Icon name="chevron" size={16} stroke={c.muted} sw={2.4} />
             </Pressable>
           </View>
@@ -378,7 +399,7 @@ function StopCard({
         <TextInput
           value={stop.note}
           onChangeText={onNote}
-          placeholder="Optional note — why, a tip, what to order…"
+          placeholder="Optional note, why, a tip, what to order…"
           placeholderTextColor={c.muted}
           multiline
           autoFocus={!stop.note}

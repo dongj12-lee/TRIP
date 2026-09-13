@@ -1,14 +1,14 @@
 // Per-leg travel estimates for the trip planner: given two consecutive stops,
 // suggest how to get between them (walk / subway-bus / taxi) and roughly how
 // long it takes. Two tiers:
-//   1. heuristicLeg — pure math on the coordinates we already have. Always
+//   1. heuristicLeg, pure math on the coordinates we already have. Always
 //      available, no API, no key. Honest "estimate" (straight-line based).
 //   2. Seoul transit API (data.go.kr) will later replace the `transit` tier's
 //      estimate with a real route (line names, transfers, exact minutes) for
-//      Seoul-area legs — see lib/transitSeoul.ts. Everything degrades to the
+//      Seoul-area legs, see lib/transitSeoul.ts. Everything degrades to the
 //      heuristic outside Seoul or if the API is unavailable, so the leg info
 //      never disappears.
-import { Linking, Platform } from 'react-native';
+import { ActionSheetIOS, Alert, Linking, Platform } from 'react-native';
 import { haversineKm } from './routeHealth';
 
 export type TransitMode = 'walk' | 'transit' | 'taxi';
@@ -80,12 +80,67 @@ export function dayTravelMinutes(stops: { lat?: number; lng?: number }[]): numbe
 }
 
 // Tap-through to real turn-by-turn: Naver Map app via its documented URL
-// scheme (nmap://route/{walk|public|car}, appname required — see
+// scheme (nmap://route/{walk|public|car}, appname required, see
 // guide.ncloud-docs.com "지도 앱 연동 URL Scheme"), falling back to the
 // Google Maps directions URL (documented Maps URLs API) when the app isn't
 // installed or we're on web. No API key involved in either.
 const NMAP_PATH: Record<TransitMode, string> = { walk: 'walk', transit: 'public', taxi: 'car' };
 const GMAPS_MODE: Record<TransitMode, string> = { walk: 'walking', transit: 'transit', taxi: 'driving' };
+// Apple Maps URL scheme (developer.apple.com "Map Links"): ll + q to show a
+// place, saddr/daddr + dirflg for a route. dirflg is d = drive, w = walk,
+// r = transit. Omitting saddr makes the origin "here".
+const AMAPS_DIRFLG: Record<TransitMode, string> = { walk: 'w', transit: 'r', taxi: 'd' };
+
+// Apple rejected build 11 under Guideline 4 for routing every map action into
+// a third-party app: "revise the app to give users the option to launch the
+// native Apple Maps app." So every map hand-off now asks first. Naver stays
+// the first option because it is meaningfully better inside Korea (transit
+// routing, real-time bus, Korean addresses), but Apple Maps is always offered.
+function chooseMapApp(title: string, message: string, open: (app: 'naver' | 'apple') => void): void {
+  const options = ['Naver Map', 'Apple Maps', 'Cancel'];
+  if (Platform.OS === 'ios') {
+    ActionSheetIOS.showActionSheetWithOptions(
+      { title, message, options, cancelButtonIndex: 2 },
+      (i) => {
+        if (i === 0) open('naver');
+        if (i === 1) open('apple');
+      },
+    );
+    return;
+  }
+  Alert.alert(title, message, [
+    { text: 'Naver Map', onPress: () => open('naver') },
+    { text: 'Apple Maps', onPress: () => open('apple') },
+    { text: 'Cancel', style: 'cancel' },
+  ]);
+}
+
+// Centers the Naver Map app on a single place, no route — for "here it is"
+// entry points (Explore's search-pin callout, the place detail screen) as
+// opposed to openDirections below, which is turn-by-turn between two points
+// for the planner's leg-by-leg routing. Naver's own app then handles
+// "directions from here" using the phone's current location, so this needs
+// no location permission of our own.
+export function openInNaverMap(lat: number, lng: number, name: string): void {
+  const appleUrl = `http://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(name)}`;
+  if (Platform.OS === 'web') {
+    Linking.openURL(appleUrl).catch(() => {});
+    return;
+  }
+  chooseMapApp('Open in maps', name, (app) => {
+    if (app === 'apple') {
+      Linking.openURL(appleUrl).catch(() => {});
+      return;
+    }
+    const url = `nmap://place?lat=${lat}&lng=${lng}&name=${encodeURIComponent(name)}&appname=com.bada.korea`;
+    // Naver Map app not installed, send to its store listing (verified IDs:
+    // iOS App Store / Android Play Store).
+    const storeUrl = Platform.OS === 'android'
+      ? 'https://play.google.com/store/apps/details?id=com.nhn.android.nmap'
+      : 'https://apps.apple.com/app/id311867728';
+    Linking.openURL(url).catch(() => Linking.openURL(storeUrl).catch(() => {}));
+  });
+}
 
 export async function openDirections(
   a: { lat: number; lng: number },
@@ -97,16 +152,25 @@ export async function openDirections(
   const web =
     `https://www.google.com/maps/dir/?api=1&origin=${a.lat},${a.lng}` +
     `&destination=${b.lat},${b.lng}&travelmode=${GMAPS_MODE[mode]}`;
+  const apple =
+    `http://maps.apple.com/?saddr=${a.lat},${a.lng}&daddr=${b.lat},${b.lng}` +
+    `&dirflg=${AMAPS_DIRFLG[mode]}`;
   if (Platform.OS === 'web') {
     Linking.openURL(web);
     return;
   }
-  const app =
-    `nmap://route/${NMAP_PATH[mode]}?slat=${a.lat}&slng=${a.lng}&sname=${encodeURIComponent(fromName)}` +
-    `&dlat=${b.lat}&dlng=${b.lng}&dname=${encodeURIComponent(toName)}&appname=com.trip.korea`;
-  try {
-    await Linking.openURL(app); // rejects when Naver Map isn't installed
-  } catch {
-    Linking.openURL(web);
-  }
+  chooseMapApp('Get directions', `${fromName} → ${toName}`, async (choice) => {
+    if (choice === 'apple') {
+      Linking.openURL(apple).catch(() => Linking.openURL(web));
+      return;
+    }
+    const app =
+      `nmap://route/${NMAP_PATH[mode]}?slat=${a.lat}&slng=${a.lng}&sname=${encodeURIComponent(fromName)}` +
+      `&dlat=${b.lat}&dlng=${b.lng}&dname=${encodeURIComponent(toName)}&appname=com.bada.korea`;
+    try {
+      await Linking.openURL(app); // rejects when Naver Map isn't installed
+    } catch {
+      Linking.openURL(web);
+    }
+  });
 }

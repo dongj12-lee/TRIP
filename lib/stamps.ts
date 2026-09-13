@@ -1,4 +1,4 @@
-// Seoul Passport — a collectible stamp system. Stamps are earned by saving or
+// Seoul Passport, a collectible stamp system. Stamps are earned by saving or
 // liking places (district + experience stamps) and by hitting milestones. The
 // collection is permanent: once earned, a stamp stays (see lib/store earnStamps),
 // so the passport only ever fills up.
@@ -32,11 +32,11 @@ export const DISTRICT_STAMPS: StampDef[] = SEOUL_DISTRICTS.map((d) => ({
 }));
 const DISTRICT_KEYS = new Set(DISTRICT_STAMPS.map((s) => s.key));
 
-// Experience badges — earned by saving/liking a place of a given kind.
+// Experience badges, earned by saving/liking a place of a given kind.
 type ExpDef = StampDef & { match: (p: Place) => boolean };
 const l2 = (p: Place) => p.categoryL2 ?? '';
 export const EXPERIENCE_STAMPS: ExpDef[] = [
-  { key: 'exp:palace', kind: 'experience', emoji: '🏯', label: 'Palace Pilgrim', hint: 'Save a historic site', match: (p) => p.category === 'History' },
+  { key: 'exp:palace', kind: 'experience', emoji: '👑', label: 'Palace Pilgrim', hint: 'Save a historic site', match: (p) => p.category === 'History' },
   { key: 'exp:culture', kind: 'experience', emoji: '🎭', label: 'Culture Buff', hint: 'Save a cultural spot', match: (p) => p.category === 'Culture' && l2(p) !== 'Parks' },
   { key: 'exp:nature', kind: 'experience', emoji: '🌳', label: 'Nature Seeker', hint: 'Save a park or nature spot', match: (p) => p.category === 'Nature' || l2(p) === 'Parks' },
   { key: 'exp:market', kind: 'experience', emoji: '🧺', label: 'Market Hunter', hint: 'Save a traditional market', match: (p) => p.category === 'Shopping' && l2(p).includes('Traditional Market') },
@@ -47,7 +47,7 @@ export const EXPERIENCE_STAMPS: ExpDef[] = [
   { key: 'exp:kcontent', kind: 'experience', emoji: '🎬', label: 'K-Content Fan', hint: 'Save a filming/idol spot', match: (p) => !!p.kContentTitle },
 ];
 
-// Milestones — derived live from store state (not place-based).
+// Milestones, derived live from store state (not place-based).
 export const MILESTONE_STAMPS: StampDef[] = [
   { key: 'ms:firstsave', kind: 'milestone', emoji: '🔖', label: 'First Save', hint: 'Save your first spot' },
   { key: 'ms:planner', kind: 'milestone', emoji: '🗺️', label: 'Trip Planner', hint: 'Add a stop to your trip' },
@@ -85,7 +85,7 @@ export function progressFor(earned: Set<string>): Progress {
   return { earned: earned.size, total: TOTAL_STAMPS, districts };
 }
 
-// A traveler "rank" title based on how full the passport is — pure flavor that
+// A traveler "rank" title based on how full the passport is, pure flavor that
 // gives the collection a sense of leveling up.
 export function passportRank(earned: number): { title: string; emoji: string } {
   if (earned >= 30) return { title: 'Seoul Native', emoji: '👑' };
@@ -95,16 +95,16 @@ export function passportRank(earned: number): { title: string; emoji: string } {
   return { title: 'Just Landed', emoji: '🛬' };
 }
 
-// ─── Seoul Conquest — district milestones with a reward moment ─────────────
+// ─── Seoul Conquest, district milestones with a reward moment ─────────────
 // A rewards track keyed to how many of Seoul's 25 districts you've stamped.
 // Crossing one triggers a celebration overlay (see CelebrationOverlay).
 export type ConquestTier = { districts: number; title: string; emoji: string; blurb: string };
 export const CONQUEST_TIERS: ConquestTier[] = [
   { districts: 5, title: 'Neighborhood Nomad', emoji: '🏘️', blurb: '5 districts stamped' },
-  { districts: 10, title: 'City Explorer', emoji: '🧭', blurb: '10 districts — you know your way around' },
-  { districts: 15, title: 'Seoul Regular', emoji: '🚇', blurb: '15 districts — practically a local' },
-  { districts: 20, title: 'Almost Local', emoji: '🌟', blurb: '20 districts — Seoul is your city' },
-  { districts: 25, title: 'Seoul Conqueror', emoji: '👑', blurb: 'All 25 districts — you conquered Seoul!' },
+  { districts: 10, title: 'City Explorer', emoji: '🧭', blurb: '10 districts, you know your way around' },
+  { districts: 15, title: 'Seoul Regular', emoji: '🚇', blurb: '15 districts, practically a local' },
+  { districts: 20, title: 'Almost Local', emoji: '🌟', blurb: '20 districts, Seoul is your city' },
+  { districts: 25, title: 'Seoul Conqueror', emoji: '👑', blurb: 'All 25 districts, you conquered Seoul!' },
 ];
 
 // The highest tier reached at a given district count (or null below the first).

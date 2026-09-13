@@ -3,7 +3,7 @@ import { View, Image } from 'react-native';
 import { useTheme } from '@/theme/theme';
 import { T } from './base';
 
-// Round avatar — the user's photo if set, otherwise their initial on an
+// Round avatar, the user's photo if set, otherwise their initial on an
 // accent-tinted circle (deterministic hue variation keeps a feed of avatars
 // from looking monotonous).
 const HUES = ['#c2569b', '#5b7a99', '#4a9d8e', '#e0a05a', '#8a6fc0', '#c75c54'];

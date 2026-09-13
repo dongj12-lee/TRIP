@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Modal, Pressable, ScrollView } from 'react-native';
+import { View, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
+import { Icon } from './Icon';
 import { T, H } from './base';
 import { Weather, weatherDesc, weatherTip, dayLabel, hourLabel } from '@/lib/weather';
 
@@ -9,6 +10,7 @@ import { Weather, weatherDesc, weatherTip, dayLabel, hourLabel } from '@/lib/wea
 export function WeatherSheet({ visible, onClose, weather }: { visible: boolean; onClose: () => void; weather: Weather | null }) {
   const { c, dark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: winH } = useWindowDimensions();
   if (!weather) return null;
 
   const now = weatherDesc(weather.code, weather.isDay);
@@ -21,8 +23,15 @@ export function WeatherSheet({ visible, onClose, weather }: { visible: boolean; 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
-      <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingBottom: insets.bottom + 16 }}>
+      {/* Height cap + ScrollView. This sheet is the tallest in the app (24
+          hourly cells + 7 daily rows); uncapped it filled the whole iPad
+          viewport, leaving the scrim above it zero height. With no scrim to
+          tap and no close button, the sheet could not be dismissed at all —
+          the app had to be force-quit. Same Guideline 4 class as the
+          onboarding overlap. */}
+      <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: winH * 0.9 }}>
         <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginTop: 10, marginBottom: 4 }} />
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}>
 
         {/* Current conditions header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
@@ -36,9 +45,14 @@ export function WeatherSheet({ visible, onClose, weather }: { visible: boolean; 
               Feels {weather.feels}° · 💧 {weather.humidity}%{tip ? ` · ${tip}` : ''}
             </T>
           </View>
+          <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Close">
+            <View style={{ width: 32, height: 32, borderRadius: 999, backgroundColor: c.surface2, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="close" size={16} stroke={c.inkSoft} sw={2.2} />
+            </View>
+          </Pressable>
         </View>
 
-        {/* Hourly — next 24 hours */}
+        {/* Hourly, next 24 hours */}
         {weather.hourly.length > 0 && (
           <>
             <View style={{ height: 1, backgroundColor: c.line, marginHorizontal: 20 }} />
@@ -89,7 +103,7 @@ export function WeatherSheet({ visible, onClose, weather }: { visible: boolean; 
                     </>
                   ) : null}
                 </View>
-                {/* Low — bar — High */}
+                {/* Low, bar. High */}
                 <T style={{ width: 30, fontSize: 13, fontWeight: '600', color: c.muted, textAlign: 'right' }}>{d.lo}°</T>
                 <View style={{ flex: 1, height: 6, borderRadius: 999, backgroundColor: c.surface2, marginHorizontal: 10, justifyContent: 'center' }}>
                   <View style={{ position: 'absolute', left: `${left}%`, width: `${width}%`, height: 6, borderRadius: 999, backgroundColor: c.accent }} />
@@ -101,6 +115,7 @@ export function WeatherSheet({ visible, onClose, weather }: { visible: boolean; 
         </View>
 
         <T style={{ fontSize: 11, color: c.muted, textAlign: 'center', marginTop: 14 }}>Live forecast · {weather.source ?? '기상청 KMA'}</T>
+        </ScrollView>
       </View>
     </Modal>
   );

@@ -16,7 +16,13 @@
 // overwrites an existing link and logs anything it can't confidently resolve
 // for manual review instead of guessing.
 //
-//   npx tsx scripts/backfill-place-website.ts [--dry-run] [--force]
+// Pass --source=<value> to restrict to one import batch (e.g. the rows a fresh
+// import just added) instead of re-attempting every website-less place in the
+// catalog — Naver Local Search comes back empty for many places that simply
+// have no registered homepage, and those unresolved rows would otherwise be
+// re-queried on every run for no gain.
+//
+//   npx tsx scripts/backfill-place-website.ts [--dry-run] [--force] [--source=tourapi_kor]
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
@@ -41,6 +47,7 @@ if (!NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET) {
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 const dryRun = process.argv.includes('--dry-run');
 const force = process.argv.includes('--force');
+const sourceFilter = process.argv.find((a) => a.startsWith('--source='))?.slice('--source='.length) || null;
 
 type Row = { slug: string; name: string; name_ko: string | null; neighborhood: string | null; website_url: string | null };
 
@@ -75,16 +82,20 @@ async function main() {
   const all: Row[] = [];
   const PAGE = 1000;
   for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase
+    let query = supabase
       .from('places')
       .select('slug,name,name_ko,neighborhood,website_url')
       .range(from, from + PAGE - 1);
+    if (sourceFilter) query = query.eq('source', sourceFilter);
+    const { data, error } = await query;
     if (error) throw error;
     all.push(...(data as Row[]));
     if (data.length < PAGE) break;
   }
   const todo = force ? all : all.filter((r) => !r.website_url);
-  console.log(`${all.length} places total, ${todo.length} to resolve${force ? ' (--force: re-resolving all)' : ''}.`);
+  console.log(
+    `${all.length} places${sourceFilter ? ` (source=${sourceFilter})` : ''} total, ${todo.length} to resolve${force ? ' (--force: re-resolving all)' : ''}.`,
+  );
 
   let resolved = 0;
   const unresolved: string[] = [];

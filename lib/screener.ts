@@ -1,11 +1,11 @@
 // Natural-language "screener" search. A traveler types how they feel —
 // "quiet cafe with an english menu", "must-see palace", "vegetarian dinner
-// near a subway" — and this ranks places by matching that intent against the
+// near a subway", and this ranks places by matching that intent against the
 // data we actually have: the rich Visit Seoul descriptions, the Good-to-know
 // facts (subway / free entry / english site / wheelchair), the traveler intent
 // buckets, and (once crowd-sourced) the Foreigner-Fit tags.
 //
-// Pure scoring — free, instant, offline, deterministic — the same philosophy as
+// Pure scoring, free, instant, offline, deterministic, the same philosophy as
 // the day-plan generator, and structured so an LLM re-rank could sit on top
 // later without changing how signals are sourced. Falls back to plain text
 // matching when the query carries no recognizable signal, so exact lookups
@@ -159,11 +159,3 @@ export function screen(raw: string, places: Place[], limit = 60): ScreenerHit[] 
 
   return hits.sort((a, b) => b.score - a.score).slice(0, limit);
 }
-
-// Example prompts shown under an empty search bar to teach the feature.
-export const SCREENER_EXAMPLES = [
-  'quiet café with an english menu',
-  'must-see palace worth visiting',
-  'vegetarian dinner near a subway',
-  'traditional spot for photos',
-];

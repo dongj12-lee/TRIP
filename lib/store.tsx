@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_ITINERARY, buildRoutePost } from '@/data';
-import { ForeignerTagKey, Itinerary, Post, Profile } from '@/data/types';
+import { ForeignerTagKey, Itinerary, ItineraryDay, Post, Profile } from '@/data/types';
 import { isSupabaseConfigured } from './supabase';
 import { useAuth } from './auth';
 import { useRemoteContent } from './remoteData';
@@ -10,7 +10,7 @@ import * as remote from '@/data/remote';
 
 // Local persistence (AsyncStorage) doubles as: (a) the entire data store when
 // Supabase isn't configured yet, and (b) an instant-load cache/optimistic
-// layer once it is — real writes also go to Supabase (see toggle* below).
+// layer once it is, real writes also go to Supabase (see toggle* below).
 const STORE_KEY = 'trip_app_state_v1';
 
 type PersistShape = {
@@ -45,7 +45,14 @@ type StoreValue = {
   toggleJoin: (buddyId: string, message?: string) => void;
   toggleFollow: (id: string) => void;
   setItinerary: (next: Itinerary | ((prev: Itinerary) => Itinerary)) => void;
-  shareTrip: (message: string) => Promise<void>;
+  // Share a route to the Feed for feedback. Pass an explicit itinerary to share
+  // one that isn't yet committed to state (e.g. straight from the trip planner,
+  // before setItinerary has flushed).
+  shareTrip: (message: string, itineraryOverride?: Itinerary) => Promise<void>;
+  // Load a shared route post's days back into the editable itinerary, so a
+  // traveller can refine their own route after feedback, or adopt someone
+  // else's. Slugs resolve to full places; free-text stops are kept as-is.
+  adoptRoute: (post: Post) => void;
   updateProfile: (fields: Partial<Profile>) => Promise<void>;
   myPostCount: number;
   placeReactions: Record<string, 'like' | 'dislike'>;
@@ -130,7 +137,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (data) setItineraryState(data as Itinerary);
       })
       .catch((e) => console.warn('fetchItinerary failed', e));
-    // Real identity — replaces the hardcoded "You / 340 PTS" mock.
+    // Real identity, replaces the hardcoded "You / 340 PTS" mock.
     remote
       .fetchProfile(user.id)
       .then((p) => {
@@ -258,8 +265,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       },
       setItinerary: (next) =>
         setItineraryState((prev) => (typeof next === 'function' ? (next as any)(prev) : next)),
-      shareTrip: async (message) => {
-        const built = buildRoutePost(itinerary, message, profile.country);
+      shareTrip: async (message, itineraryOverride) => {
+        const built = buildRoutePost(itineraryOverride ?? itinerary, message, profile.country);
         if (canWrite && user) {
           try {
             const created = await remote.createPost({
@@ -280,6 +287,33 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           }
         }
         setSharedPost(built);
+      },
+      adoptRoute: (post) => {
+        if (!post.routeDays?.length) return;
+        const days: ItineraryDay[] = post.routeDays.map((d, i) => ({
+          label: d.day || `Day ${i + 1}`,
+          date: '',
+          theme: d.theme || '',
+          stops: d.stops
+            .filter((s) => (s.slug || s.name))
+            .map((s) => {
+              const p = s.slug ? placeBySlug[s.slug] : null;
+              return {
+                time: s.time || '',
+                part: '',
+                name: s.name || p?.name || '',
+                note: s.note || '',
+                slug: s.slug || null,
+                swatch: p?.swatch || (['#7a4a2a', '#e0a05a'] as [string, string]),
+                lat: p?.lat,
+                lng: p?.lng,
+                category: p?.category,
+                photoUrl: p?.photoUrl,
+              };
+            }),
+        }));
+        const title = (post.title || 'Seoul trip').replace(/,?\s*feedback welcome.*$/i, '').trim() || 'Seoul trip';
+        setItineraryState((prev) => ({ ...prev, title, days }));
       },
       updateProfile: async (fields) => {
         setProfile((prev) => ({ ...prev, ...fields }));

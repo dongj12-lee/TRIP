@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Modal, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Modal, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, InteractionManager, ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '@/theme/theme';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/auth';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { uploadAvatar } from '@/data/remote';
+import { uploadAvatar, friendlyError } from '@/data/remote';
 import { haptic } from '@/lib/haptics';
 import { T, H, Button } from './base';
 import { Avatar } from './Avatar';
@@ -17,6 +17,7 @@ import { useToast } from './Toast';
 export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: winH } = useWindowDimensions();
   const { profile, updateProfile } = useStore();
   const { configured, session } = useAuth();
   const { showToast } = useToast();
@@ -40,6 +41,10 @@ export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClo
     if (!canUpload) { showToast('Sign in to add a photo', '🔒'); return; }
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) { showToast('Photo access is needed to set an avatar'); return; }
+    // This sheet is an RN Modal; launching the native picker (itself a modal
+    // presentation) synchronously from inside an already-open one can
+    // silently no-op on iOS. Same fix as components/PhotoAttach.tsx.
+    await new Promise<void>((resolve) => InteractionManager.runAfterInteractions(() => resolve()));
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
@@ -53,7 +58,7 @@ export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClo
       setAvatarUrl(url);
       haptic.success();
     } catch (e) {
-      showToast("Couldn't upload that photo — try again");
+      showToast(friendlyError(e, "Couldn't upload that photo, try again"), '⚠️');
       console.warn('uploadAvatar failed', e);
     } finally {
       setUploading(false);
@@ -82,7 +87,17 @@ export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClo
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20 }}>
+        {/* maxHeight + ScrollView, not a bare View: this sheet's content runs
+            ~450pt, and once the keyboard claims its share there was no room
+            left on a short viewport. The sheet then grew past the top of the
+            screen and the title and avatar became unreachable — the "obscured
+            elements" class of Guideline 4 rejection. */}
+        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: winH * 0.9 }}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 20 }}
+          >
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
           <H style={{ fontSize: 21, marginBottom: 16 }}>Edit profile</H>
 
@@ -91,7 +106,7 @@ export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClo
             <Pressable onPress={pickAvatar} accessibilityRole="button" accessibilityLabel="Change profile photo" style={{ position: 'relative' }}>
               <Avatar name={name || 'You'} uri={avatarUrl} size={84} />
               <View style={{ position: 'absolute', right: -2, bottom: -2, width: 30, height: 30, borderRadius: 999, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: c.paper }}>
-                {uploading ? <ActivityIndicator size="small" color="#fff" /> : <T style={{ fontSize: 15 }}>📷</T>}
+                {uploading ? <ActivityIndicator size="small" color={c.paper} /> : <T style={{ fontSize: 15 }}>📷</T>}
               </View>
             </Pressable>
             <T style={{ fontSize: 12, color: c.muted, marginTop: 8 }}>{uploading ? 'Uploading…' : 'Tap to change photo'}</T>
@@ -115,6 +130,7 @@ export function EditProfileSheet({ visible, onClose }: { visible: boolean; onClo
           </View>
 
           <Button label={saving ? 'Saving…' : 'Save'} onPress={save} disabled={saving} style={{ marginTop: 20 }} />
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>

@@ -94,10 +94,10 @@ export function weatherDesc(code: number, isDay: boolean): { emoji: string; labe
 export function weatherTip(w: Weather): string | null {
   const wet = (w.code >= 51 && w.code <= 67) || (w.code >= 80 && w.code <= 82) || w.code >= 95;
   const snow = (w.code >= 71 && w.code <= 77) || w.code === 85 || w.code === 86;
-  if (snow) return 'Snow — dress warm 🧣';
+  if (snow) return 'Snow, dress warm 🧣';
   if (wet) return 'Umbrella weather ☔';
-  if (w.feels >= 31) return 'Hot & humid — hydrate 💧';
-  if (w.feels <= 0) return 'Freezing — bundle up 🧥';
+  if (w.feels >= 31) return 'Hot & humid, hydrate 💧';
+  if (w.feels <= 0) return 'Freezing, bundle up 🧥';
   if (w.code <= 1) return 'Great day to be out ✨';
   return null;
 }

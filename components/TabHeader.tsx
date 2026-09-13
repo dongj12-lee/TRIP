@@ -1,26 +1,34 @@
 import React, { useRef } from 'react';
 import { Animated, View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useScrollToTop } from '@react-navigation/native';
 import { useTheme } from '@/theme/theme';
 import { H, T } from './base';
 
 // iOS-style large title that collapses on scroll. Instead of a permanent
 // title + descriptive subtitle (a template tell), each tab shows a big title
 // at rest that scrolls away behind a slim bar; the compact title + hairline
-// fade in as you scroll — the pattern Apple's own apps use.
+// fade in as you scroll, the pattern Apple's own apps use.
 //
 // The bar is transparent at rest (so the large title sits right under the
 // status bar with no dead gap) and only paints its paper background + compact
-// title + hairline once you scroll — the large title slides up beneath it.
+// title + hairline once you scroll, the large title slides up beneath it.
 
 const BAR_HEIGHT = 44; // nav-bar band below the status bar
 
+// Every tab screen calls this once, so wiring "tap the active tab again to
+// jump to the top" here (the standard iOS/Android behaviour, e.g. Instagram,
+// Apple's own apps) covers all five tabs from one place instead of five
+// copies of the same ref-and-listener boilerplate. `scrollRef` just needs to
+// land on the screen's own top-level ScrollView/FlatList.
 export function useTabScroll() {
   const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<any>(null);
+  useScrollToTop(scrollRef);
   const onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
     useNativeDriver: true,
   });
-  return { scrollY, onScroll };
+  return { scrollY, onScroll, scrollRef };
 }
 
 export function TabBar({
@@ -38,7 +46,7 @@ export function TabBar({
   const titleOpacity = scrollY.interpolate({ inputRange: [30, 54], outputRange: [0, 1], extrapolate: 'clamp' });
   return (
     <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, paddingTop: insets.top }}>
-      {/* Paper background + hairline — fade in only once scrolled */}
+      {/* Paper background + hairline, fade in only once scrolled */}
       <Animated.View
         pointerEvents="none"
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top + BAR_HEIGHT, backgroundColor: c.paper, opacity: bgOpacity }}
@@ -59,7 +67,7 @@ export function TabBar({
 
 // The big in-content title. Sits just under the status bar and scrolls away
 // beneath the (transparent-at-rest) bar. `subtitle` is a one-line purpose
-// statement — used only where the tab name alone doesn't say what it's for
+// statement, used only where the tab name alone doesn't say what it's for
 // (kept short and concrete, never generic marketing copy, so it doesn't read
 // as templated boilerplate).
 export function TabTitle({ title, subtitle, style }: { title: string; subtitle?: string; style?: any }) {
@@ -74,7 +82,7 @@ export function TabTitle({ title, subtitle, style }: { title: string; subtitle?:
   );
 }
 
-// Top padding the scroll content needs. Small — the bar is transparent at rest,
+// Top padding the scroll content needs. Small, the bar is transparent at rest,
 // so the large title tucks right under the status bar with no empty band.
 export function useContentTopPadding() {
   const insets = useSafeAreaInsets();

@@ -7,14 +7,14 @@ import { T } from './base';
 import { WebMap } from './WebMap';
 import { categoryPinColor } from './webMapHtml';
 
-// `sub` is category_l2 — lets Cuisine (cafes/bars/restaurants all share the
+// `sub` is category_l2, lets Cuisine (cafes/bars/restaurants all share the
 // same L1) still get a distinct pin per kind.
 function pinEmoji(cat: string, sub?: string | null) {
   if (sub?.includes('Cafe')) return '☕';
   if (sub?.includes('Bar')) return '🍺';
   if (sub?.includes('Restaurant')) return '🍜';
   if (cat.includes('Culture')) return '🎭';
-  if (cat.includes('History')) return '🏯';
+  if (cat.includes('History')) return '🏛️';
   if (cat.includes('Nature')) return '🌳';
   if (cat.includes('Shopping')) return '🛍️';
   if (cat.includes('Experience')) return '🎟️';
@@ -23,7 +23,7 @@ function pinEmoji(cat: string, sub?: string | null) {
 }
 
 // Sentinel id for the one-off pin from a live Naver search result (not part
-// of the app's own catalog) — chosen to never collide with a real place slug.
+// of the app's own catalog), chosen to never collide with a real place slug.
 export const EXTERNAL_PIN_ID = '__external__';
 
 export function ExploreMap({

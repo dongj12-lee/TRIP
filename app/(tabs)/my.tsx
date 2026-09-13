@@ -27,10 +27,10 @@ export default function MyScreen() {
   const router = useRouter();
   const { saved, toggleSave, itinerary, sharedPost, shareTrip, profile, myPostCount, placeReactions, stamps, joined } = useStore();
   const { placeBySlug, posts } = useRemoteContent();
-  const { user } = useAuth();
+  const { user, guest, exitGuest } = useAuth();
   const { showToast } = useToast();
   const [editing, setEditing] = useState(false);
-  const { scrollY, onScroll } = useTabScroll();
+  const { scrollY, onScroll, scrollRef } = useTabScroll();
   const topPad = useContentTopPadding();
 
   const name = profile.displayName || 'You';
@@ -58,25 +58,51 @@ export default function MyScreen() {
   const passportProg = progressFor(earnedStamps);
   const passportRankInfo = passportRank(earnedStamps.size);
   const passportPct = Math.round((earnedStamps.size / passportProg.total) * 100);
-  // The user's own posts — real, not the seeded mock contributions.
+  // The user's own posts, real, not the seeded mock contributions.
   const myPosts = user ? posts.filter((p) => p.authorId === user.id) : [];
 
   return (
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <TabBar
-        title="My TRIP"
+        title="My travels"
         scrollY={scrollY}
         right={<IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} color={c.inkSoft} />}
       />
       <Animated.ScrollView
+        ref={scrollRef}
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
         showsVerticalScrollIndicator={false}
       >
-        <TabTitle title="My TRIP" />
+        <TabTitle title="My travels" />
 
-        {/* Identity — tap to edit */}
+        {/* Guests keep everything they do locally; this is where they can turn
+            it into a real account so it syncs and they can post. */}
+        {guest && (
+          <View style={{ paddingHorizontal: 18, paddingTop: 10 }}>
+            <Pressable
+              onPress={() => { haptic.tick(); exitGuest(); router.replace('/auth'); }}
+              accessibilityRole="button"
+              accessibilityLabel="Sign in or create an account"
+              style={({ pressed }) => ({
+                flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14,
+                borderRadius: 14, backgroundColor: c.accent50, opacity: pressed ? 0.9 : 1,
+              })}
+            >
+              <Icon name="user" size={20} stroke={c.accent} sw={2} />
+              <View style={{ flex: 1 }}>
+                <T style={{ fontSize: 14, fontWeight: '800', color: c.accent }}>Browsing as a guest</T>
+                <T style={{ fontSize: 12.5, color: c.inkSoft, marginTop: 1.5, lineHeight: 17 }}>
+                  Create an account to sync your trip and post to the feed.
+                </T>
+              </View>
+              <Icon name="chevron" size={17} stroke={c.accent} sw={2.2} />
+            </Pressable>
+          </View>
+        )}
+
+        {/* Identity, tap to edit */}
         <Pressable onPress={() => setEditing(true)} style={{ paddingHorizontal: 18, paddingTop: 10, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <Avatar name={name} uri={profile.avatarUrl} size={56} />
           <View style={{ flex: 1 }}>
@@ -94,7 +120,7 @@ export default function MyScreen() {
           </View>
         </Pressable>
 
-        {/* Tier progress — the path to the next badge */}
+        {/* Tier progress, the path to the next badge */}
         {nextTier && (
           <View style={{ paddingHorizontal: 18, paddingTop: 12 }}>
             <View style={{ backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line, padding: 12 }}>
@@ -117,14 +143,20 @@ export default function MyScreen() {
           </View>
         )}
 
-        {/* Stats — real usage */}
+        {/* Stats, real usage */}
         <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 18, paddingTop: 14 }}>
-          <Stat n={myPostCount} label="Posts" />
+          {/* myPostCount only counts shareTrip (route shares); a tip/question
+              published via app/compose.tsx goes through addLocalPost
+              instead and never bumped it, so "Posts" could read 0 right
+              after publishing your first one. myPosts.length (below,
+              filtered from the same live post list "My contributions"
+              already uses) can't drift from what's actually on screen. */}
+          <Stat n={myPosts.length} label="Posts" />
           <Stat n={saved.size} label="Saved" />
           <Stat n={likedPlaces.length} label="Liked" />
         </View>
 
-        {/* Seoul Passport — the district-fill collection, taps into /passport */}
+        {/* Seoul Passport, the district-fill collection, taps into /passport */}
         <View style={{ paddingHorizontal: 18, paddingTop: 16 }}>
           <Pressable
             onPress={() => { haptic.tick(); router.push('/passport'); }}
@@ -182,23 +214,29 @@ export default function MyScreen() {
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
               <Button label="Open & edit" icon="edit" variant="soft" style={{ flex: 1 }} onPress={() => router.push('/planner')} />
               <Button
-                label={sharedPost ? '✓ Shared' : 'Share'}
+                label={sharedPost ? 'View post' : 'Share'}
                 icon={sharedPost ? undefined : 'share'}
                 variant={sharedPost ? 'soft' : 'primary'}
                 style={{ flex: 1 }}
                 onPress={async () => {
-                  if (!sharedPost) {
-                    await shareTrip('');
-                    showToast('Shared — feedback incoming', '🙏');
-                    router.push('/(tabs)/feed');
+                  // Used to just no-op once shared — the button kept looking
+                  // live (same enabled Button, right next to "Open & edit")
+                  // but did nothing, right when a traveller most wants to
+                  // jump to the post and read the feedback coming in.
+                  if (sharedPost) {
+                    router.push(`/post/${sharedPost.slug}`);
+                    return;
                   }
+                  await shareTrip('');
+                  showToast('Shared, feedback incoming', '🙏');
+                  router.push('/(tabs)/feed');
                 }}
               />
             </View>
           </Card>
         </View>
 
-        {/* My contributions — the user's own posts, or an empty state */}
+        {/* My contributions, the user's own posts, or an empty state */}
         <Section title="My contributions">
           {myPosts.length === 0 ? (
             <Pressable
@@ -218,23 +256,29 @@ export default function MyScreen() {
           )}
         </Section>
 
-        {/* Liked spots — quick jump back to what resonated */}
+        {/* Liked spots, quick jump back to what resonated. A full-bleed rail
+            like Themes' (app/(tabs)/themes.tsx Rail) and Explore's — not
+            Section, whose own paddingHorizontal:18 stacked with this rail's
+            paddingRight:18 to inset the right edge 36px while the left
+            stayed at 18px, and clipped the last card short of the screen
+            edge instead of running flush like every other rail. */}
         {likedPlaces.length > 0 && (
-          <Section title="Liked spots">
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 18 }}>
+          <View style={{ paddingTop: 22 }}>
+            <H style={{ fontSize: 18, marginBottom: 12, paddingHorizontal: 18 }}>Liked spots</H>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 18 }}>
               {likedPlaces.map((p) => (
                 <PlaceCardCompact key={p.slug} place={p} />
               ))}
             </ScrollView>
-          </Section>
+          </View>
         )}
 
-        {/* Saved places — compact scannable rows (full cards buried the list) */}
+        {/* Saved places, compact scannable rows (full cards buried the list) */}
         <Section title={savedPlaces.length > 0 ? `Saved places · ${savedPlaces.length}` : 'Saved places'}>
           {savedPlaces.length === 0 ? (
             <View style={{ padding: 24, alignItems: 'center', backgroundColor: c.surface, borderRadius: 14, borderWidth: 1, borderColor: c.line }}>
               <T style={{ fontSize: 26 }}>🔖</T>
-              <T style={{ color: c.muted, marginTop: 6, fontWeight: '600' }}>Start exploring — tap ♥ on any spot.</T>
+              <T style={{ color: c.muted, marginTop: 6, fontWeight: '600' }}>Start exploring, tap ♥ on any spot.</T>
             </View>
           ) : (
             <View style={{ gap: 9 }}>

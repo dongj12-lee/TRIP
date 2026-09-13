@@ -5,7 +5,7 @@ import { useTheme } from '@/theme/theme';
 import { Screen, DetailHeader } from '@/components/base';
 import { legalDocHtml, LEGAL_TITLES, LegalDocKey } from '@/data/legalDocs';
 
-// Web variant — react-native-webview has no web target (same reason
+// Web variant, react-native-webview has no web target (same reason
 // WebMap.web.tsx exists), so on web we render the bundled legal HTML in a
 // real DOM <iframe srcDoc>. Under react-native-web, JSX still compiles to
 // React.createElement, so a lowercase 'iframe' renders an actual iframe.

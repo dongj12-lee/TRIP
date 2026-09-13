@@ -11,8 +11,8 @@ import { haptic } from '@/lib/haptics';
 import { GlassView } from 'expo-glass-effect';
 import { GLASS_ON } from './glass';
 
-// Consolidates the foreigner-tag and neighborhood pickers — previously two
-// full-width horizontal scroll rows always on screen — into a single sheet
+// Consolidates the foreigner-tag and neighborhood pickers, previously two
+// full-width horizontal scroll rows always on screen, into a single sheet
 // behind one "Filters" button, so Explore's default view stays to one
 // category rail instead of three competing rows of pills.
 export function FiltersSheet({
@@ -74,7 +74,7 @@ export function FiltersSheet({
               </Pressable>
             )}
           </View>
-          <T style={{ fontSize: 12, color: c.muted, marginBottom: 10 }}>Tap districts on the map — pick as many as you like.</T>
+          <T style={{ fontSize: 12, color: c.muted, marginBottom: 10 }}>Tap districts on the map, pick as many as you like.</T>
           <SeoulMapPicker
             selected={selectedHoods}
             onToggle={(h) => { haptic.tick(); toggleHood(h); }}

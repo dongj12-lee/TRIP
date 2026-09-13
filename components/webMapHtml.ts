@@ -2,7 +2,7 @@
 // WebView, inline HTML + baseUrl) and WebMap.web.tsx (browser iframe pointed
 // at the real same-origin public/naver-map.html). react-native-webview has
 // no web target, and a srcDoc/blob iframe reports window.location as
-// "about:srcdoc" — which the Naver SDK's domain check always rejects — so the
+// "about:srcdoc", which the Naver SDK's domain check always rejects, so the
 // two platforms load the map differently but share ALL rendering logic below.
 // See docs/OPERATIONS.md.
 
@@ -13,8 +13,8 @@ export type MapPin = {
   color?: string; // pin fill (category color); falls back to accent
   number?: number; // numbered circle (route-stop style)
   selected?: boolean;
-  saved?: boolean; // a place the traveler saved — drawn with a heart center
-  external?: boolean; // found via live Naver search, not in TRIP's own catalog
+  saved?: boolean; // a place the traveler saved, drawn with a heart center
+  external?: boolean; // found via live Naver search, not in BADA's own catalog
 };
 
 export type MapData = {
@@ -31,7 +31,7 @@ export const NAVER_CLIENT_ID = process.env.EXPO_PUBLIC_NAVER_MAP_CLIENT_ID;
 // here even though the registration is http: with an http baseUrl the WKWebView
 // page is a non-secure origin, and iOS then blocks it from loading the Naver
 // SDK/tiles (the map came up blank despite the origin being registered). An
-// https baseUrl makes the page a secure origin loading an https script — no
+// https baseUrl makes the page a secure origin loading an https script, no
 // mixed-content/ATS block. For production, register+use the app's real origin.
 export const MAP_ORIGIN = 'https://127.0.0.1:8081';
 
@@ -53,7 +53,7 @@ export function categoryPinColor(category: string, sub?: string | null): string 
 
 // The full in-page map runtime, as a plain-JS string injected into both the
 // native WebView HTML and the web iframe. Exposes window.__renderMap(data)
-// (idempotent — clears and redraws, re-clusters on zoom) and calls
+// (idempotent, clears and redraws, re-clusters on zoom) and calls
 // window.__onPin(id) on individual-pin taps. Keep this dependency-free: it
 // runs inside the map page, not the RN bundle. (No backticks / ${} inside.)
 export const MAP_RUNTIME_JS = String.raw`
@@ -68,13 +68,13 @@ export const MAP_RUNTIME_JS = String.raw`
     var y=(0.5-Math.log((1+sl)/(1-sl))/(4*Math.PI))*s;
     return {x:x,y:y};
   }
-  // Clean SVG teardrop pin (no emoji — glyph rendering varies across
+  // Clean SVG teardrop pin (no emoji, glyph rendering varies across
   // WebViews and reads as clutter at browse density).
   function pinHtml(p,cs){
     if(p.number!=null){
       return '<div style="width:28px;height:28px;border-radius:999px;background:'+cs.accent+';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font:800 13px system-ui;color:#fff">'+p.number+'</div>';
     }
-    // A live-search result outside TRIP's own catalog — a distinct ink pin
+    // A live-search result outside BADA's own catalog, a distinct ink pin
     // with a magnifier center and a dashed ring, so it visually reads as
     // "found, not curated" rather than one of the app's own places.
     if(p.external){
@@ -83,14 +83,14 @@ export const MAP_RUNTIME_JS = String.raw`
     }
     var fill=p.selected?cs.accent:(p.color||cs.accent);
     // Saved spots sit between normal and selected in size and carry a heart
-    // center instead of a dot — so a traveler's shortlist stands out on the map.
+    // center instead of a dot, so a traveler's shortlist stands out on the map.
     var h=p.selected?34:(p.saved?31:27), w=Math.round(h*0.72);
     var center=p.saved
       ? '<path d="M12 15s-3.3-2.3-3.3-4.5a1.75 1.75 0 0 1 3.3-.85 1.75 1.75 0 0 1 3.3.85C15.3 12.7 12 15 12 15z" fill="rgba(255,255,255,.96)"/>'
       : '<circle cx="12" cy="11.6" r="4.6" fill="rgba(255,255,255,.92)"/>';
     return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 24 33" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"><path d="M12 0C5.4 0 0 5.4 0 12c0 8.6 10 19.6 11.2 20.8a1.1 1.1 0 0 0 1.6 0C14 31.6 24 20.6 24 12 24 5.4 18.6 0 12 0z" fill="'+fill+'"/>'+center+'</svg>';
   }
-  // Cluster bubble — quiet Airbnb-style white disc, ink count, hairline ring.
+  // Cluster bubble, quiet Airbnb-style white disc, ink count, hairline ring.
   function bubbleHtml(n,cs){
     var sz=n<10?34:(n<100?40:46);
     var fs=n<100?13:12;
@@ -149,7 +149,7 @@ export const MAP_RUNTIME_JS = String.raw`
     fitKey=key;
     if(DATA.pins.length===1){ map.setCenter(new naver.maps.LatLng(DATA.pins[0].lat,DATA.pins[0].lng)); map.setZoom(15); return; }
     // The unfiltered catalog (~2,300+ pins) spans Incheon airport to Ganghwado
-    // — fitBounds' center is the midpoint of those extremes, not Seoul, and
+    //, fitBounds' center is the midpoint of those extremes, not Seoul, and
     // its zoom shrinks everything to fit them in. For a set that large just
     // center on Seoul proper at a fixed, readable zoom instead of fitting to
     // the outliers; smaller (filtered/searched) sets still fit-to-bounds
@@ -184,7 +184,7 @@ export function buildNativeShell(clientId: string) {
     '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />' +
     '<style>html,body,#map{width:100%;height:100%;margin:0;padding:0}</style>' +
     // Naver calls this global if the ncpKeyId or its registered Service URL
-    // check fails — surface it to RN instead of silently blank-mapping.
+    // check fails, surface it to RN instead of silently blank-mapping.
     '<script>window.navermap_authFailure=function(){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"mapAuthFail"}));};</script>' +
     '<script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=' + clientId + '&language=en"></script>' +
     '</head><body><div id="map"></div>' +
@@ -192,7 +192,7 @@ export function buildNativeShell(clientId: string) {
     '<script>window.__onPin=function(id){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"pinPress",id:id}));};</script>' +
     // Catch-all: navermap_authFailure only fires if the SDK loaded but the key
     // was rejected. If the script never loaded at all (network/ATS), no
-    // callback fires and the map is silently blank — so if `naver` is still
+    // callback fires and the map is silently blank, so if `naver` is still
     // undefined a few seconds in, report the same failure so RN can fall back.
     '<script>setTimeout(function(){if(!window.naver||!window.naver.maps){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify({type:"mapAuthFail"}));}},3500);</script>' +
     '</body></html>'

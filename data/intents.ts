@@ -1,9 +1,9 @@
-// Traveler-intent categories — the browsing taxonomy Explore actually shows.
+// Traveler-intent categories, the browsing taxonomy Explore actually shows.
 //
 // Visit Seoul's own hierarchy (category/L2/L3) is an administrator's taxonomy:
 // "Culture" holds parks AND museums AND landmarks, "History" vs "Culture" is
 // arbitrary to a tourist, and "Experience Programs" is opaque. Travelers think
-// in intents — eat / café / see / shop / nature / night out. This module maps
+// in intents, eat / cafe / see / shop / nature / night out. This module maps
 // every (category, L2, L3) combination onto 9 intent buckets, verified to
 // cover the full 2,110-place catalog with nothing left over.
 //
@@ -44,12 +44,12 @@ export const INTENTS: Intent[] = [
         if (t === 'Western' || t === 'Chinese' || t === 'Japanese') return t;
         return 'World'; // Fusion / Others / untagged foreign
       }
-      return 'Local picks'; // Cuisine with no L2 — untagged local spots
+      return 'Local picks'; // Cuisine with no L2, untagged local spots
     },
   },
-  { key: 'cafe', emoji: '☕', label: 'Cafés', match: isCafe },
+  { key: 'cafe', emoji: '☕', label: 'Cafes', match: isCafe },
   {
-    key: 'sights', emoji: '🏯', label: 'Sights',
+    key: 'sights', emoji: '🏛️', label: 'Sights',
     match: (p) =>
       p.category === 'History' ||
       (p.category === 'Culture' && ['Landmarks', 'Cultural Districts', 'Other Cultural Destinations'].includes(l2(p))),

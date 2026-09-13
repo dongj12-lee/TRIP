@@ -60,6 +60,23 @@ export default function Onboarding() {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: c.paper }}>
       <View style={{ flex: 1, paddingTop: insets.top + 12 }}>
+        {/* Back — there was no way out of a step at all before this: no
+            hardware back on iOS, progress dots aren't pressable, and Continue
+            is disabled until the step's own requirement is met. A name
+            typo on step 1 had no fix. */}
+        <View style={{ height: 28, paddingHorizontal: 20 }}>
+          {step > 0 && (
+            <Pressable
+              onPress={() => setStep(step - 1)}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel="Back"
+              style={{ width: 36, height: 28, justifyContent: 'center' }}
+            >
+              <Icon name="back" size={20} stroke={c.ink} sw={2.2} />
+            </Pressable>
+          )}
+        </View>
         {/* progress */}
         <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 24, paddingTop: 8 }}>
           {Array.from({ length: STEPS }).map((_, i) => (
@@ -80,11 +97,9 @@ export default function Onboarding() {
             onPress={next}
             disabled={!canNext}
           />
-          {step === 0 && (
-            <Pressable onPress={() => finish(true)} style={{ alignItems: 'center', paddingVertical: 6 }}>
-              <T style={{ color: c.muted, fontSize: 14, fontWeight: '600' }}>Skip for now</T>
-            </Pressable>
-          )}
+          <Pressable onPress={() => finish(true)} style={{ alignItems: 'center', paddingVertical: 6 }}>
+            <T style={{ color: c.muted, fontSize: 14, fontWeight: '600' }}>Skip for now</T>
+          </Pressable>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -94,11 +109,21 @@ export default function Onboarding() {
 function PickName({ name, setName }: { name: string; setName: (v: string) => void }) {
   const { c } = useTheme();
   return (
-    <View style={{ flex: 1, paddingTop: 40 }}>
+    // The last step still on a fixed flex:1 View, and the only one that raises
+    // the keyboard. Once KeyboardAvoidingView shrank the content area, the
+    // ~250pt of heading + copy + field no longer fit, and since React Native
+    // does not clip overflow the field spilled downward and rendered *through*
+    // the Continue button. Apple hit exactly this on an iPad Air (Guideline 4).
+    // Same ScrollView treatment as Welcome / PickRegion / PickInterests.
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={{ paddingTop: 32, paddingBottom: 16 }}
+    >
       <Eyebrow>Nice to meet you</Eyebrow>
       <H style={{ fontSize: 28, lineHeight: 33, marginTop: 12 }}>What should we call you?</H>
       <T style={{ fontSize: 14.5, color: c.inkSoft, marginTop: 8, lineHeight: 21 }}>
-        This is the name other travelers see on your tips, routes and buddy plans.
+        This is the name other travelers see on your tips and routes.
       </T>
       <TextInput
         value={name}
@@ -113,7 +138,7 @@ function PickName({ name, setName }: { name: string; setName: (v: string) => voi
           borderRadius: 14, paddingHorizontal: 16, paddingVertical: 15, fontSize: 18, color: c.ink, fontFamily: 'Pretendard-SemiBold',
         }}
       />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -121,8 +146,8 @@ function Welcome() {
   const { c, shadow } = useTheme();
   const rows: [string, string, string][] = [
     ['🧍', 'Solo-friendly, English menus, fair prices', 'Every spot tagged by travelers like you'],
-    ['🎬', 'Tied to the K-content you love', 'Filming locations, idol haunts, drama cafés'],
-    ['🤝', 'A community that gets it', 'Tips, guides & buddies — built for foreigners'],
+    ['🎬', 'Tied to the K-content you love', 'Filming locations, idol haunts, drama cafes'],
+    ['🤝', 'A community that gets it', 'Tips, guides & buddies, built for foreigners'],
   ];
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 40, paddingBottom: 20 }}>
@@ -132,7 +157,7 @@ function Welcome() {
           backgroundColor: c.accent, marginBottom: 26, ...(shadow as object),
         }}
       >
-        <Icon name="pin" size={38} stroke="#fff" sw={2} />
+        <Icon name="pin" size={38} stroke={c.paper} sw={2} />
       </View>
       <Eyebrow>For travelers in Korea</Eyebrow>
       <H style={{ fontSize: 33, lineHeight: 38, marginTop: 12 }}>
@@ -142,7 +167,7 @@ function Welcome() {
         </H>
       </H>
       <T style={{ fontSize: 15.5, lineHeight: 24, color: c.inkSoft, marginTop: 16 }}>
-        Local spots from your favorite K-dramas, films and idols — tagged with what actually matters to a foreign traveler.
+        Local spots from your favorite K-dramas, films and idols, tagged with what actually matters to a foreign traveler.
       </T>
       <View style={{ marginTop: 26, gap: 12 }}>
         {rows.map(([e, t, s]) => (
@@ -164,10 +189,14 @@ function Welcome() {
 function PickRegion({ region, setRegion }: { region: string | null; setRegion: (k: string) => void }) {
   const { c } = useTheme();
   return (
-    <View style={{ flex: 1, paddingTop: 22, paddingBottom: 12 }}>
+    // Was a fixed flex:1 list with no ScrollView (unlike Welcome, which has
+    // one) — 8 rows at minHeight 52 run to ~480pt, taller than the space
+    // left above the button on an SE-size screen, so "Somewhere else" was
+    // unreachable.
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 22, paddingBottom: 12 }}>
       <H style={{ fontSize: 26, lineHeight: 30 }}>Where are you visiting from?</H>
       <T style={{ fontSize: 14, color: c.inkSoft, marginTop: 6 }}>We'll surface tips from travelers in similar shoes.</T>
-      <View style={{ flex: 1, gap: 9, marginTop: 16 }}>
+      <View style={{ gap: 9, marginTop: 16 }}>
         {REGIONS.map((r) => {
           const on = region === r.key;
           return (
@@ -175,7 +204,7 @@ function PickRegion({ region, setRegion }: { region: string | null; setRegion: (
               key={r.key}
               onPress={() => setRegion(r.key)}
               style={{
-                flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14,
+                minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14,
                 borderRadius: 14, backgroundColor: on ? c.accent50 : c.surface,
                 borderWidth: 1.5, borderColor: on ? c.accent : c.line,
               }}
@@ -191,46 +220,52 @@ function PickRegion({ region, setRegion }: { region: string | null; setRegion: (
                   borderWidth: on ? 0 : 1.5, borderColor: c.line, backgroundColor: on ? c.accent : 'transparent',
                 }}
               >
-                {on && <Icon name="check" size={13} stroke="#fff" sw={2.6} />}
+                {on && <Icon name="check" size={13} stroke={c.paper} sw={2.6} />}
               </View>
             </Pressable>
           );
         })}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 function PickInterests({ interests, toggle }: { interests: Set<string>; toggle: (k: string) => void }) {
   const { c } = useTheme();
   return (
-    <View style={{ flex: 1, paddingTop: 22, paddingBottom: 10 }}>
+    // Was a fixed flex:1 grid with no ScrollView — 12 tiles at 2-per-row run
+    // taller than the space available on smaller phones, and the last row
+    // rendered under the Continue button with no way to reach it.
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 22, paddingBottom: 10 }}>
       <H style={{ fontSize: 26, lineHeight: 30 }}>What brought you to Korea?</H>
-      <T style={{ fontSize: 14, color: c.inkSoft, marginTop: 6 }}>Pick a few — we'll tune your feed and themes.</T>
-      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 9 }}>
+      <T style={{ fontSize: 14, color: c.inkSoft, marginTop: 6 }}>Pick a few, we'll tune your feed and themes.</T>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 9 }}>
         {INTERESTS.map((it) => {
           const on = interests.has(it.key);
           return (
             <Pressable
               key={it.key}
               onPress={() => toggle(it.key)}
+              // width alone, no flexGrow: with it, an odd tile count stretched
+              // the last tile to fill the row and broke the 2-up grid — the
+              // same bug already found and fixed in RouteFeedbackBar.
               style={{
-                width: '48%', flexGrow: 1, justifyContent: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 14,
+                width: '48%', justifyContent: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 14,
                 borderRadius: 14, backgroundColor: on ? c.accent : c.surface,
                 borderWidth: 1.5, borderColor: on ? c.accent : c.line,
               }}
             >
               <T style={{ fontSize: 25 }}>{it.emoji}</T>
-              <T style={{ fontSize: 14.5, fontWeight: '700', color: on ? '#fff' : c.ink }}>{it.label}</T>
+              <T style={{ fontSize: 14.5, fontWeight: '700', color: on ? c.paper : c.ink }}>{it.label}</T>
               {on && (
                 <View style={{ position: 'absolute', top: 11, right: 11 }}>
-                  <Icon name="check" size={17} stroke="#fff" sw={2.4} />
+                  <Icon name="check" size={17} stroke={c.paper} sw={2.4} />
                 </View>
               )}
             </Pressable>
           );
         })}
       </View>
-    </View>
+    </ScrollView>
   );
 }

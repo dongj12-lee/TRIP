@@ -14,7 +14,7 @@ import { haptic } from '@/lib/haptics';
 const MEDALS = ['🥇', '🥈', '🥉'];
 type Tab = 'everyone' | 'friends';
 
-// Seoul Explorers — ranks travelers by how much of the passport they've filled.
+// Seoul Explorers, ranks travelers by how much of the passport they've filled.
 // "Everyone" is the global board; "Friends" ranks you against people you've
 // added by handle. The competitive hook: "am I ahead of my friends?"
 export default function Leaderboard() {
@@ -134,7 +134,7 @@ export default function Leaderboard() {
           })}
         </View>
 
-        {/* Added-you prompts (Friends tab) — mutual growth */}
+        {/* Added-you prompts (Friends tab), mutual growth */}
         {tab === 'friends' && addedMe.length > 0 && (
           <View style={{ marginTop: 16 }}>
             <T style={{ fontSize: 12, fontWeight: '800', color: c.muted, letterSpacing: 0.6, marginBottom: 8 }}>
@@ -151,7 +151,7 @@ export default function Leaderboard() {
                     <T style={{ fontSize: 11.5, color: c.inkSoft, fontWeight: '600', marginTop: 1 }}>{r.stamps} stamps · {r.districts}/25 gu</T>
                   </View>
                   <Pressable onPress={() => addBack(r)} accessibilityRole="button" accessibilityLabel={`Add ${r.name} back`} style={{ paddingVertical: 8, paddingHorizontal: 16, borderRadius: 999, backgroundColor: c.accent }}>
-                    <T style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>Add back</T>
+                    <T style={{ fontSize: 13, fontWeight: '800', color: c.paper }}>Add back</T>
                   </Pressable>
                 </View>
               ))}
@@ -169,7 +169,7 @@ export default function Leaderboard() {
             </T>
             {tab === 'friends' && (
               <Pressable onPress={() => setAddOpen(true)} style={{ marginTop: 16, paddingVertical: 9, paddingHorizontal: 18, borderRadius: 999, backgroundColor: c.accent }}>
-                <T style={{ fontSize: 13.5, fontWeight: '700', color: '#fff' }}>Add a friend</T>
+                <T style={{ fontSize: 13.5, fontWeight: '700', color: c.paper }}>Add a friend</T>
               </Pressable>
             )}
           </View>

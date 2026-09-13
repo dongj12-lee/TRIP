@@ -1,7 +1,7 @@
 // Turns the interests picked during onboarding (profile.interests) into a
 // relevance score for places and themes, so the app can surface a personalized
 // "For you" selection. Until now onboarding interests were collected but never
-// used anywhere — this is what closes that loop.
+// used anywhere, this is what closes that loop.
 import { Place, Theme } from '@/data/types';
 
 // Each interest key (from INTERESTS in data/seed) maps to matcher predicates.
@@ -74,7 +74,7 @@ export function personalizedPlaces(places: Place[], interests: string[], limit =
 // Learns which place categories a user tends to like/dislike from their real
 // 👍/👎 reactions (place detail screen), so the day-plan scorer can favor
 // categories they've shown they enjoy even for places they've never
-// individually reacted to — not just remembering the exact places reacted to.
+// individually reacted to, not just remembering the exact places reacted to.
 export function categoryAffinity(reactions: Record<string, 'like' | 'dislike'>, places: Place[]): Map<string, number> {
   const bySlug = new Map(places.map((p) => [p.slug, p]));
   const net = new Map<string, number>();
@@ -88,7 +88,7 @@ export function categoryAffinity(reactions: Record<string, 'like' | 'dislike'>, 
   }
   const out = new Map<string, number>();
   for (const [cat, sum] of net) {
-    // Average signed reaction, scaled and clamped — a couple of reactions
+    // Average signed reaction, scaled and clamped, a couple of reactions
     // nudge scoring without one category or one stray dislike dominating it.
     out.set(cat, Math.max(-1.5, Math.min(1.5, (sum / (count.get(cat) ?? 1)) * 1.5)));
   }

@@ -16,7 +16,10 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 async function main() {
   const rows = THEMES.map((t) => {
-    const { slug, kind, category, title, ...data } = t;
+    // `refresh` is ops-only metadata (the content-freshness manifest read by
+    // scripts/refresh-themes.ts) — it's never rendered and shouldn't bloat the
+    // themes.data jsonb the app downloads, so strip it before upserting.
+    const { slug, kind, category, title, refresh: _refresh, ...data } = t;
     return { slug, kind, category, title, data };
   });
   console.log(`Upserting ${rows.length} themes…`);

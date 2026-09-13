@@ -1,5 +1,5 @@
 // On-device Plan-my-day refinement via Apple's Foundation Models framework
-// (iOS 26+, Apple Intelligence-eligible devices only) — see lib/foundationModels.ios.ts
+// (iOS 26+, Apple Intelligence-eligible devices only), see lib/foundationModels.ios.ts
 // for the real implementation. This file is the fallback Metro resolves for
 // every OTHER platform (Android, and any native target without an .ios.ts
 // override), same convention as components/WebMap.tsx/.web.tsx: a place a

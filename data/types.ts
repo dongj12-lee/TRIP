@@ -4,7 +4,7 @@ import { Tone } from '@/theme/tokens';
 export type Swatch = string[];
 
 export type ForeignerTagKey =
-  // The original five — these have boolean columns and drive the Explore filter.
+  // The original five, these have boolean columns and drive the Explore filter.
   | 'soloOk' | 'englishMenu' | 'priceTransparent' | 'cardOk' | 'englishSpoken'
   // Category-specific verification tags (vote counts live in `votes` jsonb only).
   | 'vegFriendly' | 'halalFriendly' | 'laptopOk' | 'englishInfo' | 'worthIt'
@@ -33,7 +33,7 @@ export type Place = {
   neighborhood: string;
   city: string;
   address: string;
-  // Genuine Hangul road address (not romanized) — for the phrase sheet's
+  // Genuine Hangul road address (not romanized), for the phrase sheet's
   // "show this address" toggle. Absent for places imported before
   // migration-026 or without a linked KO-locale record.
   addressKo?: string;
@@ -42,6 +42,10 @@ export type Place = {
   rating?: number;
   reviews?: number;
   description: string;
+  // Precomputed one-line summary (migration-027), written once by
+  // scripts/backfill-place-blurb.ts. Absent for rows the backfill hasn't
+  // reached yet — see lib/placeBlurb.ts for the live-extraction fallback.
+  blurbAi?: string;
   soloOk: boolean;
   englishMenu: boolean;
   priceTransparent: boolean;
@@ -50,7 +54,7 @@ export type Place = {
   votes: Partial<Record<ForeignerTagKey, { yes: number; no: number }>>;
   warnTip?: string;
   // K-content connection is the app's own curated layer (not sourced from any
-  // public API) — optional because bulk-imported places won't have one yet.
+  // public API), optional because bulk-imported places won't have one yet.
   kContentTitle?: string;
   kContentType?: string;
   kContentNote?: string;
@@ -62,21 +66,25 @@ export type Place = {
   freeEntry?: boolean;
   englishSite?: boolean;
   wheelchair?: boolean;
-  // Community satisfaction — powers the "Recommended" rail.
+  // Community satisfaction, powers the "Recommended" rail.
   likeCount?: number;
   dislikeCount?: number;
-  // Editorial "verified by TRIP" tags — mechanically derived from objective
+  // Editorial "verified by BADA" tags, mechanically derived from objective
   // Visit Seoul fields or a well-established category-level fact (never a
   // per-place guess), kept separate from the crowd-voted `votes` above so it
   // can never be confused with or overwrite a real traveler vote. Solves the
   // cold-start problem for the Foreigner-Fit checklist without fabricating
   // per-place claims.
   verifiedTags?: ForeignerTagKey[];
-  // The business's own official website, when they have one — resolved once
+  // The business's own official website, when they have one, resolved once
   // via the Naver Local Search API, then stored permanently (migration-025).
   // Not a review source: Naver has no official API that exposes a place ID or
   // a link to a business's Naver Map review page.
   websiteUrl?: string;
+  // Which importer this row came from ('seed' = Visit Seoul, 'tourapi_kor',
+  // 'tourapi_eng'). Never rendered, used by lib/prominence.ts as a proxy for
+  // how tourist-facing a place is, since rating/review data is empty catalog-wide.
+  source?: string;
 };
 
 export type GuideItem = {
@@ -84,6 +92,13 @@ export type GuideItem = {
   nameKo?: string;
   emoji?: string;
   swatch?: Swatch;
+  // A real cover image for the row. Used by the filming-locations guide, where
+  // each card is a production and the picture has to carry it, an emoji can't.
+  photoUrl?: string;
+  // A bundled poster title card by key (see data/titleCards.ts). Original
+  // one-sheet-style art, not a real poster, those are copyrighted. Takes
+  // precedence over photoUrl in the renderer.
+  posterKey?: string;
   price: string;
   where?: string;
   note: string;
@@ -92,6 +107,29 @@ export type GuideItem = {
 };
 
 export type Street = { name: string; nameKo: string; note: string };
+
+// One real place a production was shot. A single production usually has
+// several, decomposing the old prose "note" into these is what lets a card
+// collapse to a title and expand to a proper location list.
+export type FilmingSpot = {
+  place: string; // English name
+  placeKo?: string;
+  scene: string; // what was actually shot here
+  where?: string; // address or area
+  caution?: string;
+};
+
+// A drama or film in the filming-locations guide. Rendered as a collapsed
+// card (poster + title + one-liner) that expands to reveal its `spots`.
+export type Production = {
+  title: string; // English
+  titleKo: string;
+  tagline: string; // the one line shown while collapsed
+  meta: string; // "Netflix · 2025"
+  price?: string; // mostly "Free"; some spots are ticketed
+  posterKey?: string; // bundled title card, see data/titleCards.ts
+  spots: FilmingSpot[];
+};
 
 export type Theme = {
   slug: string;
@@ -119,15 +157,50 @@ export type Theme = {
   // Deep guides: multiple titled item groups (bestsellers by category, a sale
   // calendar, hacks…) so one theme can hold a real handbook, not 6 picks.
   sections?: { title: string; subtitle?: string; items: GuideItem[] }[];
+  // Expandable production cards for the filming-locations guide: a list of
+  // dramas/films, each collapsing to a title and expanding to its `spots`.
+  productions?: { title: string; subtitle?: string; items: Production[] }[];
   updated?: string; // freshness stamp shown on the card, e.g. 'Jul 2026'
   // "Lounge" content blocks: richer, purpose-built layouts (a fare/time
   // comparison table, a numbered how-to, a rail of real in-app places) that a
   // generic items list can't express well. Rendered in order after sections.
   blocks?: ThemeBlock[];
+  // Ops-only "how this card stays fresh" manifest. NOT rendered in the app and
+  // NOT written to the DB (stripped in scripts/seed-themes.ts). It structures
+  // the otherwise ad-hoc content-refresh work: `scripts/refresh-themes.ts`
+  // reads it to report which cards are due and how to update them. Only the
+  // freshness-sensitive cards carry it; evergreen guides omit it entirely.
+  refresh?: RefreshManifest;
+};
+
+// Declares how (and how often) one theme's time-sensitive content gets
+// refreshed. Most of the catalog is evergreen and has none of this.
+export type RefreshManifest = {
+  // How the content is sourced when refreshing, a human-readable pointer to
+  // the ranking/feed/reference to consult (e.g. Olive Young's own ranking +
+  // Glowpick, r/AsianBeauty, the operator's fare page). Not a fetchable URL:
+  // several of these (Olive Young ranking, Daiso Mall) block plain scraping,
+  // so refresh is research-driven, not a wget.
+  source: string;
+  // Roughly how often the targeted content goes stale. Maps to a month
+  // interval in refresh-themes.ts (quarterly=3, seasonal=3, annual=12).
+  cadence: 'quarterly' | 'seasonal' | 'annual';
+  // Which section/block titles inside this theme actually get rewritten on a
+  // refresh (verbatim, matching data/seed.ts), so the update stays surgical
+  // instead of touching the whole card. e.g. ['🔥 Trending right now'].
+  targets: string[];
+  // Machine-readable last-refresh date, 'YYYY-MM'. The due check compares this
+  // against `cadence`. Bump it (and the display-facing `updated`) on every
+  // refresh, they serve different audiences (ops vs the card's freshness pill).
+  lastRefreshed: string;
+  // The concrete research recipe for this specific card, what "good" looks
+  // like, which fields to rewrite, gotchas, so the refresh isn't re-derived
+  // from scratch each time. Kept out of the app bundle since it's ops-only.
+  recipe?: string;
 };
 
 // A side-by-side comparison (e.g. AREX vs limousine bus vs taxi; KTX vs
-// flight vs express bus for a given route) — columns are option names, each
+// flight vs express bus for a given route), columns are option names, each
 // row is one comparison dimension (Time, Price, Best for…).
 export type CompareBlock = {
   type: 'compare';
@@ -147,7 +220,7 @@ export type StepsBlock = {
   steps: { title: string; note: string; emoji?: string }[];
 };
 
-// A rail linking into real in-app Place rows (by slug) — for
+// A rail linking into real in-app Place rows (by slug), for
 // neighborhood/spot themes so the "lounge" surfaces live app content
 // instead of only static copy.
 export type PlacesBlock = {
@@ -155,6 +228,10 @@ export type PlacesBlock = {
   title: string;
   subtitle?: string;
   placeSlugs: string[];
+  // Optional curatorial line per slug (why this spot, not just what it is),
+  // the place's own catalog description already covers "what it is". Keyed
+  // by slug so it stays correct if placeSlugs gets reordered.
+  notes?: Record<string, string>;
 };
 
 export type ThemeBlock = CompareBlock | StepsBlock | PlacesBlock;
@@ -199,7 +276,7 @@ export type Post = {
 };
 
 // A request to join a buddy plan. Contact (the group chat) is gated on the
-// host accepting — see migration-012.
+// host accepting, see migration-012.
 export type BuddyInterest = {
   userId?: string;
   name: string;

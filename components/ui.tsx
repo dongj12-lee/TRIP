@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleProp, ViewStyle, TextStyle, StyleSheet } from 'react-native';
+import { View, Text, StyleProp, ViewStyle, TextStyle, StyleSheet, ImageSourcePropType } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Svg, Line, Defs, Pattern, Rect } from 'react-native-svg';
@@ -115,6 +115,7 @@ export function Flag({ country, size = 28 }: { country?: string | null; size?: n
 // ─── Striped photo placeholder (swap for real <Image> later) ─────────────
 export function Photo({
   uri,
+  source,
   swatch = ['#3a2c22', '#a36643'],
   label,
   height = 160,
@@ -122,6 +123,9 @@ export function Photo({
   style,
 }: {
   uri?: string;
+  // A bundled local asset (require(...) result), used for the poster title
+  // cards, which ship in the binary rather than loading from a URL.
+  source?: ImageSourcePropType;
   swatch?: [string, string] | string[];
   label?: string;
   height?: number;
@@ -130,11 +134,11 @@ export function Photo({
 }) {
   const [a, b] = swatch;
 
-  if (uri) {
+  if (uri || source) {
     return (
       <View style={[{ width: '100%', height, borderRadius: radius, overflow: 'hidden', backgroundColor: a }, style]}>
         <Image
-          source={{ uri }}
+          source={source ?? { uri: uri! }}
           style={StyleSheet.absoluteFill}
           contentFit="cover"
           transition={150}

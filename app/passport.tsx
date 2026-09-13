@@ -86,7 +86,7 @@ export default function Passport() {
           </View>
         </View>
 
-        {/* Leaderboard entry — the competitive hook */}
+        {/* Leaderboard entry, the competitive hook */}
         {earned.size > 0 && (
           <Pressable
             onPress={() => { haptic.tick(); router.push('/leaderboard'); }}
@@ -116,7 +116,7 @@ export default function Passport() {
             {prog.districts === 0
               ? 'Save a spot to stamp your first district'
               : prog.districts >= 25
-                ? '🎉 All 25 districts stamped — Seoul is yours!'
+                ? '🎉 All 25 districts stamped. Seoul is yours!'
                 : `${25 - prog.districts} districts to go`}
           </T>
           <View style={{ paddingHorizontal: 14 }}>
@@ -124,7 +124,7 @@ export default function Passport() {
           </View>
         </View>
 
-        {/* Seoul Conquest — district-milestone reward track */}
+        {/* Seoul Conquest, district-milestone reward track */}
         <View style={{ paddingHorizontal: 18, paddingTop: 24 }}>
           <H style={{ fontSize: 18 }}>Seoul Conquest</H>
           <T style={{ fontSize: 12.5, color: c.muted, marginBottom: 12, marginTop: 3 }}>Rewards for stamping more districts</T>
@@ -156,7 +156,7 @@ export default function Passport() {
         <StampSection title="Milestones" subtitle="First steps around the app" stamps={MILESTONE_STAMPS} earned={earned} />
 
         <T style={{ textAlign: 'center', color: c.muted, fontSize: 12, marginTop: 24, paddingHorizontal: 30, lineHeight: 18 }}>
-          Save or ♥ places as you explore — your passport fills up automatically.
+          Save or ♥ places as you explore, your passport fills up automatically.
         </T>
       </ScrollView>
 

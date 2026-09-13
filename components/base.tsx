@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, Pressable, StyleProp, ViewStyle, TextStyle, ScrollView,
-  ScrollViewProps, TextProps, PressableProps,
+  ScrollViewProps, TextProps, PressableProps, StyleSheet, useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -26,27 +26,71 @@ function uiFamily(weight?: TextStyle['fontWeight']) {
   return UI_FONT[w] ?? 'Pretendard';
 }
 
-// Body text — Pretendard (Latin + Hangul), resolves weight → family.
-export function T({ style, ...props }: TextProps) {
-  const { c } = useTheme();
-  const flat = Array.isArray(style) ? Object.assign({}, ...style.filter(Boolean)) : (style as TextStyle) || {};
-  const family = flat.fontFamily || uiFamily(flat.fontWeight);
-  return <Text {...props} style={[{ color: c.ink, fontFamily: family }, style, { fontFamily: family }]} />;
+// How far text may grow with the system font-size setting. React Native's
+// default is uncapped, and at iOS's accessibility sizes (up to ~310%) that
+// clipped button labels mid-word and pushed the trip-length chips under the
+// bottom bar. Capping keeps the traveller's preference working while the layout
+// survives: body text still grows noticeably, headings — already large — grow
+// less, since it was those that ate the whole screen. Any caller can override
+// by passing its own maxFontSizeMultiplier.
+const BODY_MAX_SCALE = 1.4;
+const HEADING_MAX_SCALE = 1.25;
+
+/**
+ * Past the cap, iOS keeps scaling an explicit `lineHeight` by the full system
+ * multiplier (up to ~3.1x) while `fontSize` stops at ours, so a heading ends up
+ * with a line box several times taller than its text and the screen fills with
+ * empty gaps. Dropping the fixed value there lets the system derive line height
+ * from the (capped) font size instead. ~101 call sites set an explicit
+ * lineHeight, so this is handled once here rather than at each of them.
+ */
+function useTextStyle(style: StyleProp<TextStyle>, cap: number): TextStyle {
+  const { fontScale } = useWindowDimensions();
+  const flat = (StyleSheet.flatten(style) ?? {}) as TextStyle;
+  if (fontScale > cap && flat.lineHeight != null) {
+    const { lineHeight: _drop, ...rest } = flat;
+    return rest;
+  }
+  return flat;
 }
 
-// Display heading — Fraunces serif.
+// Body text. Pretendard (Latin + Hangul), resolves weight → family.
+export function T({ style, ...props }: TextProps) {
+  const { c } = useTheme();
+  const flat = useTextStyle(style, BODY_MAX_SCALE);
+  const family = flat.fontFamily || uiFamily(flat.fontWeight);
+  return (
+    <Text
+      maxFontSizeMultiplier={BODY_MAX_SCALE}
+      {...props}
+      style={[{ color: c.ink }, flat, { fontFamily: family }]}
+    />
+  );
+}
+
+// Display heading. Pretendard, same family as body text (was the Fraunces
+// serif; unified so headline+body match everywhere and accented Latin
+// characters render with Pretendard's plainer diacritics instead of
+// Fraunces's deliberately dramatic ones). Defaults to Bold since headings
+// carried Fraunces SemiBold's built-in heft with no explicit weight before.
+// `italic` no longer does anything — Pretendard has no italic variant loaded
+// — kept as a no-op prop so call sites don't need updating.
 export function H({
   style,
-  italic,
+  italic: _italic,
   ...props
 }: TextProps & { italic?: boolean }) {
   const { c } = useTheme();
+  const flat = useTextStyle(style, HEADING_MAX_SCALE);
+  const family = flat.fontFamily || uiFamily(flat.fontWeight ?? '700');
   return (
     <Text
+      maxFontSizeMultiplier={HEADING_MAX_SCALE}
       {...props}
       style={[
-        { color: c.ink, fontFamily: italic ? 'Fraunces-Italic' : 'Fraunces', letterSpacing: -0.3 },
-        style,
+        { color: c.ink },
+        flat,
+        { fontFamily: family },
       ]}
     />
   );
@@ -181,7 +225,10 @@ export function Button({
 }) {
   const { c, shadow } = useTheme();
   const bg = disabled ? c.line : variant === 'primary' ? c.accent : variant === 'soft' ? c.surface : 'transparent';
-  const fg = disabled ? c.muted : variant === 'primary' ? '#fff' : c.ink;
+  // `c.paper` rather than a hard '#fff': it inverts with the theme, so the
+  // label stays high-contrast on the accent in dark mode too (white on the
+  // lighter dark-mode accent measured ~2.4:1, below WCAG AA).
+  const fg = disabled ? c.muted : variant === 'primary' ? c.paper : c.ink;
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}
@@ -190,7 +237,10 @@ export function Button({
       accessibilityState={{ disabled: !!disabled }}
       style={({ pressed }) => [
         {
-          height: 52, borderRadius: RADII.md, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8,
+          // minHeight, not height: with a larger system font the label needs
+          // the room, and a fixed height clipped it mid-word.
+          minHeight: 52, paddingVertical: 8,
+          borderRadius: RADII.md, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8,
           backgroundColor: bg,
           borderWidth: variant === 'soft' ? 1 : 0,
           borderColor: c.line,
@@ -201,7 +251,7 @@ export function Button({
       ]}
     >
       {icon ? <Icon name={icon} size={18} stroke={fg} sw={2} /> : null}
-      <T style={{ color: fg, fontSize: 16, fontWeight: '700' }}>{label}</T>
+      <T style={{ color: fg, fontSize: 16, fontWeight: '700', flexShrink: 1 }} numberOfLines={2}>{label}</T>
     </Pressable>
   );
 }

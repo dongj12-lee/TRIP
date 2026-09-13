@@ -3,7 +3,7 @@ import { createClient, processLock } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 
-// Public (anon) config — safe to ship. Set these in mobile/.env (see .env.example).
+// Public (anon) config, safe to ship. Set these in mobile/.env (see .env.example).
 // Expo inlines EXPO_PUBLIC_* vars at build time.
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';

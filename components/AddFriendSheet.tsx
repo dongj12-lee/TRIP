@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Modal, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Modal, Pressable, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/theme';
 import { findProfileByHandle, addFriend, LeaderRow } from '@/data/remote';
@@ -8,10 +8,11 @@ import { T, H, Button } from './base';
 import { useToast } from './Toast';
 
 // Add a friend by exact @handle to compare passports. Looks up the public
-// profile, shows a preview, and links them (directional — no request needed).
+// profile, shows a preview, and links them (directional, no request needed).
 export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean; onClose: () => void; onAdded: () => void }) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
+  const { height: winH } = useWindowDimensions();
   const { showToast } = useToast();
   const [handle, setHandle] = useState('');
   const [busy, setBusy] = useState(false);
@@ -46,7 +47,7 @@ export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean
       reset();
       onClose();
     } catch {
-      showToast("Couldn't add friend — try again");
+      showToast("Couldn't add friend, try again");
     } finally {
       setBusy(false);
     }
@@ -61,7 +62,15 @@ export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={{ flex: 1, backgroundColor: c.scrim }} onPress={onClose} accessibilityLabel="Close" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: insets.bottom + 20 }}>
+        {/* Same guard as EditProfileSheet: capped height + scroll so the
+            keyboard can never push the sheet's head off the top of a short
+            screen. */}
+        <View style={{ backgroundColor: c.paper, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: winH * 0.9 }}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 20 }}
+          >
           <View style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, backgroundColor: c.line, marginBottom: 16 }} />
           <H style={{ fontSize: 21, marginBottom: 4 }}>Add a friend</H>
           <T style={{ fontSize: 13, color: c.muted, marginBottom: 16 }}>Enter their @handle to compare passports.</T>
@@ -102,6 +111,7 @@ export function AddFriendSheet({ visible, onClose, onAdded }: { visible: boolean
               <Button label="Add" onPress={add} disabled={busy} style={{ height: 40, paddingHorizontal: 20 } as any} />
             </View>
           )}
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>

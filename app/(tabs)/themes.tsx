@@ -13,9 +13,10 @@ import { Icon } from '@/components/Icon';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SkeletonList, SkeletonThemeCard } from '@/components/Skeleton';
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { FestivalsNowRail } from '@/components/FestivalsNowRail';
 import { TabBar, TabTitle, useTabScroll, useContentTopPadding } from '@/components/TabHeader';
 
-// Editorial browse order — lead with the trip-defining categories, practical
+// Editorial browse order, lead with the trip-defining categories, practical
 // essentials mid-page, seasonal last. Only sections with content render.
 const SECTION_ORDER = [
   'K-Content',
@@ -34,7 +35,7 @@ export default function ThemesScreen() {
   const insets = useSafeAreaInsets();
   const { themes, loading } = useRemoteContent();
   const { profile } = useStore();
-  const { scrollY, onScroll } = useTabScroll();
+  const { scrollY, onScroll, scrollRef } = useTabScroll();
   const topPad = useContentTopPadding();
 
   const byCat = useMemo(() => {
@@ -58,7 +59,7 @@ export default function ThemesScreen() {
   }, [byCat]);
 
   // Lead with one cinematic cover (the personalized top pick, or the first
-  // trip-defining theme) — Apple News+ / Arts & Culture style — then rails.
+  // trip-defining theme). Apple News+ / Arts & Culture style, then rails.
   const featured = forYou[0] ?? (sections.length ? byCat.get(sections[0])![0] : null);
   const featuredSlug = featured?.slug;
   const forYouRest = forYou.filter((t) => t.slug !== featuredSlug);
@@ -79,6 +80,7 @@ export default function ThemesScreen() {
     <View style={{ flex: 1, backgroundColor: c.paper }}>
       <TabBar title="Themes" scrollY={scrollY} />
       <Animated.ScrollView
+        ref={scrollRef}
         onScroll={onScroll}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingTop: topPad, paddingBottom: insets.bottom + 90 }}
@@ -89,6 +91,7 @@ export default function ThemesScreen() {
           <OfflineBanner />
         </View>
         {featured && <FeaturedTheme theme={featured} />}
+        <FestivalsNowRail />
         {forYouRest.length > 0 && <Rail title="For you" themes={forYouRest} />}
         {sections.map((cat) => {
           const items = byCat.get(cat)!.filter((t) => t.slug !== featuredSlug);
@@ -99,7 +102,7 @@ export default function ThemesScreen() {
   );
 }
 
-// The cover story — one large, cinematic full-bleed card with the title set
+// The cover story, one large, cinematic full-bleed card with the title set
 // over a gradient scrim. Gives Themes an editorial "magazine cover" lead
 // instead of opening straight into uniform rails (Apple News+ / Arts & Culture).
 function FeaturedTheme({ theme }: { theme: Theme }) {
@@ -120,22 +123,43 @@ function FeaturedTheme({ theme }: { theme: Theme }) {
         locations={[0, 0.42, 1]}
         style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}
       />
+      {/* This pill sits on a photo, so it stays white in both themes. Its
+          contents must therefore be fixed dark colours: theme tokens would flip
+          to near-white in dark mode and vanish against the pill. */}
       <View style={{ position: 'absolute', top: 14, left: 14, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,255,255,0.94)', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
-        <Icon name="sparkle" size={13} stroke={c.accent} sw={2} />
-        <T style={{ fontSize: 11.5, fontWeight: '800', color: c.ink }}>Featured</T>
+        <Icon name="sparkle" size={13} stroke="#4d5589" sw={2} />
+        <T style={{ fontSize: 11.5, fontWeight: '800', color: '#2e2a24' }}>Featured</T>
       </View>
+      {/* A maintained reference reads as trustworthy when it visibly says so:
+          same freshness stamp the detail page shows, surfaced here too so it's
+          the first thing you see, not something you find after tapping in. */}
+      {!!theme.updated && (
+        <View style={{ position: 'absolute', top: 14, right: 14, backgroundColor: 'rgba(255,255,255,0.94)', paddingVertical: 5, paddingHorizontal: 11, borderRadius: 999 }}>
+          <T style={{ fontSize: 10.5, fontWeight: '800', color: '#5f6d53', letterSpacing: 0.3 }}>UPDATED {theme.updated.toUpperCase()}</T>
+        </View>
+      )}
       <View style={{ position: 'absolute', left: 18, right: 18, bottom: 18 }}>
         <T style={{ fontSize: 12.5, fontWeight: '800', color: 'rgba(255,255,255,0.85)', marginBottom: 5 }} numberOfLines={1}>
           {theme.badge || theme.category}
         </T>
         <H style={{ fontSize: 27, lineHeight: 31, color: '#fff' }} numberOfLines={2}>{theme.title}</H>
         <T style={{ fontSize: 14, lineHeight: 19, color: 'rgba(255,255,255,0.92)', fontWeight: '600', marginTop: 6 }} numberOfLines={2}>{theme.subtitle}</T>
+        {!!theme.meta?.length && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 9 }}>
+            {theme.meta.slice(0, 3).map((m, i) => (
+              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Icon name={m.icon as any} size={12} stroke="rgba(255,255,255,0.85)" sw={2} />
+                <T style={{ fontSize: 12, fontWeight: '700', color: 'rgba(255,255,255,0.85)' }} numberOfLines={1}>{m.label}</T>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </Pressable>
   );
 }
 
-// One browse section: a title, then a horizontal rail of theme cards — the
+// One browse section: a title, then a horizontal rail of theme cards, the
 // App-Store / Netflix pattern, so each category reads as a shelf you scan
 // rather than a thin filter chip.
 function Rail({ title, themes }: { title: string; themes: Theme[] }) {
@@ -170,10 +194,31 @@ function ThemeRailCard({ theme }: { theme: Theme }) {
             </T>
           </View>
         </View>
+        {/* Same freshness stamp as the detail page's "UPDATED …" pill, so a
+            maintained guide reads as maintained before you even tap in. */}
+        {!!theme.updated && (
+          <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: 'rgba(255,255,255,0.92)', paddingVertical: 3, paddingHorizontal: 8, borderRadius: 999 }}>
+            <T style={{ fontSize: 9.5, fontWeight: '800', color: '#5f6d53', letterSpacing: 0.2 }}>{theme.updated.toUpperCase()}</T>
+          </View>
+        )}
       </View>
       <View style={{ padding: 13, paddingBottom: 14 }}>
         <H style={{ fontSize: 17, color: c.ink, lineHeight: 21 }} numberOfLines={2}>{theme.title}</H>
         <T style={{ fontSize: 12.5, color: c.inkSoft, fontWeight: '600', marginTop: 3 }} numberOfLines={1}>{theme.subtitle}</T>
+        {/* Quick-facts row, this was collected in the data (`theme.meta`) but
+            never actually rendered anywhere, so a 30-pick deep guide and a
+            6-item list looked identical from the rail. Surfacing it is the
+            cheapest possible signal of how much is actually inside. */}
+        {!!theme.meta?.length && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 8 }}>
+            {theme.meta.slice(0, 2).map((m, i) => (
+              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flexShrink: 1 }}>
+                <Icon name={m.icon as any} size={11} stroke={c.muted} sw={2} />
+                <T style={{ fontSize: 11, fontWeight: '700', color: c.muted }} numberOfLines={1}>{m.label}</T>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </Card>
   );
