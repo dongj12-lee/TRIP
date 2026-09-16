@@ -1,8 +1,8 @@
 # BADA — project brief
 
 A single document that should let someone (or a fresh Claude session) pick this
-codebase up cold. Written 2026-09-13, while v1.0 build 16 sits in App Store
-review.
+codebase up cold. Written 2026-09-13; updated 2026-09-16, when v1.0 build 16
+was approved for the App Store.
 
 Repo: `github.com/dongj12-lee/TRIP` (public). App code lives in `mobile/`.
 
@@ -150,14 +150,15 @@ OpenAI-spending app-facing ones are rate-limited per IP. See §6.
 
 ## 5. Current state
 
-**v1.0 build 16 is in App Store review.** It has been rejected twice:
+**v1.0 build 16 was approved on 2026-09-16** and is the released version. It
+took three submissions — the first two were rejected:
 
 1. **Guideline 2.1** — fixed (sign-up was broken by a duplicate-handle crash,
    `migration-028`).
 2. **Guideline 4 (Design)** — overlapping elements on iPad, and every map
    action going to Naver with no alternative.
 
-Both are fixed and verified on a physical iPad in iPhone compatibility mode
+Both were fixed and verified on a physical iPad in iPhone compatibility mode
 (the app is iPhone-only, `supportsTablet: false`, so that is the configuration
 Apple reviews). `apple-resolution-center-reply.md` holds the reply that was
 sent; `appstore-submission-checklist.md` holds the full submission procedure
@@ -167,13 +168,18 @@ Build numbers are not contiguous — 12 and 15 were consumed by a failed and a
 cancelled build, 13 and 14 were superseded. **Never predict the next build
 number; read it from `eas build:view`.**
 
-### Deferred until review passes
+### Unblocked by the approval
+
+The three items below were held back only because a review was open. That
+constraint is gone; they are now ordinary work, and the regional-city one is
+the reason this section existed at all.
 
 - **Regional-city content.** The `city-day-trips` theme has a `PlacesBlock`
-  commented out, and two import scripts would add ~336 non-Seoul places. This
-  is held back for one specific reason: doing it during a review once already
-  put Korean-named places in front of a reviewer. Not a build concern — it is
-  a "do not mutate production content while a review is open" concern.
+  commented out, and two import scripts would add ~336 non-Seoul places. It was
+  held back because doing it during a review once already put Korean-named
+  places in front of a reviewer. Safe to do now — the shipped build filters
+  Explore to Seoul, so the extra rows only surface inside that one theme.
+  Still worth checking the imported names are English before seeding.
 - **Push notifications.** `migration-003-push.sql` was never applied to prod
   (`profiles.push_token` does not exist there), so push has never worked in
   production. The app registers a token, fails, and logs a warning. Applying
