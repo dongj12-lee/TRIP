@@ -174,12 +174,17 @@ The three items below were held back only because a review was open. That
 constraint is gone; they are now ordinary work, and the regional-city one is
 the reason this section existed at all.
 
-- **Regional-city content.** The `city-day-trips` theme has a `PlacesBlock`
-  commented out, and two import scripts would add ~336 non-Seoul places. It was
-  held back because doing it during a review once already put Korean-named
-  places in front of a reviewer. Safe to do now — the shipped build filters
-  Explore to Seoul, so the extra rows only surface inside that one theme.
-  Still worth checking the imported names are English before seeding.
+- **Regional-city content.** Still off, and the reason changed. The review
+  constraint is gone and the Seoul filter shipped, so non-Seoul rows can no
+  longer leak into Explore. The blocker now is that the theme's fifteen place
+  slugs end in KorService2 content ids, while the importer moved to
+  EngService2 (the Korean catalogue named every place in Hangul, which is
+  useless here). The catalogues are independent with no id crosswalk, so all
+  fifteen miss, and two landmarks the theme's copy names — Gamcheon Culture
+  Village, Daereungwon — have no English entry at all. The importer itself is
+  fixed and verified; what remains is re-slugging the theme against real ids.
+  See the comment on the block in `data/seed.ts`.
+
 - **Push notifications.** `migration-003-push.sql` was never applied to prod
   (`profiles.push_token` does not exist there), so push has never worked in
   production. The app registers a token, fails, and logs a warning. Applying

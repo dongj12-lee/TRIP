@@ -1376,15 +1376,31 @@ export const THEMES: Theme[] = [
         ],
         note: 'Fares swing with train time and how far ahead you book, first class runs roughly 40–50% more. Jeonju\'s range is wide because both KTX and the cheaper ITX-Saemaeul run the route.',
       },
-      // TEMPORARILY REMOVED — restore once a build containing the Seoul filter
-      // in lib/remoteData.tsx ships (i.e. after TestFlight build #7 clears
-      // review). This block's places are the only non-Seoul rows in `places`,
-      // and build #7 has no filter, so keeping them in production leaks
-      // Korean-named Busan/Jeonju spots into its Explore list.
-      // To restore: un-comment this block, re-run
+      // STILL OFF, but no longer for the original reason. The Seoul filter in
+      // lib/remoteData.tsx shipped long ago (build 11+), so non-Seoul rows can
+      // no longer leak into Explore — that blocker is gone.
+      //
+      // What blocks it now is that the slugs below cannot resolve. They end in
+      // a TourAPI contentId taken from KorService2, and the importer has since
+      // moved to EngService2 because the Korean catalogue gave every place a
+      // Korean name — unusable in an app for people who cannot read Hangul.
+      // The two catalogues are independently curated with no ID crosswalk, so
+      // the same beach has a different id in each: haeundae-beach-126081 here
+      // against haeundae-beach-264155 from the English import. All fifteen
+      // slugs miss.
+      //
+      // Worse, two of them have no English-catalogue entry at all — Gamcheon
+      // Culture Village and Daereungwon — and the theme's own copy names both,
+      // so they cannot just be dropped.
+      //
+      // To finish this (1.0.1): re-run the importer, look up what it actually
+      // inserted per city, rewrite these fifteen slugs against those ids, and
+      // choose replacements for the two that are missing. The importer itself
+      // is ready — English names, HTML entities decoded, nested-parenthesis
+      // titles split correctly, all verified against dev.
       //   npx tsx scripts/import-tourapi-daytrip-cities.ts
-      //   npx tsx scripts/curate-daytrip-landmarks.ts
-      // then reseed themes. See scripts/cleanup-daytrip-cities.ts for the rollback.
+      //   npx tsx scripts/curate-daytrip-landmarks.ts   ← its slugs need the same fix
+      // then reseed themes. scripts/cleanup-daytrip-cities.ts rolls it back.
       /*
       {
         type: 'places', title: 'Real spots to anchor each city', subtitle: 'Three per city, straight from the tourism board',
