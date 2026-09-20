@@ -185,6 +185,20 @@ the reason this section existed at all.
   fixed and verified; what remains is re-slugging the theme against real ids.
   See the comment on the block in `data/seed.ts`.
 
+- **No in-app way to say "this is wrong".** The app can report a *post* and
+  react to a shared *route*, but there is nowhere to say the app itself is
+  confusing or that a place's hours are out of date — which is the feedback
+  most likely to be worth acting on. Held for 1.0.1 because the legal docs are
+  bundled HTML and Settings is app code, so any entry point needs a build, and
+  v1.0 was already approved and waiting to release. The App Store support URL
+  carries it in the meantime: zero build, editable at any time, though a user
+  has to leave the app to find it.
+
+  For 1.0.1: a Settings row, and ideally an entry on place detail ("something
+  wrong here?") since stale hours and prices are the errors travellers actually
+  hit. Keep the form to a category and a free-text box — device and version can
+  be attached automatically, and asking for them only costs completions.
+
 - **Push notifications.** `migration-003-push.sql` was never applied to prod
   (`profiles.push_token` does not exist there), so push has never worked in
   production. The app registers a token, fails, and logs a warning. Applying
