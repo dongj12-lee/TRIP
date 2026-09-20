@@ -514,6 +514,28 @@ export default function PlaceDetail() {
             </View>
           </View>
         )}
+        {/* Stale hours and prices are the errors travellers actually hit —
+            the catalogue is ~3,800 tourism-board rows and they go out of date
+            on their own. Ask here, where the reader is standing in front of
+            the evidence, rather than only in Settings: the slug rides along,
+            so nobody has to describe which place they mean. */}
+        <View style={{ paddingHorizontal: 18, paddingTop: 30 }}>
+          <Pressable
+            onPress={() => { haptic.tick(); router.push(`/support?place=${place.slug}`); }}
+            accessibilityRole="button"
+            accessibilityLabel={`Report something wrong about ${place.name}`}
+            style={{
+              flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
+              paddingVertical: 13, borderRadius: 14,
+              borderWidth: 1, borderColor: c.line, backgroundColor: c.surface,
+            }}
+          >
+            <Icon name="info" size={15} stroke={c.muted} sw={2} />
+            <T style={{ fontSize: 13.5, fontWeight: '700', color: c.inkSoft }}>
+              Something wrong here?
+            </T>
+          </Pressable>
+        </View>
       </ScrollView>
 
       <ShareCardSheet

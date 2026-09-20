@@ -97,6 +97,14 @@ export default function Settings() {
           </View>
         </Card>
 
+        {/* Reaching a person. Above the legal block on purpose: someone who
+            opens Settings because something is wrong should meet this first,
+            not three documents. */}
+        <SectionLabel>Support</SectionLabel>
+        <Card>
+          <LinkRow label="Help & feedback" onPress={() => router.push('/support')} />
+        </Card>
+
         {/* Legal */}
         <SectionLabel>About</SectionLabel>
         <Card>
