@@ -1,6 +1,6 @@
 # BADA
 
-외국인 여행자를 위한 서울 여행 iOS 앱 · [App Store](https://apps.apple.com/kr/app/bada-korea-travel-guide/id6797165977)
+외국인 여행자를 위한 서울 여행 서비스 (iOS 앱) · [App Store](https://apps.apple.com/kr/app/bada-korea-travel-guide/id6797165977)
 
 개발할 때 프로젝트명은 TRIP이었고, 출시하면서 BADA(바다)로 바꿨습니다. 저장소 이름은 TRIP을 그대로 씁니다.
 
