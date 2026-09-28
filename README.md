@@ -1,206 +1,112 @@
-# TRIP (mobile) — Expo React Native 앱
+# BADA
 
-`../README.md`의 디자인 레퍼런스를 실제 앱으로 이식한 프로젝트입니다.
-스택: **Expo SDK 54 · React Native 0.81 · expo-router · Supabase**.
+외국인 여행자를 위한 서울 여행 iOS 앱 · [App Store](https://apps.apple.com/kr/app/bada-korea-travel-guide/id6797165977)
 
-(SDK는 원래 57로 시작했으나, App Store의 Expo Go 앱이 아직 SDK 57을 지원하지
-않아 — 심사 대기 중 — 개발 중 실기기 테스트를 위해 54로 다운그레이드했습니다.)
+개발할 때 프로젝트명은 TRIP이었고, 출시하면서 BADA(바다)로 바꿨습니다. 저장소 이름은 TRIP을 그대로 씁니다.
 
-## 지금 상태
+<p>
+  <img src="docs/images/1-explore.jpg" width="200" alt="장소 탐색">
+  <img src="docs/images/2-trip-planner.jpg" width="200" alt="여행 일정">
+  <img src="docs/images/4-themes-festivals.jpg" width="200" alt="테마">
+  <img src="docs/images/5-place-detail.jpg" width="200" alt="장소 상세">
+</p>
 
-- ✅ 온보딩 3단계 (지역/관심사) + 이메일 로그인/회원가입
-- ✅ 5개 탭: Explore / Themes / Feed / Buddy / My — Supabase 연결 시 실데이터, 미연결 시 목업 데이터로 자동 폴백
-- ✅ 상세 화면: Place(외국인 적합도·번역 시트) / Theme(walk·guide) / Post(댓글 작성 포함) / Buddy(참여) / Creator / 여정 플래너(편집+공유) / Compose(실제 글/버디 작성) / Settings
-- ✅ 라이트/다크 + 4가지 액센트 테마, Fraunces + Plus Jakarta Sans 폰트
-- ✅ Supabase 백엔드: 인증, 장소/테마/포스트/버디 CRUD, 저장·업보트·참여·팔로우·여정 동기화
-- ✅ **App Store 심사 필수 항목**: 신고(Report)·차단(Block) UI, 셀프 계정 삭제, 개인정보처리방침·이용약관·커뮤니티 가이드라인 게시(Settings에서 링크)
-- ✅ 앱 아이콘/스플래시/적응형 아이콘 에셋 생성 완료
-- ✅ iOS 번들 빌드 검증 완료 (`expo export` 통과)
-- ⏳ 실제 장소 사진은 아직 플레이스홀더(스와치 그라디언트) — 실사진 소싱 필요
-- ⏳ EAS 빌드/제출은 사용자의 Apple Developer 계정 필요 (아래 참고)
-- ⏳ iOS 전용 "Plan my day" Foundation Models(Apple Intelligence, on-device) 개인화 — 코드는 완료, `@react-native-ai/apple` 첫 네이티브 의존성 추가로 **Expo Go 워크플로우가 깨짐** (아래 "네이티브 의존성 추가됨" 참고). 실기기 검증은 아직 안 됨
+## 소개
 
-## 실행 (개발)
+- 한국어를 모르는 외국인 여행자가 서울에서 장소를 찾고 여행 일정을 짤 수 있도록 돕는 앱
+- 1인 개발: 기획, 디자인, 앱·서버 개발, 데이터 수집, 배포
+- 2026년 7월 개발 시작, 2026년 9월 20일 App Store 출시 (v1.0)
 
-```bash
-cd mobile
-cp .env.example .env      # Supabase 값 입력 (없어도 목업 데이터로 실행됨)
-npm start                 # 터널 모드가 필요하면: npm start -- --tunnel
-```
+## 주요 기능
 
-QR/링크를 아이폰의 **Expo Go** 앱으로 열면 됩니다 (Expo Go는 SDK 54까지 지원).
-로컬 Xcode 없이 실기기 테스트 가능. 시뮬레이터로 열려면 `npm run ios` (Xcode 필요).
-
-### ⚠️ 네이티브 의존성 추가됨 (Expo Go 더 이상 안 됨)
-
-`@react-native-ai/apple` (iOS Foundation Models 브릿지, Plan-my-day 개인화용)가
-이 프로젝트의 **첫 네이티브 의존성**이에요. Expo Go는 고정된 SDK 모듈 세트만
-탑재하고 있어서 커스텀 네이티브 코드가 있는 프로젝트는 절대 못 엽니다 — iOS든
-Android든 상관없이요 (이 기능 자체는 iOS 전용이지만, Expo Go가 막히는 건
-플랫폼 무관). 위 "로컬 Xcode 없이 실기기 테스트 가능"은 이제 더 이상 사실이
-아니에요. 새 워크플로우:
-
-```bash
-npx expo prebuild        # ios/, android/ 네이티브 프로젝트 생성 (최초 1회, 또는 의존성 바뀔 때마다)
-npx expo start --dev-client
-```
-
-`npx expo prebuild`는 CocoaPods(`pod install`)가 필요해요 — 없으면
-`brew install cocoapods` 먼저. 실기기/시뮬레이터에서 돌리려면 EAS dev client
-빌드(`eas build --profile development --platform ios`)가 필요하고, 코드
-서명 때문에 Apple Developer 계정이 있어야 해요.
-
-`lib/foundationModels.ts`/`.ios.ts`/`.web.ts`는 플랫폼별로 분리돼 있어서
-(components/WebMap.tsx/.web.tsx와 같은 패턴) Android·웹 번들에는 이 네이티브
-패키지가 아예 포함되지 않고, 기존 동작 그대로예요 — 이 기능이 깨는 건 오직
-"Expo Go로 켜는 것" 자체입니다.
-
-## Supabase 백엔드 세팅 (최초 1회)
-
-1. https://supabase.com → 프로젝트 생성 (Region: Seoul 권장, 무료 플랜)
-2. **SQL Editor** → `supabase/schema.sql` 전체 내용 붙여넣고 Run
-   - 테이블, RLS 정책, 카운터 트리거, `delete_account()` RPC가 모두 생성됩니다
-3. **Settings → API**에서 값 3개를 `.env`에 입력:
-   ```
-   EXPO_PUBLIC_SUPABASE_URL=...
-   EXPO_PUBLIC_SUPABASE_ANON_KEY=...
-   SUPABASE_SERVICE_ROLE_KEY=...   # 시드 스크립트 전용, 절대 앱에 배포하지 말 것
-   ```
-4. 초기 콘텐츠(장소/테마/포스트/버디) 시딩:
-   ```bash
-   npm run seed
-   ```
-   재실행해도 안전합니다 (장소/테마/포스트는 slug 기준 upsert, 버디는 이미 있으면 스킵).
-5. 앱을 재시작하면 Explore/Themes/Feed/Buddy가 실데이터로 전환됩니다.
-
-### 실제 장소 데이터 채우기
-
-**주 소스: Visit Seoul API 센터.** 서울관광재단이 2025-10-20 공개한 API로, 영문이
-기계번역이 아니라 원래 관광객 대상으로 작성된 콘텐츠라 품질이 좋고, 같은 콘텐츠를
-7개 언어로 연결 제공해서(`multi_lang_list`) 영문 이름/설명과 진짜 한국어 이름
-(`nameKo`, "직원에게 보여주기" 기능에 필요)을 한 소스에서 동시에 얻을 수 있습니다.
-TourAPI(한국관광공사)는 이제 보조 소스입니다 — 국문 전용이고 커버리지를 더 넓히고
-싶을 때 추가로 돌리는 용도.
-
-**1) Visit Seoul (주 소스)**
-
-1. https://api.visitseoul.net → 회원가입 → 마이페이지 → API 키 관리 → 발급 신청
-   (호출할 사이트 URL 등록 필요, 관리자 승인 소요시간 불명 — 바로 안 될 수 있음)
-2. Supabase SQL Editor에서 다음 실행 (사진 URL, source 구분, 영문 설명 컬럼 추가):
-   ```sql
-   -- migration-001-photos.sql 내용
-   -- migration-002-source.sql 내용
-   ```
-3. `.env`에 `VISITSEOUL_API_KEY` 입력
-4. 먼저 응답 구조를 확인 (공식 문서에 일부 필드가 명확히 안 나와 있어서, TourAPI 때처럼
-   추측하다 삽질하지 않기 위함):
-   ```bash
-   npm run import:visitseoul -- --discover
-   ```
-   출력된 카테고리 이름이 스크립트의 `CATEGORY_MAP`과 다르면 `scripts/import-visitseoul.ts`에서
-   맞춰준 뒤 진행하세요.
-5. 본 실행:
-   ```bash
-   npm run import:visitseoul
-   ```
-   `VISITSEOUL_MAX_PAGES`(기본 20)로 가져올 페이지 수를 조절할 수 있습니다. slug가
-   `vs-{cid}` 형식이라 재실행해도 안전합니다(upsert).
-
-**2) TourAPI (보조 소스, 선택)**
-
-1. https://www.data.go.kr → "한국관광공사" 검색 → **"한국관광공사_국문 관광정보
-   서비스_GW"** 활용신청 (보통 자동승인)
-2. `.env`에 `TOURAPI_SERVICE_KEY` 입력
-3. ```bash
-   npm run import:tourapi
-   ```
-   `TOURAPI_ROWS_PER_CATEGORY`(기본 40 × 5카테고리 = 200개)로 조절. 재실행 안전(upsert).
-
-**알아두면 좋은 점** (며칠간 삽질해서 확인한 내용, 둘 다 스크립트 헤더에도 적어둠):
-- TourAPI의 `detailCommon2`(설명 조회)는 **`contentId`만** 받습니다.
-  `contentTypeId`/`defaultYN`/`overviewYN`을 같이 보내면 에러 납니다.
-- TourAPI의 **영문 서비스(EngService2)는 국문 서비스와 완전히 별개의 데이터셋**입니다
-  (contentId 공간 자체가 다름 — 서로의 ID를 넣으면 결과 0건). 그래서 TourAPI로는
-  영문 매칭을 포기했고, 대신 Visit Seoul을 주 소스로 쓰는 이유이기도 합니다.
-- 둘 다 외국인 적합도 태그·K-콘텐츠 연결 정보는 제공하지 않습니다 — 이 앱만의 고유
-  데이터라서 수입된 장소는 전부 미검증 상태(false/빈값)로 들어가고, 실제 사용자
-  투표로 채워지는 구조입니다.
-- **무료 Papago 번역(openapi.naver.com)은 2024-02-29부로 종료됐습니다** — 다시
-  추천하지 말 것. 번역이 필요해지면 DeepL 무료(월 50만자)나 Google Cloud Translation
-  무료(월 50만자)가 현재 확인된 대안이고, NCP 유료 Papago는 품질은 최고지만 정확한
-  가격을 사용자가 직접 콘솔에서 확인해야 함 (100만자 단위 올림 과금이라 소량 작업도
-  최소 과금 단위가 적용될 수 있음).
-
-### 심사 필수 항목이 스키마/앱에 어떻게 반영됐는지
-
-| 요구사항 | 구현 위치 |
+| 기능 | 내용 |
 |---|---|
-| UGC 신고 (Guideline 1.2) | `reports` 테이블 + `components/ReportSheet.tsx` (Post/Buddy 상세 화면 "···" 버튼) |
-| 사용자 차단 (Guideline 1.2) | `blocks` 테이블 + RLS가 차단된 사용자의 글을 자동으로 숨김 |
-| 셀프 계정 삭제 (Guideline 5.1.1(v)) | `delete_account()` RPC + Settings → Account → Delete account |
-| 개인정보처리방침 / 이용약관 | Settings → About에서 링크 (현재 Claude Artifact에 게시됨 — 아래 참고) |
+| 장소 탐색 | 서울 장소 4,000여 곳의 영문 정보. 직원이나 택시 기사에게 보여줄 수 있는 한국어 이름 카드 |
+| Foreigner Fit | 혼자 방문 가능 여부, 카드 결제, 가격 표시, 영어 응대를 여행자 투표로 기록 |
+| 여행 일정 | 원하는 여행을 문장으로 입력하면 여러 날 일정을 생성하고, 대화로 수정 |
+| 가이드 | 교통, 결제, 에티켓, 축제, K-콘텐츠 촬영지 등 29종 |
+| 피드 | 질문, 일정 공유, 신고·차단 |
 
-**⚠️ 법적 문서 관련 확인 필요:**
-- `app/settings.tsx`와 `app/auth.tsx`에 걸린 개인정보처리방침/이용약관/커뮤니티
-  가이드라인 링크는 임시로 Claude Artifact 페이지입니다. **Artifact는 기본 비공개**이므로,
-  Apple 심사관이 접근할 수 있도록 각 페이지에서 **공유(Share) 설정**을 켜주세요.
-  장기적으로는 실제 도메인(예: trip-korea.app)으로 옮기는 것을 권장합니다.
-- 문서 안에 `[Your Legal Entity Name]` 같은 플레이스홀더가 있습니다 — 실제 사업자명/
-  연락처로 교체하고, 정식 서비스 전 변호사 검토를 받으세요. (지금 문서는 표준적인
-  스타트업 템플릿 수준이며 법률 자문이 아닙니다.)
+## 기술 스택
 
-## 출시 (EAS Build / Submit)
-
-Xcode 없이도 클라우드에서 앱스토어용 빌드가 가능합니다.
-
-```bash
-npm install -g eas-cli
-eas login                     # Expo 계정 (무료 가입)
-eas init                      # 이 프로젝트를 EAS 프로젝트에 연결
-```
-
-`eas.json`의 `submit.production.ios` 값을 채워주세요:
-```json
-"appleId": "본인 Apple ID 이메일",
-"ascAppId": "App Store Connect 앱 고유 ID",
-"appleTeamId": "Apple Developer Team ID"
-```
-(App Store Connect에서 앱을 먼저 하나 만들어야 `ascAppId`가 생깁니다. `eas submit`을
-처음 실행하면 대화형으로 이 값들을 자동으로 채워주기도 합니다.)
-
-```bash
-eas build --platform ios --profile production    # 클라우드 빌드 (~15-20분)
-eas submit --platform ios --latest                # 빌드 결과물을 App Store Connect에 업로드
-```
-
-이후 App Store Connect 웹에서: 스크린샷 업로드, 앱 설명 작성, 심사 제출.
-UGC 앱이므로 **App Review 정보**란에 "Report/Block은 게시글 상세의 ··· 버튼,
-계정 삭제는 설정 화면에 있습니다"라고 적어두면 심사가 빨라집니다.
-
-**Apple Developer 계정 관련**: 사업자 계정은 D-U-N-S 번호 처리로 몇 주 걸릴 수
-있습니다. 개인 계정(연 $99, 즉시 승인)으로 먼저 출시하고 나중에 이관하는 것을
-권장합니다.
+| 영역 | 사용 기술 |
+|---|---|
+| 앱 | Expo SDK 54, React Native 0.81, React 19, TypeScript, expo-router |
+| 백엔드 | Supabase: PostgreSQL, Auth, Storage, Edge Functions (Deno) |
+| AI | OpenAI API (구조화 출력), Apple Foundation Models (`@react-native-ai/apple`) |
+| 지도 | 네이버 지도 (WebView), 네이버 지역 검색 |
+| 외부 데이터 | 서울관광 API, 한국관광공사 TourAPI, 기상청 단기·중기 예보, 한국천문연구원 특일 정보 |
+| 빌드·운영 | EAS Build, GitHub Actions |
 
 ## 구조
 
 ```
-app/                    expo-router 라우트
-  (tabs)/               5개 탭
-  auth.tsx              로그인/회원가입
-  place|theme|post|buddy|creator/[…].tsx   상세 화면
-  planner.tsx           여정 플래너
-  compose.tsx           글/버디 작성
-  settings.tsx          설정 + 계정 삭제
-components/             Icon·ui·cards·base·ExploreMap·ReportSheet
-theme/                  디자인 토큰 + ThemeProvider
-data/                   타입 + 시드 데이터(data.jsx 이식) + remote.ts(Supabase 매핑)
-lib/
-  store.tsx             앱 상태 (저장/업보트/참여/팔로우/여정) — 로컬 캐시 + Supabase 동기화
-  auth.tsx              인증 상태
-  remoteData.tsx        원격 콘텐츠 로딩 + 로컬 폴백
-  supabase.ts           Supabase 클라이언트
-supabase/schema.sql     DB 스키마 + RLS + 트리거 + delete_account()
-scripts/
-  seed.ts               초기 콘텐츠 시딩 (service role key 필요)
-  gen-assets.mjs         앱 아이콘/스플래시 생성 스크립트
+iOS 앱 (Expo)                    Supabase                         외부 API
+ ├ 화면 (app/)          ──공개 키──▶  PostgreSQL (테이블 20개, RLS)
+ ├ 도메인 로직 (lib/)       + RLS    Auth · Storage
+ └ 기기 내 AI                        Edge Functions  ──비밀 키──▶  OpenAI, 기상청,
+                                                                  관광 API, 네이버
+                                            ▲
+                         GitHub Actions ────┘ 데이터 갱신 · 백업
 ```
+
+- 외부 API 키는 Edge Function secret에만 두고, 앱에는 Supabase 공개(anon) 키만 넣었습니다.
+- 서버에 연결할 수 없을 때는 앱에 내장된 기본 데이터로 동작합니다.
+
+## 폴더
+
+```
+app/                 화면 (expo-router). 탭 4개(탐색·테마·피드·마이) + 상세 화면
+components/          공통 UI, 바텀시트
+lib/                 도메인 로직
+  dayPlan.ts         하루 일정 생성, 장소 점수 계산
+  tripPlan.ts        여러 날 일정 생성 (지역 배정, 항공 시간 반영)
+  tripIntake.ts      문장 → 일정 조건 (trip-intake 호출)
+  tripChat.ts        대화형 수정 (trip-chat 호출)
+  tripEdit.ts        장소 교체·삭제·추가
+  prominence.ts      장소 등급 S/A/B
+  foundationModels.ios.ts   기기 내 AI
+data/                타입, 가이드 원본(seed.ts), Supabase 읽기·쓰기
+scripts/             데이터 수집·정제·백필 스크립트
+supabase/
+  schema.sql, migration-*.sql   스키마와 마이그레이션
+  functions/         Edge Functions 11개
+docs/                운영 문서
+```
+
+## AI 사용 방식
+
+- **문장으로 일정 만들기 (`trip-intake`)**: 사용자 문장을 분위기·관심사·속도·제외 항목으로 변환합니다. 값은 앱이 정한 목록 안에서만 고르도록 JSON Schema strict 모드를 씁니다.
+- **대화로 일정 수정 (`trip-chat`)**: 요청을 `replace / remove / add / regenerate_day / set_vibe` 명령으로 변환합니다.
+- **장소 선택은 AI가 하지 않습니다.** AI는 조건과 명령만 반환하고, 실제 장소는 `lib/dayPlan.ts`와 `lib/tripEdit.ts`가 DB에 있는 장소 중에서 고릅니다. 모르는 장소 ID가 오면 버립니다. 그래서 존재하지 않는 장소가 추천되지 않습니다.
+- **기기 내 AI**: 점수 차이가 작은 후보만 Apple Foundation Models가 다시 고릅니다. 지원하지 않는 기기에서는 기존 결과를 그대로 씁니다.
+- **데이터 보강 (`place-blurb`, `place-fit`)**: 앱에서 호출하지 않고 배치 스크립트로만 실행합니다. 태그는 장소 설명에 근거가 있을 때만 반영합니다.
+- **비용 제한**: IP당 1분 12회 호출 제한과 OpenAI 계정 월 사용 한도를 걸어 두었습니다.
+
+## 데이터
+
+- 장소: 서울관광 API(영문·한국어 이름 연결)와 TourAPI에서 수집한 뒤 정제했습니다. 음식점 세부 분류는 네이버 지역 검색으로 보완했는데, 좌표 차이가 150m 이내인 결과만 반영했습니다.
+- 자동 갱신 (GitHub Actions): 매일 종료된 행사를 정리하고, 매주 전체를 다시 수집하고, DB를 주 1회 백업합니다.
+
+## 보안
+
+- 모든 테이블에 RLS를 적용했습니다. 정책 코드만 보지 않고 익명 키로 직접 조회해 점검했습니다 (`supabase/migration-030-rls-audit-fixes.sql`).
+- 투표 합계는 공개하고, 누가 투표했는지는 본인만 볼 수 있습니다.
+- 서버 전용 함수는 내부 토큰으로 호출자를 확인합니다.
+
+## 실행
+
+```bash
+npm install
+cp .env.example .env     # 개발용 Supabase 키 입력
+npx expo start           # 네이티브 모듈을 쓰므로 Expo Go가 아닌 dev client 필요
+npx tsc --noEmit         # 타입 검사
+```
+
+데이터 수집, Edge Function 배포, 빌드·제출 명령은 [PROJECT.md](PROJECT.md)에 정리했습니다.
+
+## 문서
+
+- [PROJECT.md](PROJECT.md): 프로젝트 전체 설명 (영문)
+- [docs/OPERATIONS.md](docs/OPERATIONS.md): 데이터 파이프라인과 운영
+- [appstore-submission-checklist.md](appstore-submission-checklist.md): App Store 제출 절차와 심사 기록
